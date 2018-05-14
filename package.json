@@ -1,0 +1,31 @@
+{
+  "name": "disc-electron",
+  "version": "0.0.1",
+  "description": "An Electron version of the DISC application.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "repository": "",
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "electron": "^2.0.0",
+    "electron-builder": "^20.13.3"
+  },
+  "dependencies": {
+    "sql.js": "^0.4.0"
+  },
+  "build": {
+    "asar": true,
+    "appId": "disc.app",
+    "mac": {
+      "category": "disc.app"
+    },
+    "nsis": {
+      "oneClick": false
+    }
+  }
+}
