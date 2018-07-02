@@ -16,7 +16,8 @@
     "electron-builder": "^20.13.3"
   },
   "dependencies": {
-    "sql.js": "^0.4.0"
+    "sql.js": "^0.4.0",
+    "wkhtmltopdf": "^0.3.4"
   },
   "build": {
     "asar": true,

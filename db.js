@@ -6,7 +6,11 @@ $(document).on('click', 'a[href^="http"]', function(event) {
     shell.openExternal(this.href);
 });
 
+const ipc = nodeRequire('electron').ipcRenderer;
 
+function generateReport() {
+  ipc.send('print-to-pdf');
+}
 
 const electron = nodeRequire('electron');
 const app = electron.app;
