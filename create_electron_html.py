@@ -26,6 +26,7 @@ copyfile('static_qed/hwbi/disc/css/jquery-ui.min.css', 'disc_app_electron/static
 copyfile('static_qed/hwbi/disc/js/jquery-ui.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-ui.min.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-app.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-report-v2.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-report-v2.js')
+copyfile('static_qed/hwbi/disc/js/jquery-3.3.1.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-3.3.1.min.js')
 
 copyfile('static_qed/hwbi/disc/img/connection_to_nature.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/connection_to_nature.jpg')
 copyfile('static_qed/hwbi/disc/img/cultural_fulfillment.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/cultural_fulfillment.jpg')
