@@ -6,7 +6,11 @@ $(document).on('click', 'a[href^="http"]', function(event) {
     shell.openExternal(this.href);
 });
 
+const ipc = nodeRequire('electron').ipcRenderer;
 
+function generateReport() {
+  ipc.send('print-to-pdf');
+}
 
 const electron = nodeRequire('electron');
 const app = electron.app;
@@ -169,9 +173,48 @@ function getScoreData() {
 
 function getScoreDataAJAXCall(location){
   var data = {};
-  var services = get_baseline_scores(location.state, location.county); //services
-  var domains = get_domains(); //domains
-  data.outputs = hwbi_run(services, domains);//outputs
+  //var services = get_baseline_scores(location.state, location.county); //services
+  //var domains = get_domains(); //domains
+  //data.outputs = hwbi_run(services, domains);//outputs
+
+  var indicators = getIndicatorDataForCounty(location.state_abbr, location.county);
+  for (var domain in discDomains) {
+    var sum = 0;
+    var count = 0;
+    for (var index in discDomains[domain]) {
+      for (var i = 0; i < discDomains[domain][index].length; i++) {        
+        if (indicators.hasOwnProperty(discDomains[domain][index][i])) {
+          if (indicators[discDomains[domain][index][i]].hasOwnProperty("score")) {
+            sum += indicators[discDomains[domain][index][i]].score;
+            count++;
+          }
+        }
+
+      }
+    }
+
+    discDomains[domain].score = (count === 0 ? 0 : sum / count);
+  }
+
+  data.outputs = {"domains" : [] };
+  data.outputs.domains.push({ "score" : discDomains["built environment"].score, weight: 1, description: "Built Environment" });
+  data.outputs.domains.push({ "score" : discDomains["community involvement"].score, weight: 1, description: "Community Involvement" });
+  data.outputs.domains.push({ "score" : discDomains["education"].score, weight: 1, description: "Education" });
+  data.outputs.domains.push({ "score" : discDomains["health"].score, weight: 1, description: "Health" });
+  data.outputs.domains.push({ "score" : discDomains["environmental resource management"].score, weight: 1, description: "Environmental Resource Management" });
+  data.outputs.domains.push({ "score" : discDomains["hazard vulnerability"].score, weight: 1, description: "Hazard Vulnerability" });
+  data.outputs.domains.push({ "score" : discDomains["local economy"].score, weight: 1, description: "Local Economy" });
+  data.outputs.domains.push({ "score" : discDomains["resilience planning"].score, weight: 1, description: "Resilience Planning" });
+  data.outputs.domains.push({ "score" : discDomains["local culture"].score, weight: 1, description: "Local Culture" });
+  data.outputs.domains.push({ "score" : discDomains["safety and security"].score, weight: 1, description: "Safety and Security" });
+
+  data.outputs.hwbi = 0;
+  for (var i = 0; i < data.outputs.domains.length; i++) {
+    data.outputs.hwbi += data.outputs.domains[i].score;
+  }
+
+  data.outputs.hwbi /= data.outputs.domains.length;
+
   var state_domains = get_domain_scores_state(location.state_abbr); //state_domains
 
   for (var i = 0; i < state_domains.length; i++) {
@@ -192,8 +235,8 @@ function getScoreDataAJAXCall(location){
   }
 
   data.outputs.nationhwbi = 52.7943325;
-  data.outputs.services = services;
-  data.outputs.statehwbi = get_state_details(location.state)[2];
+  //data.outputs.services = services;
+  //data.outputs.statehwbi = get_state_details(location.state)[2];
 
   // build inputs
   var inputs = [];
@@ -456,4 +499,47 @@ function getComparisonData() {
   }
   displayCompareData();
   $('.compare-search-button').eq(communityNumber).removeClass('searching');
+}
+
+function getStateIndicators(state = "") {
+  if (state === "") {
+    return {};
+  }
+  var indicators = [];
+  var stmt = db.prepare("SELECT Indicators_County.indicator, Indicators_County.score, Counties.stateID " +
+    "FROM Indicators_County INNER JOIN Counties ON Indicators_County.county_FIPS == Counties.county_FIPS " +
+    "WHERE Counties.stateID ==?;");
+  stmt.bind([state]);
+
+  while (stmt.step()) {
+    var row = stmt.get();
+    var indicator = {};
+    indicator.indicator = row[0];
+    indicator.score = row[1];
+    indicator.stateID = row[2];
+    indicators.push(indicator);
+  }
+  return indicators;
+}
+
+function getIndicatorDataForCounty(state = "", county = ""){
+  if (state === "" || county === "") {
+    return {};
+  }
+  var indicators = {};
+  var stmt = db.prepare("SELECT Indicators_County.indicator, Indicators_County.score, Indicators_County.county_FIPS, Counties.county, Counties.stateID " +
+    "FROM Indicators_County INNER JOIN Counties ON Indicators_County.county_FIPS == Counties.county_FIPS " +
+    "WHERE Counties.county ==? AND Counties.stateID ==?;");
+  stmt.bind([county, state]);
+
+  while (stmt.step()) {
+    var row = stmt.get();
+    var indicator = {};
+    indicator.county = row[3];
+    indicator.indicator = row[0];
+    indicator.score = row[1];
+    indicator.stateID = row[4];
+    indicators[row[0]] = indicator;
+  }
+  return indicators;
 }
