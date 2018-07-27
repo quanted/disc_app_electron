@@ -186,9 +186,7 @@ function getScoreDataAJAXCall(location){
         if (indicators.hasOwnProperty(discDomains[domain][index][i].toLowerCase())) {
           if (indicators[discDomains[domain][index][i]].hasOwnProperty("score")) {
             var score = indicators[discDomains[domain][index][i]].score;
-            if (index === "crsi") {
-              score *= 100;
-            }
+            
             sum += score;
             count++;
           }
@@ -529,6 +527,9 @@ function getIndicatorsForCounty(state = "", county = ""){
     indicator.county = row[3];
     indicator.indicator = row[0];
     indicator.score = row[1];
+    if (indicator.score <= 1 && indicator.score >= 0) {
+      indicator.score *= 100
+    }
     indicator.stateID = row[4];
     indicators[row[0].toLowerCase()] = indicator;
   }
