@@ -111,7 +111,7 @@ function getIndicatorDataAJAXCall(location) {
   inputs.push(meta_county);
   data.inputs = inputs;
 
-  var indicators = getIndicatorsForCounty(location.state.abbr, location.county);
+  var indicators = getIndicatorsForCounty(location.state_abbr, location.county);
   data.outputs = indicators;
 
   return data;
