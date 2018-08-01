@@ -156,12 +156,12 @@ function getScoreData() {
       }
   }
   var location = JSON.parse(location_data);
-  $('#community-snapshot-tab-link').trigger("click");
   data = JSON.stringify(getScoreDataAJAXCall(location));
 
   locationValue = location;
   // zeroScoreData();
   setScoreData(data);
+  $('#community-snapshot-tab-link').trigger("click");
   setCompareData(data, 0);
   displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
   $('#customize_location').html(location.county + " County, " + location.state);
@@ -193,8 +193,12 @@ function getScoreDataAJAXCall(location){
         }
       }
     }
-
+    
     discDomains[domain].score = (count === 0 ? 0 : sum / count);
+    if (discDomains[domain].score == 0) {
+      toast("No data found for " + location.county + " County, " + location.state)
+      return;
+    }
   }
 
   data.outputs = {"domains" : [] };
