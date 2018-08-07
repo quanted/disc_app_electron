@@ -155,7 +155,10 @@ function getScoreData() {
           return "";
       }
   }
-  var location = JSON.parse(location_data);
+
+  
+
+  try {var location = JSON.parse(location_data); } catch(err) {toast("Results already being shown.");}
   data = JSON.stringify(getScoreDataAJAXCall(location));
 
   locationValue = location;
@@ -176,7 +179,6 @@ function getScoreData() {
 
 function getScoreDataAJAXCall(location){
   var data = {};
-
   var indicators = getIndicatorsForCounty(location.state_abbr, location.county);
   for (var domain in discDomains) {
     var sum = 0;
@@ -473,6 +475,7 @@ function getComparisonData() {
   var location = {};
   location["county"] = county;
   location["state"] = state;
+  location["state_abbr"] = state_abbr;
 
   $('.compare-search-button').eq(communityNumber).addClass('searching');
   $('.compare-search-error').hide();
@@ -539,3 +542,4 @@ function getIndicatorsForCounty(state = "", county = ""){
   }
   return indicators;
 }
+
