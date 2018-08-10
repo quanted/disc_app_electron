@@ -42,6 +42,7 @@ copyfile('static_qed/hwbi/disc/img/safety.jpg', 'disc_app_electron/static_qed/hw
 copyfile('static_qed/hwbi/disc/img/social_cohesion.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social_cohesion.jpg')
 copyfile('static_qed/hwbi/disc/img/loader.gif', 'disc_app_electron/static_qed/hwbi/disc/img/loader.gif')
 copyfile('static_qed/hwbi/disc/img/rainbow_need_to_replace.png', 'disc_app_electron/static_qed/hwbi/disc/img/rainbow_need_to_replace.png')
+copyfile('static_qed/hwbi/disc/img/searchdark.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchdark.png')
 
 copyfile('hwbi_app/hwbi_db.sqlite3', 'disc_app_electron/hwbi_app/hwbi_db.sqlite3')
 
