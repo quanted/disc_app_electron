@@ -7,10 +7,8 @@ $(document).on('click', 'a[href^="http"]', function(event) {
 });
 
 $('#search_field').keypress(function(event){
-
   if (event.keyCode === 13) 
       event.preventDefault();
-
 });
 
 const ipc = nodeRequire('electron').ipcRenderer;
@@ -92,38 +90,6 @@ if (db === null) {
   }
 }
 
-function getIndicatorData() {
-  var location = locationValue;
-  var data = getIndicatorDataAJAXCall(location);
-  hwbi_indicator_data = data;
-  setIndicatorSliders();
-}
-
-function getIndicatorDataAJAXCall(location) {
-  var data = {};
-
-  // build inputs
-  var inputs = [];
-  var meta_state = {
-    'name': 'state',
-    'value': location.state,
-    'description': 'US State'
-  };
-  var meta_county = {
-    'name': 'county',
-    'value': location.county,
-    'description': 'County'
-  };
-  inputs.push(meta_state);
-  inputs.push(meta_county);
-  data.inputs = inputs;
-
-  var indicators = getIndicatorsForCounty(location.state_abbr, location.county);
-  data.outputs = indicators;
-
-  return data;
-}
-
 function get_county_indicator_data (state = "", county = ""){
   if (state === "" || county === "") {
     return [];
@@ -152,23 +118,20 @@ function get_county_indicator_data (state = "", county = ""){
 }
 
 function getScoreData() {
-  var location_data = locationValue.toString();
+  var location_data = locationValue;
   if (location_data === "{}") {
       var locationCookie = getCookie("EPAHWBIDISC");
       if (locationCookie !== "") {
           location_data = locationCookie;
       }
       else {
-          return "";
+        return "";
       }
   }
-
-  
-
-  try {var location = JSON.parse(location_data); } catch(err) {toast("Results already being shown.");}
+  var location = JSON.parse(location_data);
   data = JSON.stringify(getScoreDataAJAXCall(location));
 
-  locationValue = location;
+  locationValue = JSON.stringify(location);
   // zeroScoreData();
   setScoreData(data);
   $('#community-snapshot-tab-link').trigger("click");
@@ -176,7 +139,7 @@ function getScoreData() {
   displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
   $('#customize_location').html(location.county + " County, " + location.state);
   hwbi_disc_data = JSON.parse(data);
-  setTimeout(getIndicatorData, 1200);
+  setIndicatorSliders();
   hwbi_indicator_value_adjusted = {};
   setCookie('EPAHWBIDISC', location_data, 0.5);
   $('html, body').animate({
@@ -186,56 +149,16 @@ function getScoreData() {
 
 function getScoreDataAJAXCall(location){
   var data = {};
-  var indicators = getIndicatorsForCounty(location.state_abbr, location.county);
-  for (var domain in discDomains) {
-    var sum = 0;
-    var count = 0;
-    for (var index in discDomains[domain]) {
-      for (var i = 0; i < discDomains[domain][index].length; i++) {        
-        if (indicators.hasOwnProperty(discDomains[domain][index][i].toLowerCase())) {
-          if (indicators[discDomains[domain][index][i]].hasOwnProperty("score")) {
-            var score = indicators[discDomains[domain][index][i]].score;
-            
-            sum += score;
-            count++;
-          }
-        }
-      }
-    }
-    
-    discDomains[domain].score = (count === 0 ? 0 : sum / count);
-    if (discDomains[domain].score == 0) {
-      toast("No data found for " + location.county + " County, " + location.state)
-      return;
-    }
-  }
+  data.outputs = getIndicatorsForCounty(location.state_abbr, location.county);
 
-  data.outputs = {"domains" : [] };
-  data.outputs.domains.push({ "score" : discDomains["built environment"].score, weight: 1, description: "Built Environment", domainID : 'environment' });
-  data.outputs.domains.push({ "score" : discDomains["community involvement"].score, weight: 1, description: "Community Involvement", domainID : 'community' });
-  data.outputs.domains.push({ "score" : discDomains["education"].score, weight: 1, description: "Education", domainID : 'Education' });
-  data.outputs.domains.push({ "score" : discDomains["health"].score, weight: 1, description: "Health", domainID : 'Health' });
-  data.outputs.domains.push({ "score" : discDomains["environmental resource management"].score, weight: 1, description: "Environmental Resource Management", domainID : 'resource-mgmt' });
-  data.outputs.domains.push({ "score" : discDomains["hazard vulnerability"].score, weight: 1, description: "Hazard Vulnerability", domainID : 'hazard' });
-  data.outputs.domains.push({ "score" : discDomains["local economy"].score, weight: 1, description: "Local Economy", domainID : 'economy' });
-  data.outputs.domains.push({ "score" : discDomains["resilience planning"].score, weight: 1, description: "Resilience Planning", domainID : 'resilience' });
-  data.outputs.domains.push({ "score" : discDomains["local culture"].score, weight: 1, description: "Local Culture", domainID : 'culture' });
-  data.outputs.domains.push({ "score" : discDomains["safety and security"].score, weight: 1, description: "Safety and Security", domainID : 'safety' });
+  hwbi_indicator_data = formatIndicatorData(setIndicatorData(JSON.stringify(data)));
 
-  data.outputs.hwbi = 0;
-  for (var i = 0; i < data.outputs.domains.length; i++) {
-    data.outputs.hwbi += data.outputs.domains[i].score;
-  }
-
-  data.outputs.hwbi /= data.outputs.domains.length;
-
-  data.outputs.nationhwbi = 52.7943325;
-
+  data = formatDomainData(data);
   // build inputs
   var inputs = [];
   var meta_state = {
     'name': 'state',
-    'value': location.state ,
+    'value': location.state,
     'description': 'US State'
   };
   var meta_county = {
@@ -525,7 +448,7 @@ function getIndicatorsForCounty(state = "", county = ""){
   if (state === "" || county === "") {
     return {};
   }
-  var indicators = {};
+  var indicators = [];
 
   var stmt = db.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
     "FROM CountyIndicatorScores " +
@@ -541,12 +464,8 @@ function getIndicatorsForCounty(state = "", county = ""){
     indicator.county = row[3];
     indicator.indicator = row[0];
     indicator.score = row[1];
-    if (indicator.score <= 1 && indicator.score >= 0) {
-      indicator.score *= 100
-    }
     indicator.stateID = row[4];
-    indicators[row[0].toLowerCase()] = indicator;
+    indicators.push(indicator);
   }
   return indicators;
 }
-
