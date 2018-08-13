@@ -44,7 +44,7 @@ copyfile('static_qed/hwbi/disc/img/loader.gif', 'disc_app_electron/static_qed/hw
 copyfile('static_qed/hwbi/disc/img/rainbow_need_to_replace.png', 'disc_app_electron/static_qed/hwbi/disc/img/rainbow_need_to_replace.png')
 copyfile('static_qed/hwbi/disc/img/searchdark.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchdark.png')
 
-copyfile('hwbi_app/hwbi_db.sqlite3', 'disc_app_electron/hwbi_app/hwbi_db.sqlite3')
+copyfile('hwbi_app/hwbi_db_v2.sqlite3', 'disc_app_electron/hwbi_app/hwbi_db_v2.sqlite3')
 
 
 temp_google_key = 'AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g'

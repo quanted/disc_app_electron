@@ -56,12 +56,12 @@ let dbPath;
 //console.log(fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3')));
 //console.log(fs.existsSync(path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db.sqlite3')));
 
-if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3'))) {
-  dbPath = path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3'); //Not built
-} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3'))) {
-  dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3'); //Built but not ASAR
+if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
+  dbPath = path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'); //Not built
+} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'))) {
+  dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'); //Built but not ASAR
 } else {
-  dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db.sqlite3'); //ASAR packaged
+  dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3'); //ASAR packaged
 }
 
 console.log(dbPath);
