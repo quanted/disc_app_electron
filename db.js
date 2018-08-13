@@ -6,10 +6,7 @@ $(document).on('click', 'a[href^="http"]', function(event) {
     shell.openExternal(this.href);
 });
 
-$('#search_field').keypress(function(event){
-  if (event.keyCode === 13) 
-      event.preventDefault();
-});
+
 
 const ipc = nodeRequire('electron').ipcRenderer;
 
