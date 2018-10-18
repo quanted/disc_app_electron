@@ -43,7 +43,7 @@ function createWindow () {
   }));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -81,17 +81,37 @@ app.on('activate', function () {
 const ipc = electron.ipcMain;
 const fs = require('fs');
 const shell = electron.shell;
+const {dialog} = require('electron');
 ipc.on('print-to-pdf', function (event) {
   const pdfPath = path.join(__dirname, '/print.pdf');
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF({printBackground: true, landscape: true}, function (error, data) {
     if (error) throw error
-    fs.writeFile(pdfPath, data, function (error) {
-      if (error) {
-        throw error;
+    dialog.showSaveDialog(
+    {
+      filters: [
+        {
+          name: 'Adobe PDF',
+          extensions: ['pdf']
+        }
+      ]
+    },
+    function (fileNames) {
+      if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+        console.log("No file selected");
+      } else {
+        if(!fileNames.endsWith(".pdf")) {
+          fileNames += ".pdf";
+        }
+        fs.writeFile(fileNames, data, function (error) {
+          if (error) {
+            throw error;
+          }
+          console.log(fileNames);
+          shell.openExternal('file://' + fileNames);
+          event.sender.send('wrote-pdf', fileNames);
+        });
       }
-      shell.openExternal('file://' + pdfPath);
-      event.sender.send('wrote-pdf', pdfPath);
     });
   });
 });
