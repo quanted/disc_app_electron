@@ -12,8 +12,8 @@
   "author": "",
   "license": "",
   "devDependencies": {
-    "electron": "^2.0.0",
-    "electron-builder": "^20.13.3"
+    "electron": "^3.0.0",
+    "electron-builder": "^20.28.4"
   },
   "dependencies": {
     "sql.js": "^0.4.0",
@@ -22,6 +22,7 @@
   "build": {
     "asar": true,
     "appId": "disc.app",
+    "productName": "Decision Integration for Strong Communities",
     "mac": {
       "category": "disc.app"
     },
