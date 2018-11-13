@@ -63,7 +63,9 @@ html += render_to_string('disc/drupal_2017/03epa_drupal_section_title_generic.ht
     'HEADER': 'Conceptual Decision Integration for Strong Communities',
     "electron": electron
 })
-body = render_to_string('disc/hwbi-disc-app-body.html') # Modify
+body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify
+body += render_to_string('disc/hwbi-disc-app-body2.html') # Modify
+body += render_to_string('disc/hwbi-disc-app-body3.html') # Modify
 html += body
 html += render_to_string('disc/drupal_2017/10epa_drupal_footer.html', {
     'electron': electron
