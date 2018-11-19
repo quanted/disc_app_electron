@@ -358,7 +358,7 @@ object {
   }
   body {
     font-size: 100%;
-    line-height: 1.5;
+    /*line-height: 1.5;*/
   }
   aside .pane-content {
     font-size: 88.2353%;
@@ -1098,9 +1098,9 @@ fieldset.filter-wrapper {
 .main-nav > .nav__inner,
 .masthead,
 .secondary-nav {
-  margin: 0 auto;
+  margin: 0;
   max-width: 35em;
-  padding: 0 1em;
+  /*padding: 0 1em;*/
 }
 @media screen and (min-width: 35em), print and (min-width: 35em) {
   .main-nav > .nav__inner,

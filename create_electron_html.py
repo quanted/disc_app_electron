@@ -46,6 +46,14 @@ copyfile('static_qed/hwbi/disc/img/searchdark.png', 'disc_app_electron/static_qe
 
 copyfile('hwbi_app/hwbi_db_v2.sqlite3', 'disc_app_electron/hwbi_app/hwbi_db_v2.sqlite3')
 
+copyfile('static_qed/hwbi/disc/css/mainstyle.css', 'disc_app_electron/static_qed/hwbi/disc/css/mainstyle.css')
+copyfile('static_qed/hwbi/disc/img/epa2.gif', 'disc_app_electron/static_qed/hwbi/disc/img/epa2.gif')
+copyfile('static_qed/hwbi/disc/img/epawhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/epawhite.png')
+copyfile('static_qed/hwbi/disc/img/searchblack.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchblack.png')
+copyfile('static_qed/hwbi/disc/img/searchwhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchwhite.png')
+copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
+
+
 
 temp_google_key = 'AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g'
 electron = True
@@ -54,22 +62,24 @@ html = render_to_string('disc/drupal_2017/01epa_drupal_header.html', {
     'title': 'Conceptual Decision Integration for Strong Communities',
     'electron': electron
 })
-html += render_to_string('disc/drupal_2017/02epa_drupal_header_bluestripe.html', {
+""" html += render_to_string('disc/drupal_2017/02epa_drupal_header_bluestripe.html', {
     'electron': electron
-})
+})  """
 imports = render_to_string('disc/hwbi-disc-app-imports.html', {'API_KEY': temp_google_key}) # Modify?
 html += imports
-html += render_to_string('disc/drupal_2017/03epa_drupal_section_title_generic.html', {
+""" html += render_to_string('disc/drupal_2017/03epa_drupal_section_title_generic.html', {
     'HEADER': 'Conceptual Decision Integration for Strong Communities',
     "electron": electron
-})
-body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify
-body += render_to_string('disc/hwbi-disc-app-body2.html') # Modify
-body += render_to_string('disc/hwbi-disc-app-body3.html') # Modify
+}) """
+# body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify (tabs)
+body = render_to_string('disc/mainpage.html')
+body += render_to_string('disc/hwbi-disc-app-body2.html') # Modify (tab content)
+body += render_to_string('disc/content-wrapper.html')
+# body += render_to_string('disc/hwbi-disc-app-body3.html') # Modify 
 html += body
-html += render_to_string('disc/drupal_2017/10epa_drupal_footer.html', {
+""" html += render_to_string('disc/drupal_2017/10epa_drupal_footer.html', {
     'electron': electron
-})
+}) """
 #print(html)
 #f = open('disc_app_electron/templates_qed/hwbi/disc/index.html', 'w')
 f = open('disc_app_electron/index.html', 'w')
