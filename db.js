@@ -131,6 +131,7 @@ function getScoreData() {
   locationValue = JSON.stringify(location);
   // zeroScoreData();
   setScoreData(data);
+  show('mainpage', 'homepage');
   $('#community-snapshot-tab-link').trigger("click");
   setCompareData(data, 0);
   displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
@@ -140,7 +141,7 @@ function getScoreData() {
   hwbi_indicator_value_adjusted = {};
   setCookie('EPAHWBIDISC', location_data, 0.5);
   $('html, body').animate({
-      scrollTop: $('#disc-tabs').offset().top
+      //scrollTop: $('#disc-tabs').offset().top
   }, 'slow');
 }
 

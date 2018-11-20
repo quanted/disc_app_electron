@@ -27,6 +27,8 @@ copyfile('static_qed/hwbi/disc/js/jquery-ui.min.js', 'disc_app_electron/static_q
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-app.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-report-v2.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-report-v2.js')
 copyfile('static_qed/hwbi/disc/js/jquery-3.3.1.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-3.3.1.min.js')
+copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
+
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')
 
@@ -51,8 +53,6 @@ copyfile('static_qed/hwbi/disc/img/epa2.gif', 'disc_app_electron/static_qed/hwbi
 copyfile('static_qed/hwbi/disc/img/epawhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/epawhite.png')
 copyfile('static_qed/hwbi/disc/img/searchblack.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchblack.png')
 copyfile('static_qed/hwbi/disc/img/searchwhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchwhite.png')
-copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
-
 
 
 temp_google_key = 'AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g'
@@ -74,7 +74,9 @@ html += imports
 # body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify (tabs)
 body = render_to_string('disc/mainpage.html')
 body += render_to_string('disc/hwbi-disc-app-body2.html') # Modify (tab content)
-body += render_to_string('disc/content-wrapper.html')
+body += render_to_string('disc/content-wrapper.html', {
+    'electron': electron
+})
 # body += render_to_string('disc/hwbi-disc-app-body3.html') # Modify 
 html += body
 """ html += render_to_string('disc/drupal_2017/10epa_drupal_footer.html', {
