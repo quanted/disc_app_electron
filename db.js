@@ -1,3 +1,5 @@
+var dragVal = {};
+
 var shell = nodeRequire('electron').shell;
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
@@ -64,6 +66,7 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
 console.log(dbPath);
 fs.existsSync(dbPath);
 let db = SQL.dbOpen(dbPath);
+let dbOLD = SQL.dbOpen(path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old"));
 
 if (db === null) {
   /* The file doesn't exist so create a new database. */
@@ -137,6 +140,23 @@ function getScoreData() {
   displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
   $('#customize_location').html(location.county + " County, " + location.state);
   hwbi_disc_data = JSON.parse(data);
+
+  //draw aster plot 
+  drawPieChart(hwbi_disc_data.outputs.domains);
+
+
+  // Set service slider values
+  dragVal.services = hwbi_disc_data.outputs.services;
+  for (var i = 0; i < hwbi_disc_data.outputs.services.length; i++) {
+    var services = hwbi_disc_data.outputs.services;
+    var $ele =  $('#' + services[i].name);
+    var val = services[i].score;
+    $ele.val(val);
+    $ele.prev().html("<span>: " + round(val, 0) + "</span>");
+  }
+
+
+
   setIndicatorSliders();
   hwbi_indicator_value_adjusted = {};
   setCookie('EPAHWBIDISC', location_data, 0.5);
@@ -144,6 +164,25 @@ function getScoreData() {
       //scrollTop: $('#disc-tabs').offset().top
   }, 'slow');
 }
+
+// Service listeners
+$('.thumb').on('change', function() {
+  console.log("change");
+  var ele = $(this);
+  var val = ele.val();
+  for (var i = 0; i < dragVal.services.length; i++) {
+    if (dragVal.services[i].name === ele.attr('id')) {
+      dragVal.services[i].score = +val;
+    }
+  }
+});
+$('.thumb').on('input', function() {
+  var $ele = $(this);
+  var val = $ele.val();
+  $ele.prev().html("<span>: " + round(val, 0) + "</span>");
+});
+
+
 
 function getScoreDataAJAXCall(location){
   var data = {};
@@ -168,6 +207,8 @@ function getScoreDataAJAXCall(location){
   inputs.push(meta_county);
   data.inputs = inputs;
 
+  data.outputs.services = get_baseline_scores(location.state, location.county);
+
   return data;
 }
 
@@ -177,21 +218,21 @@ function get_baseline_scores(state = "", county = "") {
   }
   var services = [];
   // Old Database
-  // var stmt = db.prepare("Select SSB.county_FIPS, CO.stateID, ST.[State], CO.county, SSB.serviceID, SVC.serviceName, SVC.serviceTypeName, SSB.score, SVC.description, SVT.serviceType, SVC.name " +
-  //    "From ServiceScores_Baseline SSB, Counties CO, [Services] SVC, States ST, ServiceTypes SVT " +
-  //    "Where SSB.county_FIPS=CO.county_FIPS and UPPER(ST.state)=? and UPPER(CO.county)=? and SSB.serviceID=SVC.serviceID and CO.stateID=ST.stateID and SVC.serviceTypeID=SVT.serviceTypeID");
-  // stmt.bind([state.toUpperCase(), county.toUpperCase()]);
+  var stmt = dbOLD.prepare("Select SSB.county_FIPS, CO.stateID, ST.[State], CO.county, SSB.serviceID, SVC.serviceName, SVC.serviceTypeName, SSB.score, SVC.description, SVT.serviceType, SVC.name " +
+     "From ServiceScores_Baseline SSB, Counties CO, [Services] SVC, States ST, ServiceTypes SVT " +
+     "Where SSB.county_FIPS=CO.county_FIPS and UPPER(ST.state)=? and UPPER(CO.county)=? and SSB.serviceID=SVC.serviceID and CO.stateID=ST.stateID and SVC.serviceTypeID=SVT.serviceTypeID");
+  stmt.bind([state.toUpperCase(), county.toUpperCase()]);
   
-  // while (stmt.step()) {
-  //   var row = stmt.get();
-  //   var service = {};
-  //   service.serviceID = row[4];
-  //   service.name = row[10];
-  //   service.serviceTypeName = row[6];
-  //   service.description = row[5];
-  //   service.score = row[7];
-  //   services.push(service);
-  // }
+  while (stmt.step()) {
+    var row = stmt.get();
+    var service = {};
+    service.serviceID = row[4];
+    service.name = row[10];
+    service.serviceTypeName = row[6];
+    service.description = row[5];
+    service.score = row[7];
+    services.push(service);
+  }
   return services;
 }
 
