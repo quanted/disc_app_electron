@@ -141,10 +141,6 @@ function getScoreData() {
   $('#customize_location').html(location.county + " County, " + location.state);
   hwbi_disc_data = JSON.parse(data);
 
-  //draw aster plot 
-  drawPieChart(hwbi_disc_data.outputs.domains);
-
-
   // Set service slider values
   dragVal.services = hwbi_disc_data.outputs.services;
   for (var i = 0; i < hwbi_disc_data.outputs.services.length; i++) {
@@ -152,7 +148,7 @@ function getScoreData() {
     var $ele =  $('#' + services[i].name);
     var val = services[i].score;
     $ele.val(val);
-    $ele.prev().html("<span>: " + round(val, 0) + "</span>");
+    $ele.prev().html(": " + round(val, 0));
   }
 
 
@@ -163,8 +159,20 @@ function getScoreData() {
   $('html, body').animate({
       //scrollTop: $('#disc-tabs').offset().top
   }, 'slow');
+
+  //draw aster plot 
+  //$('#aster').html('');
+  if (drawn === false) {
+    drawAsterPlot(hwbi_disc_data.outputs.domains);
+  } else {
+    updateAsterPlot(hwbi_disc_data.outputs.domains);
+  }
+
 }
 
+$('.rankinglist input').on("change", function() {
+  useRIVWeights();
+});
 // Service listeners
 $('.thumb').on('change', function() {
   console.log("change");
@@ -175,6 +183,8 @@ $('.thumb').on('change', function() {
       dragVal.services[i].score = +val;
     }
   }
+  updateAsterPlot(hwbi_run(dragVal.services, hwbi_disc_data.outputs.domains).domains);
+  useRIVWeights();
 });
 $('.thumb').on('input', function() {
   var $ele = $(this);
@@ -278,7 +288,7 @@ function get_state_details(state = ''){
 
 function get_domains() {
     var domains = []
-    var stmt = db.prepare("Select * from Domains");
+    var stmt = dbOLD.prepare("Select * from Domains");
     while (stmt.step()) {
       var row = stmt.get()
       domains.push(row);
