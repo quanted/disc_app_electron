@@ -167,6 +167,7 @@ function getScoreData() {
   } else {
     updateAsterPlot(hwbi_disc_data.outputs.domains);
   }
+  $('.rankinglist input').val(1); // reset the RIV weight values
 
 }
 
