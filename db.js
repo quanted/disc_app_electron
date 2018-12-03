@@ -48,6 +48,7 @@ SQL.dbClose = function (databaseHandle, databaseFileName) {
   }
 }
 let dbPath;
+let dbPathOLD;
 
 //console.log(path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3'));
 //console.log(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3'));
@@ -57,16 +58,19 @@ let dbPath;
 
 if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'); //Not built
+  dbPathOLD = path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old");
 } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'); //Built but not ASAR
+  dbPathOLD = path.join(__dirname, "/resources/app/hwbi_app/hwbi_db_v2.sqlite3.old");
 } else {
   dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3'); //ASAR packaged
+  dbPathOLD = path.join(__dirname, "/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3.old");
 }
 
 console.log(dbPath);
 fs.existsSync(dbPath);
 let db = SQL.dbOpen(dbPath);
-let dbOLD = SQL.dbOpen(path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old"));
+let dbOLD = SQL.dbOpen(path.join(__dirname, dbPathOLD));
 
 if (db === null) {
   /* The file doesn't exist so create a new database. */
