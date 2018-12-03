@@ -53,6 +53,7 @@ copyfile('static_qed/hwbi/disc/img/epa2.gif', 'disc_app_electron/static_qed/hwbi
 copyfile('static_qed/hwbi/disc/img/epawhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/epawhite.png')
 copyfile('static_qed/hwbi/disc/img/searchblack.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchblack.png')
 copyfile('static_qed/hwbi/disc/img/searchwhite.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchwhite.png')
+copyfile('static_qed/hwbi/disc/img/bg1.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/bg1.jpg')
 
 
 temp_google_key = 'AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g'
