@@ -157,7 +157,7 @@ function getScoreData() {
 
 
 
-  setIndicatorSliders();
+  setMetricSliders();
   hwbi_indicator_value_adjusted = {};
   setCookie('EPAHWBIDISC', location_data, 0.5);
   $('html, body').animate({
