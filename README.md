@@ -4,10 +4,10 @@ Electron app for Decision Integration for Strong Communities (DISC) tool
 **Note**: Running this requires [Git](https://git-scm.com/), [Python 3](https://www.python.org/downloads/), and [Django](https://www.djangoproject.com/download/) on your system.
 ### Clone the qed_hwbi host project
 `git clone -b dev --recursive https://github.com/quanted/qed_hwbi.git`
-### Switch to the dev branches of hwbi_app, static_qed, and templates_qed
+### Switch to the dev branch of hwbi_app and the facelift branches of static_qed, and templates_qed
 `cd hwbi_app`  
 `git checkout dev`
-### You will need to obtain hwbi_db.sqlite3 from *somewhere* and put it in hwbi_app
+### You will need to obtain hwbi_db_v2.sqlite3 and hwbi_db_v2.sqlite3.old from *somewhere* and put them in disc_app_electron\hwbi_app
 ## Electron App Compilation from Source
 **Note**: Running this requires [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/) (which includes npm) on your system.
 ### Clone the repository to the qed_hwbi folder
