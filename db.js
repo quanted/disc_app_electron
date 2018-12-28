@@ -49,6 +49,7 @@ SQL.dbClose = function (databaseHandle, databaseFileName) {
 }
 let dbPath;
 let dbPathOLD;
+let dbPathNEW;
 
 //console.log(path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3'));
 //console.log(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3'));
@@ -59,18 +60,22 @@ let dbPathOLD;
 if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'); //Not built
   dbPathOLD = path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old");
+  dbPathNEW = path.join(__dirname, "/hwbi_app/DISC.db");
 } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'); //Built but not ASAR
   dbPathOLD = path.join(__dirname, "/resources/app/hwbi_app/hwbi_db_v2.sqlite3.old");
+  dbPathNEW = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
 } else {
   dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3'); //ASAR packaged
   dbPathOLD = path.join(__dirname, "/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3.old");
+  dbPathNEW = path.join(__dirname, "/resources/app.asar/hwbi_app/DISC.db");
 }
 
 console.log(dbPath);
 fs.existsSync(dbPath);
 let db = SQL.dbOpen(dbPath);
 let dbOLD = SQL.dbOpen(path.join(__dirname, dbPathOLD));
+let dbNEW = SQL.dbOpen(path.join(__dirname, dbPathNEW));
 
 if (db === null) {
   /* The file doesn't exist so create a new database. */
@@ -117,7 +122,7 @@ function get_county_indicator_data (state = "", county = ""){
     indicator.stateID = row[4];
     indicators.push(indicator);
   }
-  
+  stmt.free();
   return indicators;
 }
 
@@ -248,6 +253,7 @@ function get_baseline_scores(state = "", county = "") {
     service.score = row[7];
     services.push(service);
   }
+  stmt.free();
   return services;
 }
 
@@ -259,6 +265,7 @@ function get_domain_scores_national(){
   //   var row = stmt.get()
   //   scores.push(row);
   // } 
+  // stmt.free();
   return scores;
 }
 
@@ -274,6 +281,7 @@ function get_domain_scores_state(state = ''){
   //   var row = stmt.get();
   //   scores.push(row);
   // }
+  // stmt.free();
   return scores;
 }
 
@@ -288,6 +296,7 @@ function get_state_details(state = ''){
     var row = stmt.get()
     scores = row;
   }
+  stmt.free();
   return scores;
 }
 
@@ -298,6 +307,7 @@ function get_domains() {
       var row = stmt.get()
       domains.push(row);
     }
+    stmt.free();
     return domains;
 }
 
@@ -495,6 +505,7 @@ function getStateIndicators(state = "") {
     indicator.stateID = row[2];
     indicators.push(indicator);
   }
+  stmt.free();
   return indicators;
 }
 
@@ -521,5 +532,49 @@ function getIndicatorsForCounty(state = "", county = ""){
     indicator.stateID = row[4];
     indicators.push(indicator);
   }
+  stmt.free();
   return indicators;
+}
+
+function getMetricsForCounty(state = "", county = ""){
+  if (state === "" || county === "") {
+    return {};
+  }
+  var metrics = [];
+
+  var stmt = dbNEW.prepare("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
+    "FROM MetricScores " +
+    "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
+    "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
+    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  AND MetricGroups.METRIC_GROUP != \"HWBI\" " +
+    "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
+    "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
+    "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?")
+    console.log("execute statement")
+  stmt.bind([county, state]);
+console.log("looping")
+  while (stmt.step()) {
+    console.log("1")
+    var row = stmt.get();
+    console.log("2")
+    var metric = {};
+    metric.metric_var = row[0];
+    metric.description = row[1];
+    metric.score = row[2];
+    metric.fips = row[3];
+    metric.county = row[4];
+    metric.stateID = row[5];
+    metric.domain = row[6];
+    metric.indicator = row[7];
+    metric.metric_group = row[8];
+    metric.minvla = row[9];
+    metric.maxval = row[10];
+    metric.pos_neg_metric = row[11];
+    metric.short_description = row[12];
+    metrics.push(metric);
+    console.log(metric)
+  }
+  console.log("done looping")
+  stmt.free();
+  return metrics;
 }
