@@ -196,10 +196,19 @@ $('.thumb').on('change', function() {
   updateAsterPlot(hwbi_run(dragVal.services, hwbi_disc_data.outputs.domains).domains);
   useRIVWeights();
 });
+
+/* sets a variable for service metrics before slider input */
+$('.thumb').each( function() {
+  var slider = $(this);
+  let startval = slider.val();
+  slider.prev().html(round(startval, 0));
+})
+
+
 $('.thumb').on('input', function() {
   var $ele = $(this);
   var val = $ele.val();
-  $ele.prev().html("<span>: " + round(val, 0) + "</span>");
+  $ele.prev().html("<span> " + round(val, 0) + "</span>");
 });
 
 
