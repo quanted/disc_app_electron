@@ -65,7 +65,7 @@ copyfile('static_qed/hwbi/disc/img/education.jpg', 'disc_app_electron/static_qed
 copyfile('static_qed/hwbi/disc/img/health.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/health.jpg')
 copyfile('static_qed/hwbi/disc/img/leisure_time.png', 'disc_app_electron/static_qed/hwbi/disc/img/leisure_time.png')
 copyfile('static_qed/hwbi/disc/img/living_standards.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/living_standards.jpg')
-copyfile('static_qed/hwbi/disc/img/safety.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/safety.jpg')
+copyfile('static_qed/hwbi/disc/img/safety_and_security.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/safety_and_security.jpg')
 copyfile('static_qed/hwbi/disc/img/social_cohesion.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social_cohesion.jpg')
 copyfile('static_qed/hwbi/disc/img/loader.gif', 'disc_app_electron/static_qed/hwbi/disc/img/loader.gif')
 copyfile('static_qed/hwbi/disc/img/rainbow_need_to_replace.png', 'disc_app_electron/static_qed/hwbi/disc/img/rainbow_need_to_replace.png')
