@@ -1,6 +1,12 @@
 var dragVal = {};
 
 var shell = nodeRequire('electron').shell;
+try {
+	var sqlite3 = nodeRequire('sqlite3').verbose();
+} catch (e) { 
+	console.log(e);
+	var sqlite3 = nodeRequire('./resources/app.asar/node_modules/sqlite3').verbose();
+}
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
     console.log("catch link");
@@ -61,6 +67,7 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'); //Not built
   dbPathOLD = path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old");
   dbPathNEW = path.join(__dirname, "/hwbi_app/DISC.db");
+  var dbNEW = new sqlite3.Database(dbPathNEW);
 } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'))) {
   dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'); //Built but not ASAR
   dbPathOLD = path.join(__dirname, "/resources/app/hwbi_app/hwbi_db_v2.sqlite3.old");
@@ -68,14 +75,24 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
 } else {
   dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3'); //ASAR packaged
   dbPathOLD = path.join(__dirname, "/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3.old");
-  dbPathNEW = path.join(__dirname, "/resources/app.asar/hwbi_app/DISC.db");
+  //dbPathNEW = path.join(__dirname, "/resources/app.asar/hwbi_app/DISC.db");
+  var dbNEW = new sqlite3.Database('resources\app.asar\hwbi_app\DISC.db');
 }
+
+// console.log(dbPathNEW);
+
+// let dbNEW = new sqlite3.Database(dbPathNEW, (err) => {
+//   if (err) {
+//     console.error(err.message);
+//   }
+//   console.log('Connected to the NEW database.');
+// });
 
 console.log(dbPath);
 fs.existsSync(dbPath);
 let db = SQL.dbOpen(dbPath);
 let dbOLD = SQL.dbOpen(path.join(__dirname, dbPathOLD));
-let dbNEW = SQL.dbOpen(path.join(__dirname, dbPathNEW));
+//let dbNEW = SQL.dbOpen(path.join(__dirname, dbPathNEW));
 
 if (db === null) {
   /* The file doesn't exist so create a new database. */
@@ -197,18 +214,10 @@ $('.thumb').on('change', function() {
   useRIVWeights();
 });
 
-/* sets a variable for service metrics before slider input */
-$('.thumb').each( function() {
-  var slider = $(this);
-  let startval = slider.val();
-  slider.prev().html(round(startval, 0));
-})
-
-
 $('.thumb').on('input', function() {
   var $ele = $(this);
-  var val = $ele.val();
-  $ele.prev().html("<span> " + round(val, 0) + "</span>");
+  var val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min")) + +$ele.attr("data-min"));
+  $ele.prev().html("<span> " + round(val, 3) + "</span>");
 });
 
 
@@ -217,9 +226,12 @@ function getScoreDataAJAXCall(location){
   var data = {};
   data.outputs = getIndicatorsForCounty(location.state_abbr, location.county);
 
-  hwbi_indicator_data = formatIndicatorData(setIndicatorData(JSON.stringify(data)));
+  getServiceMetricsForCounty2(location.state_abbr, location.county);
 
+  hwbi_indicator_data = formatIndicatorData(setIndicatorData(JSON.stringify(data)));
+  console.log(data)
   data = formatDomainData(data);
+  console.log(data)
   // build inputs
   var inputs = [];
   var meta_state = {
@@ -234,8 +246,7 @@ function getScoreDataAJAXCall(location){
   };
   inputs.push(meta_state);
   inputs.push(meta_county);
-  data.inputs = inputs;
-
+  data.inputs = inputs;  
   data.outputs.services = get_baseline_scores(location.state, location.county);
 
   return data;
@@ -545,11 +556,11 @@ function getIndicatorsForCounty(state = "", county = ""){
   return indicators;
 }
 
-function getMetricsForCounty(state = "", county = ""){
+function getServiceMetricsForCounty(state = "", county = ""){
   if (state === "" || county === "") {
     return {};
   }
-  var metrics = [];
+  var metrics = {};
 
   var stmt = dbNEW.prepare("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
     "FROM MetricScores " +
@@ -580,10 +591,41 @@ console.log("looping")
     metric.maxval = row[10];
     metric.pos_neg_metric = row[11];
     metric.short_description = row[12];
-    metrics.push(metric);
+    metrics[metric.metric_var] = metric;
     console.log(metric)
   }
   console.log("done looping")
   stmt.free();
   return metrics;
+}
+
+function getServiceMetricsForCounty2(state = "", county = "") {
+  var metrics = {};
+  var sql = "SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
+  "FROM MetricScores " +
+  "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
+  "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
+  "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  " +
+  "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
+  "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
+  "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?";
+
+  dbNEW.all(sql, [county, state], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      var $ele = $('#' + row.METRIC_VAR.toLowerCase());
+      var rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
+      $ele.val(row.SCORE);
+      $ele.prev().html("<span> " + round(rawVal, 3) + "</span>");
+
+      if (row.METRIC_VAR.toLowerCase() === 'cleanair') {
+        console.log(row.SCORE);
+        console.log(row.MAXVAL);
+        console.log(row.MINVAL);
+        console.log(rawVal)
+      }
+    });
+  });
 }
