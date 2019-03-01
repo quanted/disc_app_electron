@@ -31,8 +31,17 @@ cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTI
     "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
     "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
     "WHERE Counties.COUNTY_NAME ==\"Benton\" AND Counties.STATE_CODE ==\"OR\"")
-metrics = cur.fetchall()
-#print(metrics)
+service_metrics = cur.fetchall()
+
+cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
+    "FROM MetricScores " +
+    "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
+    "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
+    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  AND MetricGroups.METRIC_GROUP == \"HWBI\" " +
+    "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
+    "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
+    "WHERE Counties.COUNTY_NAME ==\"Benton\" AND Counties.STATE_CODE ==\"OR\"")
+hwbi_metrics = cur.fetchall()
 
 try:
     os.makedirs('disc_app_electron/hwbi_app')
@@ -100,7 +109,8 @@ html += imports
 # body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify (tabs)
 body = render_to_string('disc/mainpage.html')
 body += render_to_string('disc/hwbi-disc-app-body2.html', {
-    'metrics': metrics
+    'service_metrics': service_metrics,
+    'hwbi_metrics': hwbi_metrics,
 }) # Modify (tab content)
 body += render_to_string('disc/content-wrapper.html', {
     'electron': electron
