@@ -9,7 +9,6 @@ try {
 }
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
-    console.log("catch link");
     event.preventDefault();
     shell.openExternal(this.href);
 });
@@ -26,95 +25,28 @@ const electron = nodeRequire('electron');
 const app = electron.app;
 const path = nodeRequire('path');
 const fs = nodeRequire('fs');
-//const SQL = nodeRequire('sql.js');
 
 // fs.readdirSync('.').forEach(file => {
 //   console.log(file);
 // })
 
-SQL.dbOpen = function (databaseFileName) {
-  try {
-    return new SQL.Database(fs.readFileSync(databaseFileName));
-  } catch (error) {
-    console.log("Can't open database file.", error.message);
-    return null;
-  }
-}
-
-SQL.dbClose = function (databaseHandle, databaseFileName) {
-  try {
-    let data = databaseHandle.export();
-    let buffer = Buffer.alloc(data.length, data);
-    fs.writeFileSync(databaseFileName, buffer);
-    databaseHandle.close();
-    return true;
-  } catch (error) {
-    console.log("Can't close database file.", error);
-    return null;
-  }
-}
 let dbPath;
-let dbPathOLD;
-let dbPathNEW;
 
-//console.log(path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3'));
-//console.log(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3'));
-//console.log(fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db.sqlite3')));
-//console.log(fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db.sqlite3')));
-//console.log(fs.existsSync(path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db.sqlite3')));
+//console.log(path.join(__dirname, '/hwbi_app/hwbi_dbOLD2.sqlite3'));
+//console.log(path.join(__dirname, '/resources/app/hwbi_app/hwbi_dbOLD2.sqlite3'));
+//console.log(fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_dbOLD2.sqlite3')));
+//console.log(fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_dbOLD2.sqlite3')));
+//console.log(fs.existsSync(path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_dbOLD2.sqlite3')));
 
-if (fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'))) {
-  dbPath = path.join(__dirname, '/hwbi_app/hwbi_db_v2.sqlite3'); //Not built
-  dbPathOLD = path.join(__dirname, "/hwbi_app/hwbi_db_v2.sqlite3.old");
-  dbPathNEW = path.join(__dirname, "/hwbi_app/DISC.db");
-  var dbNEW = new sqlite3.Database(dbPathNEW);
-} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'))) {
-  dbPath = path.join(__dirname, '/resources/app/hwbi_app/hwbi_db_v2.sqlite3'); //Built but not ASAR
-  dbPathOLD = path.join(__dirname, "/resources/app/hwbi_app/hwbi_db_v2.sqlite3.old");
-  dbPathNEW = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
+if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
+  dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
+} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/DISC.db'))) {
+  dbPath = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
 } else {
-  dbPath = path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3'); //ASAR packaged
-  dbPathOLD = path.join(__dirname, "/resources/app.asar/hwbi_app/hwbi_db_v2.sqlite3.old");
-  //dbPathNEW = path.join(__dirname, "/resources/app.asar/hwbi_app/DISC.db");
-  var dbNEW = new sqlite3.Database('resources\app.asar\hwbi_app\DISC.db');
+  dbPath = 'resources\app.asar\hwbi_app\DISC.db';
 }
 
-// console.log(dbPathNEW);
-
-// let dbNEW = new sqlite3.Database(dbPathNEW, (err) => {
-//   if (err) {
-//     console.error(err.message);
-//   }
-//   console.log('Connected to the NEW database.');
-// });
-
-console.log(dbPath);
-fs.existsSync(dbPath);
-let db = SQL.dbOpen(dbPath);
-let dbOLD = SQL.dbOpen(path.join(__dirname, dbPathOLD));
-//let dbNEW = SQL.dbOpen(path.join(__dirname, dbPathNEW));
-
-if (db === null) {
-  /* The file doesn't exist so create a new database. */
-  console.log("The file doesn't exist");
-} else {
-  /*
-    The file is a valid sqlite3 database. This simple query will demonstrate
-    whether it's in good health or not.
-  */
-  let query = 'SELECT count(*) as `count` FROM `sqlite_master`';
-  let row = db.exec(query);
-  let tableCount = parseInt(row[0].values);
-  if (tableCount === 0) {
-    console.log('The file is an empty SQLite3 database.');
-    //createDb(dbPath);
-  } else {
-    console.log('The database has', tableCount, 'tables.');
-  }
-  if (typeof callback === 'function') {
-    callback();
-  }
-}
+var db = new sqlite3.Database(dbPath);
 
 function get_county_indicator_data (state = "", county = ""){
   if (state === "" || county === "") {
@@ -122,7 +54,7 @@ function get_county_indicator_data (state = "", county = ""){
   }
   var indicators = [];  
 
-  var stmt = db.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
+  var stmt = dbOLD2.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
     "FROM CountyIndicatorScores " +
     "INNER JOIN Counties ON CountyIndicatorScores.countyFIPS == Counties.county_FIPS " +
     "INNER JOIN Indicators ON CountyIndicatorScores.indicatorID == Indicators.indicatorID " +
@@ -143,6 +75,42 @@ function get_county_indicator_data (state = "", county = ""){
   return indicators;
 }
 
+function setScoreData(state, county, valueType) {
+  document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
+  
+  $('#location').html("Snapshot results for:<br>" + county + " County, " + state); // Set location info
+  $('#reportlocation').html("Report for " + county + " County, " + state);
+
+   /* $('#wellbeing-score-location').html("Nation: " + data.outputs.nationhwbi.toFixed(1) + ", State: " +
+       data.outputs.statehwbi.toFixed(1)); */
+
+  var HWBI_score = round(dataStructure.METRIC_GROUP["HWBI"][valueType] * 100, 1); // Set location score
+  $('#wellbeing-score').html(HWBI_score);
+
+  document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
+  $('#report-wellbeing-score').html(HWBI_score);
+
+  function slugify(string) {
+    return string.replace(/ /g, '-').replace(/[^0-9a-z-_]/gi, '').toLowerCase().trim();
+  }
+
+  for (var domain in dataStructure.DOMAIN) { // Set Domain scores
+    var slugifiedDomain = slugify(domain);
+    var score = round(dataStructure.DOMAIN[domain][valueType] * 100, 1);
+    $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score);
+    $('#' + slugifiedDomain + '_score_bar').attr('data-percent', score + "%");
+    // $('#nature_location').html("[Nation: " + round(data.outputs.domains[0].nationScore, 1) +
+    //     ", State: " + round(data.outputs.domains[0].stateScore, 1) + "]");
+    $('#' + slugifiedDomain + '_score_summary').html(score);
+  }
+
+  for (var indicator in dataStructure.INDICATOR) { // Set indicator scores
+    var slugifiedIndicator = slugify(indicator);
+    var score = round(dataStructure.INDICATOR[indicator][valueType] * 100, 1);
+    $('#' + slugifiedIndicator + "_value").html(score);
+  }
+}
+
 function getScoreData() {
   var location_data = locationValue;
   if (location_data === "{}") {
@@ -155,63 +123,70 @@ function getScoreData() {
       }
   }
   var location = JSON.parse(location_data);
-  data = JSON.stringify(getScoreDataAJAXCall(location));
+  
+  getMetricsForCounty(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
-  // zeroScoreData();
-  setScoreData(data);
+  
   show('mainpage', 'homepage');
+ 
   $('#community-snapshot-tab-link').trigger("click");
-  setCompareData(data, 0);
-  displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
+  
+  //setCompareData(data, 0);
+  //displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
+  
   $('#customize_location').html(location.county + " County, " + location.state);
-  hwbi_disc_data = JSON.parse(data);
+  
+  //hwbi_disc_data = JSON.parse(data);
 
-  // Set service slider values
-  dragVal.services = hwbi_disc_data.outputs.services;
-  for (var i = 0; i < hwbi_disc_data.outputs.services.length; i++) {
-    var services = hwbi_disc_data.outputs.services;
-    var $ele =  $('#' + services[i].name);
-    var val = services[i].score;
-    $ele.val(val);
-    $ele.prev().html(": " + round(val, 0));
-  }
-
-
-
-  setMetricSliders();
-  hwbi_indicator_value_adjusted = {};
   setCookie('EPAHWBIDISC', location_data, 0.5);
-  $('html, body').animate({
-      //scrollTop: $('#disc-tabs').offset().top
-  }, 'slow');
-
-  //draw aster plot 
-  //$('#aster').html('');
-  if (drawn === false) {
-    drawAsterPlot(hwbi_disc_data.outputs.domains);
-  } else {
-    updateAsterPlot(hwbi_disc_data.outputs.domains);
-  }
-  $('.rankinglist input').val(1); // reset the RIV weight values
-
 }
 
+/**
+ * Change the relative importance weight of a domain
+ * @listens change
+ */
 $('.rankinglist input').on("change", function() {
-  useRIVWeights();
+  var location = JSON.parse(locationValue);
+  var $this = $(this)
+  var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<'));
+
+  //useRIVWeights();
+  dataStructure.DOMAIN[label].weight = +$this.val();
+
+  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val'); // calculate the metric group scores by averaging each metric group's child domains
+  setScoreData(location.state_abbr, location.county, "adjusted_val"); // set the domain scores
+  runAsterPlot();
 });
-// Service listeners
-$('.thumb').on('change', function() {
-  console.log("change");
+
+/**
+ * Change the HWBI metric values, update the indicators, domains, and the domains on the snapshot page snapshot
+ * @listens change
+ */
+$('.customize-metrics').on('change', function() { // customize metric listeners
   var ele = $(this);
-  var val = ele.val();
-  for (var i = 0; i < dragVal.services.length; i++) {
-    if (dragVal.services[i].name === ele.attr('id')) {
-      dragVal.services[i].score = +val;
-    }
-  }
-  updateAsterPlot(hwbi_run(dragVal.services, hwbi_disc_data.outputs.domains).domains);
-  useRIVWeights();
+  var val = +ele.val();
+  var loc = JSON.parse(locationValue);
+  var state = loc.state_abbr;
+  var county = loc.county;
+  var metric = dataStructure.METRIC_VAR[ele.attr('id').toUpperCase()];
+  
+  metric.adjusted_val = val;
+
+  updateAllAvgValues('INDICATOR', 'adjusted_val'); // calculate the indicator scores by averaging each indicator's child metrics
+  updateAllAvgValues('DOMAIN', 'adjusted_val'); // calculate the domain scores by averaging each domain's child indicators
+  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val'); // calculate the metric group scores by averaging each metric group's child domains
+  setScoreData(state, county, "adjusted_val"); // set the domain scores
+  loadSkillbar(); // update the colored bars on the snapshot page
+  runAsterPlot();
+
+  // for (var i = 0; i < dragVal.services.length; i++) {
+  //   if (dragVal.services[i].name === ele.attr('id')) {
+  //     dragVal.services[i].score = +val;
+  //   }
+  // }
+  //updateAsterPlot(hwbi_run(dragVal.services, hwbi_disc_data.outputs.domains).domains);
+  //useRIVWeights();
 });
 
 $('.thumb').on('input', function() {
@@ -220,13 +195,9 @@ $('.thumb').on('input', function() {
   $ele.prev().html("<span> " + round(val, 3) + "</span>");
 });
 
-
-
 function getScoreDataAJAXCall(location){
   var data = {};
-  data.outputs = getIndicatorsForCounty(location.state_abbr, location.county);
-
-  getServiceMetricsForCounty2(location.state_abbr, location.county);
+  //data.outputs = getIndicatorsForCounty(location.state_abbr, location.county);
 
   hwbi_indicator_data = formatIndicatorData(setIndicatorData(JSON.stringify(data)));
   console.log(data)
@@ -277,40 +248,12 @@ function get_baseline_scores(state = "", county = "") {
   return services;
 }
 
-function get_domain_scores_national(){
-  var scores = [];
-  // Old Database
-  // var stmt = db.prepare("Select * from Domains_National");
-  // while (stmt.step()) {
-  //   var row = stmt.get()
-  //   scores.push(row);
-  // } 
-  // stmt.free();
-  return scores;
-}
-
-function get_domain_scores_state(state = ''){
-  if (state === '') {
-    return [];
-  }
-  var scores = [];
-  // Old Database
-  // var stmt = db.prepare("Select * from Domains_State where state=?");
-  // stmt.bind([state]);
-  // while (stmt.step()) {
-  //   var row = stmt.get();
-  //   scores.push(row);
-  // }
-  // stmt.free();
-  return scores;
-}
-
 function get_state_details(state = ''){
   if (state === '') {
     return [];
   }
   var scores = [];
-  var stmt = db.prepare("Select * from States where state =?");
+  var stmt = dbOLD2.prepare("Select * from States where state =?");
   stmt.bind([state]);
   while (stmt.step()) {
     var row = stmt.get()
@@ -509,7 +452,7 @@ function getStateIndicators(state = "") {
     return {};
   }
 
-  var stmt = db.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, Counties.stateID " +
+  var stmt = dbOLD2.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, Counties.stateID " +
     "FROM CountyIndicatorScores " +
     "INNER JOIN Counties ON CountyIndicatorScores.countyFIPS == Counties.county_FIPS " +
     "INNER JOIN Indicators ON CountyIndicatorScores.indicatorID == Indicators.indicatorID " +
@@ -535,7 +478,7 @@ function getIndicatorsForCounty(state = "", county = ""){
   }
   var indicators = [];
 
-  var stmt = db.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
+  var stmt = dbOLD2.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
     "FROM CountyIndicatorScores " +
     "INNER JOIN Counties ON CountyIndicatorScores.countyFIPS == Counties.county_FIPS " +
     "INNER JOIN Indicators ON CountyIndicatorScores.indicatorID == Indicators.indicatorID " +
@@ -556,52 +499,20 @@ function getIndicatorsForCounty(state = "", county = ""){
   return indicators;
 }
 
-function getServiceMetricsForCounty(state = "", county = ""){
-  if (state === "" || county === "") {
-    return {};
-  }
-  var metrics = {};
-
-  var stmt = dbNEW.prepare("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
-    "FROM MetricScores " +
-    "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
-    "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  AND MetricGroups.METRIC_GROUP != \"HWBI\" " +
-    "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
-    "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?")
-    console.log("execute statement")
-  stmt.bind([county, state]);
-console.log("looping")
-  while (stmt.step()) {
-    console.log("1")
-    var row = stmt.get();
-    console.log("2")
-    var metric = {};
-    metric.metric_var = row[0];
-    metric.description = row[1];
-    metric.score = row[2];
-    metric.fips = row[3];
-    metric.county = row[4];
-    metric.stateID = row[5];
-    metric.domain = row[6];
-    metric.indicator = row[7];
-    metric.metric_group = row[8];
-    metric.minvla = row[9];
-    metric.maxval = row[10];
-    metric.pos_neg_metric = row[11];
-    metric.short_description = row[12];
-    metrics[metric.metric_var] = metric;
-    console.log(metric)
-  }
-  console.log("done looping")
-  stmt.free();
-  return metrics;
-}
-
-function getServiceMetricsForCounty2(state = "", county = "") {
-  var metrics = {};
-  var sql = "SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION " +
+function getMetricsForCounty(state = "", county = "") {
+  var sql = "SELECT  MetricVariables.METRIC_VAR, " +
+                    "MetricVariables.METRIC_DESCRIPTION, " +
+                    "MetricScores.SCORE, " +
+                    "MetricScores.FIPS, " +
+                    "Counties.COUNTY_NAME, " +
+                    "Counties.STATE_CODE, " +
+                    "Domains.DOMAIN, " +
+                    "Indicators.INDICATOR, " +
+                    "MetricGroups.METRIC_GROUP, " +
+                    "MetricScores.MINVAL, " +
+                    "MetricScores.MAXVAL, " +
+                    "MetricScores.POS_NEG_METRIC, " +
+                    "MetricVariables.SHORT_DESCRIPTION " +
   "FROM MetricScores " +
   "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
   "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
@@ -610,22 +521,179 @@ function getServiceMetricsForCounty2(state = "", county = "") {
   "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
   "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?";
 
-  dbNEW.all(sql, [county, state], (err, rows) => {
+  db.all(sql, [county, state], (err, rows) => {
     if (err) {
       throw err;
     }
     rows.forEach((row) => {
       var $ele = $('#' + row.METRIC_VAR.toLowerCase());
       var rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
-      $ele.val(row.SCORE);
+      $ele.val(row.SCORE); // set the metric scores
       $ele.prev().html("<span> " + round(rawVal, 3) + "</span>");
+      dataStructure.METRIC_VAR[row.METRIC_VAR].original_val = row.SCORE; // add the metric score to the data structure
+      dataStructure.METRIC_VAR[row.METRIC_VAR].adjusted_val = row.SCORE; // add the metric score to the data structure
+      dataStructure.METRIC_VAR[row.METRIC_VAR].scenario_val = row.SCORE; // add the metric score to the data structure
+    });
+   
+    setAllInitialAvgValues('INDICATOR'); // calculate the indicator scores by averaging each indicator's child metrics
+    setAllInitialAvgValues('DOMAIN'); // calculate the domain scores by averaging each domain's child indicators
+    setAllInitialWeightedAvgValues('METRIC_GROUP'); // calculate the metric group scores by averaging each metric group's child domains
 
-      if (row.METRIC_VAR.toLowerCase() === 'cleanair') {
-        console.log(row.SCORE);
-        console.log(row.MAXVAL);
-        console.log(row.MINVAL);
-        console.log(rawVal)
+    setScoreData(state, county, "original_val"); // set the domain scores
+    loadSkillbar(); // update the colored bars on the snapshot page
+    runAsterPlot(); //draw aster plot
+  });
+}
+
+var dataStructure = {
+  METRIC_GROUP: {},
+  DOMAIN: {},
+  INDICATOR: {},
+  METRIC_VAR: {}
+};
+
+function createDataStructure() {
+  sql = "SELECT MetricGroups.METRIC_GROUP as METRIC_GROUP, Domains.DOMAIN AS DOMAIN, Indicators.INDICATOR as INDICATOR, METRIC_VAR " +
+  "FROM MetricVariables " +
+  "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID " +
+  "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
+  "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID;";
+
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+
+      if (!dataStructure.METRIC_GROUP.hasOwnProperty(row.METRIC_GROUP)) {
+        dataStructure.METRIC_GROUP[row.METRIC_GROUP] = new Node(row.METRIC_GROUP, [], 0, 0, 0, null, "METRIC_GROUP");
+      }
+
+      if (!dataStructure.DOMAIN.hasOwnProperty(row.DOMAIN)) {
+        dataStructure.DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, dataStructure.METRIC_GROUP[row.METRIC_GROUP], "DOMAIN");
+      } else if (dataStructure.DOMAIN[row.DOMAIN].parent.name !== row.METRIC_GROUP) {
+        console.log("This domain exists already... " + row.DOMAIN + " BUT " + dataStructure.DOMAIN[row.DOMAIN].parent.name + " != " + row.METRIC_GROUP)
+        //dataStructure.INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
+      }
+
+      if (!dataStructure.INDICATOR.hasOwnProperty(row.DOMAIN + '_' + row.INDICATOR)) {
+        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0, dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
+      } else if (dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name !== row.DOMAIN) {
+        console.log("This indicator exists already... " + row.DOMAIN + '_' + row.INDICATOR + " BUT " + dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name + " != " + row.DOMAIN)
+        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0,dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
+      }
+
+      if (!dataStructure.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
+        dataStructure.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR], "METRIC_VAR");
+      }
+
+      if (dataStructure.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(dataStructure.DOMAIN[row.DOMAIN]) < 0) {
+        dataStructure.METRIC_GROUP[row.METRIC_GROUP].children.push(dataStructure.DOMAIN[row.DOMAIN]);
+      }
+      if (dataStructure.DOMAIN[row.DOMAIN].children.indexOf(dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]) < 0) {
+        dataStructure.DOMAIN[row.DOMAIN].children.push(dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]);
+      }
+      if (dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.indexOf(dataStructure.METRIC_VAR[row.METRIC_VAR]) < 0) {
+        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.push(dataStructure.METRIC_VAR[row.METRIC_VAR]);
       }
     });
   });
 }
+
+function Node(name, children, original_val, adjusted_val, scenario_val, parent, type) {
+  this.name = name;
+  this.children = children;
+  this.original_val = original_val;
+  this.adjusted_val = adjusted_val;
+  this.scenario_val = scenario_val;
+  this.parent = parent;
+  this.type = type;
+  if (type === "DOMAIN") {
+    this.weight = 1;
+  }
+}
+
+// a('INDICATOR', 'original_val'); // calculate the indicator scores by averaging each indicator's child metrics
+// set the 'value' to the average of the children Node's 'value' for the specified 'thing'
+function updateAllAvgValues(thing, value) {
+	for (var indicator in dataStructure[thing]) {
+    var sum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop];
+      }, 0);
+    };
+    var avg = sum(dataStructure[thing][indicator].children, value) / dataStructure[thing][indicator].children.length;
+		dataStructure[thing][indicator][value] = avg;
+  }
+}
+
+function updateAllWeightedAvgValues(thing, value) {
+	for (var indicator in dataStructure[thing]) {
+    var sum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop];
+      }, 0);
+    };
+    var weightedSum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop] * b.weight;
+      }, 0);
+    };
+    var avg = weightedSum(dataStructure[thing][indicator].children, value) / sum(dataStructure[thing][indicator].children, "weight");
+		dataStructure[thing][indicator][value] = avg;
+  }
+}
+
+function setAllInitialAvgValues(thing) {
+	for (var indicator in dataStructure[thing]) {
+    var sum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop];
+      }, 0);
+    };
+    var avg = sum(dataStructure[thing][indicator].children, "original_val") / dataStructure[thing][indicator].children.length;
+    dataStructure[thing][indicator]["original_val"] = avg;
+    dataStructure[thing][indicator]["adjusted_val"] = avg;
+    dataStructure[thing][indicator]["scenario_val"] = avg;
+  }
+}
+
+function setAllInitialWeightedAvgValues(thing) {
+	for (var indicator in dataStructure[thing]) {
+    var sum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop];
+      }, 0);
+    };
+    var weightedSum = function (items, prop) {
+      return items.reduce( function(a, b) {
+        return a + b[prop] * b.weight;
+      }, 0);
+    };
+    var avg = weightedSum(dataStructure[thing][indicator].children, "original_val") / sum(dataStructure[thing][indicator].children, "weight");
+    dataStructure[thing][indicator]["original_val"] = avg;
+    dataStructure[thing][indicator]["adjusted_val"] = avg;
+    dataStructure[thing][indicator]["scenario_val"] = avg;
+  }
+}
+
+function runAsterPlot() {
+  var asterData = [];
+  for (var domain in dataStructure.DOMAIN) {
+    if (dataStructure.DOMAIN[domain].parent.name == "HWBI") {
+      asterData.push({
+          description: domain,
+          weight: dataStructure.DOMAIN[domain].weight,
+          score: dataStructure.DOMAIN[domain].adjusted_val * 100
+      });
+    }
+  }
+
+  if (drawn === false) {
+    drawAsterPlot(asterData);
+  } else {
+    updateAsterPlot(asterData);
+  }
+}
+
+createDataStructure();
