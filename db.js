@@ -90,19 +90,17 @@ function setScoreData(state, county, valueType) {
   document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
   $('#report-wellbeing-score').html(HWBI_score);
 
-  for (var domain in dataStructure.DOMAIN) { // Set Domain scores
+  for (var domain in dataStructure.HWBI_DOMAIN) { // Set Domain scores
     var slugifiedDomain = slugify(domain);
-    var score = round(dataStructure.DOMAIN[domain][valueType] * 100, 1);
+    var score = round(dataStructure.HWBI_DOMAIN[domain][valueType] * 100, 1);
     $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score);
     $('#' + slugifiedDomain + '_score_bar').attr('data-percent', score + "%");
-    // $('#nature_location').html("[Nation: " + round(data.outputs.domains[0].nationScore, 1) +
-    //     ", State: " + round(data.outputs.domains[0].stateScore, 1) + "]");
     $('#' + slugifiedDomain + '_score_summary').html(score);
   }
 
-  for (var indicator in dataStructure.INDICATOR) { // Set indicator scores
-    var slugifiedIndicator = slugify(indicator);
-    var score = round(dataStructure.INDICATOR[indicator][valueType] * 100, 1);
+  for (var indicator in dataStructure.HWBI_INDICATOR) { // Set indicator scores
+    var slugifiedIndicator = slugify(dataStructure.HWBI_INDICATOR[indicator].parent.name) + "_" + slugify(indicator);
+    var score = round(dataStructure.HWBI_INDICATOR[indicator][valueType] * 100, 1);
     $('#' + slugifiedIndicator + "_value").html(score);
   }
 }
@@ -150,7 +148,7 @@ $('.rankinglist input').on("change", function() {
   var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<'));
 
   //useRIVWeights();
-  dataStructure.DOMAIN[label].weight = +$this.val();
+  dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
 
   updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val'); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(location.state_abbr, location.county, "adjusted_val"); // set the domain scores
@@ -171,8 +169,12 @@ $('.customize-metrics').on('change', function() { // customize metric listeners
   
   metric.adjusted_val = val;
 
-  updateAllAvgValues('INDICATOR', 'adjusted_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
-  updateAllAvgValues('DOMAIN', 'adjusted_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+  updateAllAvgValues('HWBI_INDICATOR', 'adjusted_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  updateAllAvgValues('HWBI_DOMAIN', 'adjusted_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
+  updateAllAvgValues('SERVICE_INDICATOR', 'adjusted_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  updateAllAvgValues('SERVICE_DOMAIN', 'adjusted_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
   updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(state, county, "adjusted_val"); // set the domain scores
   loadSkillbar(); // update the colored bars on the snapshot page
@@ -534,8 +536,12 @@ function getMetricsForCounty(state = "", county = "") {
       dataStructure.METRIC_VAR[row.METRIC_VAR].scenario_val = row.SCORE; // add the metric score to the data structure
     });
    
-    setAllInitialAvgValues('INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
-    setAllInitialAvgValues('DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+    setAllInitialAvgValues('SERVICE_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+    setAllInitialAvgValues('SERVICE_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
+    setAllInitialAvgValues('HWBI_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+    setAllInitialAvgValues('HWBI_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
     setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
     setScoreData(state, county, "original_val"); // set the domain scores
@@ -546,8 +552,10 @@ function getMetricsForCounty(state = "", county = "") {
 
 var dataStructure = {
   METRIC_GROUP: {},
-  DOMAIN: {},
-  INDICATOR: {},
+  HWBI_DOMAIN: {},
+  SERVICE_DOMAIN: {},
+  HWBI_INDICATOR: {},
+  SERVICE_INDICATOR: {},
   METRIC_VAR: {}
 };
 
@@ -568,32 +576,44 @@ function createDataStructure(obj) {
         obj.METRIC_GROUP[row.METRIC_GROUP] = new Node(row.METRIC_GROUP, [], 0, 0, 0, null, "METRIC_GROUP");
       }
 
-      if (!obj.DOMAIN.hasOwnProperty(row.DOMAIN)) {
-        obj.DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, obj.METRIC_GROUP[row.METRIC_GROUP], "DOMAIN");
-      } else if (obj.DOMAIN[row.DOMAIN].parent.name !== row.METRIC_GROUP) {
-        console.log("This domain exists already... " + row.DOMAIN + " BUT " + obj.DOMAIN[row.DOMAIN].parent.name + " != " + row.METRIC_GROUP)
-        //obj.INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, obj.DOMAIN[row.DOMAIN], "INDICATOR");
-      }
-
-      if (!obj.INDICATOR.hasOwnProperty(row.DOMAIN + '_' + row.INDICATOR)) {
-        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0, obj.DOMAIN[row.DOMAIN], "INDICATOR");
-      } else if (obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name !== row.DOMAIN) {
-        console.log("This indicator exists already... " + row.DOMAIN + '_' + row.INDICATOR + " BUT " + obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name + " != " + row.DOMAIN)
-        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0,obj.DOMAIN[row.DOMAIN], "INDICATOR");
-      }
-
-      if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
-        obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR], "METRIC_VAR");
-      }
-
-      if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.DOMAIN[row.DOMAIN]) < 0) {
-        obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.DOMAIN[row.DOMAIN]);
-      }
-      if (obj.DOMAIN[row.DOMAIN].children.indexOf(obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]) < 0) {
-        obj.DOMAIN[row.DOMAIN].children.push(obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]);
-      }
-      if (obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
-        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
+      if (row.METRIC_GROUP === "HWBI") {
+        if (!obj.HWBI_DOMAIN.hasOwnProperty(row.DOMAIN)) {
+          obj.HWBI_DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, obj.METRIC_GROUP[row.METRIC_GROUP], "HWBI_DOMAIN");
+        }
+        if (!obj.HWBI_INDICATOR.hasOwnProperty(row.INDICATOR)) {
+          obj.HWBI_INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, 0, obj.HWBI_DOMAIN[row.DOMAIN], "HWBI_INDICATOR");
+        }
+        if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
+          obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.HWBI_INDICATOR[row.INDICATOR], "METRIC_VAR");
+        }
+        if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.HWBI_DOMAIN[row.DOMAIN]) < 0) {
+          obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.HWBI_DOMAIN[row.DOMAIN]);
+        }
+        if (obj.HWBI_DOMAIN[row.DOMAIN].children.indexOf(obj.HWBI_INDICATOR[row.INDICATOR]) < 0) {
+          obj.HWBI_DOMAIN[row.DOMAIN].children.push(obj.HWBI_INDICATOR[row.INDICATOR]);
+        }
+        if (obj.HWBI_INDICATOR[row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
+          obj.HWBI_INDICATOR[row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
+        }
+      } else {
+        if (!obj.SERVICE_DOMAIN.hasOwnProperty(row.DOMAIN)) {
+          obj.SERVICE_DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, obj.METRIC_GROUP[row.METRIC_GROUP], "SERVICE_DOMAIN");
+        }
+        if (!obj.SERVICE_INDICATOR.hasOwnProperty(row.INDICATOR)) {
+          obj.SERVICE_INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, 0, obj.SERVICE_DOMAIN[row.DOMAIN], "SERVICE_INDICATOR");
+        }
+        if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
+          obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.SERVICE_INDICATOR[row.INDICATOR], "METRIC_VAR");
+        }
+        if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.SERVICE_DOMAIN[row.DOMAIN]) < 0) {
+          obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.SERVICE_DOMAIN[row.DOMAIN]);
+        }
+        if (obj.SERVICE_DOMAIN[row.DOMAIN].children.indexOf(obj.SERVICE_INDICATOR[row.INDICATOR]) < 0) {
+          obj.SERVICE_DOMAIN[row.DOMAIN].children.push(obj.SERVICE_INDICATOR[row.INDICATOR]);
+        }
+        if (obj.SERVICE_INDICATOR[row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
+          obj.SERVICE_INDICATOR[row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
+        }
       }
     });
   });
@@ -607,7 +627,7 @@ function Node(name, children, original_val, adjusted_val, scenario_val, parent, 
   this.scenario_val = scenario_val;
   this.parent = parent;
   this.type = type;
-  if (type === "DOMAIN") {
+  if (type === "HWBI_DOMAIN") {
     this.weight = 1;
   }
 }
@@ -678,12 +698,12 @@ function setAllInitialWeightedAvgValues(thing, obj) {
 
 function runAsterPlot() {
   var asterData = [];
-  for (var domain in dataStructure.DOMAIN) {
-    if (dataStructure.DOMAIN[domain].parent.name == "HWBI") {
+  for (var domain in dataStructure.HWBI_DOMAIN) {
+    if (dataStructure.HWBI_DOMAIN[domain].parent.name == "HWBI") {
       asterData.push({
           description: domain,
-          weight: dataStructure.DOMAIN[domain].weight,
-          score: dataStructure.DOMAIN[domain].adjusted_val * 100
+          weight: dataStructure.HWBI_DOMAIN[domain].weight,
+          score: dataStructure.HWBI_DOMAIN[domain].adjusted_val * 100
       });
     }
   }
