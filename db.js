@@ -90,10 +90,6 @@ function setScoreData(state, county, valueType) {
   document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
   $('#report-wellbeing-score').html(HWBI_score);
 
-  function slugify(string) {
-    return string.replace(/ /g, '-').replace(/[^0-9a-z-_]/gi, '').toLowerCase().trim();
-  }
-
   for (var domain in dataStructure.DOMAIN) { // Set Domain scores
     var slugifiedDomain = slugify(domain);
     var score = round(dataStructure.DOMAIN[domain][valueType] * 100, 1);
@@ -124,6 +120,8 @@ function getScoreData() {
   }
   var location = JSON.parse(location_data);
   
+  getStateDomainScores(location.state_abbr);
+  getStateDISCScore(location.state_abbr);
   getMetricsForCounty(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
@@ -173,9 +171,9 @@ $('.customize-metrics').on('change', function() { // customize metric listeners
   
   metric.adjusted_val = val;
 
-  updateAllAvgValues('INDICATOR', 'adjusted_val'); // calculate the indicator scores by averaging each indicator's child metrics
-  updateAllAvgValues('DOMAIN', 'adjusted_val'); // calculate the domain scores by averaging each domain's child indicators
-  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val'); // calculate the metric group scores by averaging each metric group's child domains
+  updateAllAvgValues('INDICATOR', 'adjusted_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  updateAllAvgValues('DOMAIN', 'adjusted_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(state, county, "adjusted_val"); // set the domain scores
   loadSkillbar(); // update the colored bars on the snapshot page
   runAsterPlot();
@@ -530,14 +528,15 @@ function getMetricsForCounty(state = "", county = "") {
       var rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
       $ele.val(row.SCORE); // set the metric scores
       $ele.prev().html("<span> " + round(rawVal, 3) + "</span>");
+      dataStructure.METRIC_VAR[row.METRIC_VAR].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
       dataStructure.METRIC_VAR[row.METRIC_VAR].original_val = row.SCORE; // add the metric score to the data structure
       dataStructure.METRIC_VAR[row.METRIC_VAR].adjusted_val = row.SCORE; // add the metric score to the data structure
       dataStructure.METRIC_VAR[row.METRIC_VAR].scenario_val = row.SCORE; // add the metric score to the data structure
     });
    
-    setAllInitialAvgValues('INDICATOR'); // calculate the indicator scores by averaging each indicator's child metrics
-    setAllInitialAvgValues('DOMAIN'); // calculate the domain scores by averaging each domain's child indicators
-    setAllInitialWeightedAvgValues('METRIC_GROUP'); // calculate the metric group scores by averaging each metric group's child domains
+    setAllInitialAvgValues('INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+    setAllInitialAvgValues('DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+    setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
     setScoreData(state, county, "original_val"); // set the domain scores
     loadSkillbar(); // update the colored bars on the snapshot page
@@ -552,7 +551,7 @@ var dataStructure = {
   METRIC_VAR: {}
 };
 
-function createDataStructure() {
+function createDataStructure(obj) {
   sql = "SELECT MetricGroups.METRIC_GROUP as METRIC_GROUP, Domains.DOMAIN AS DOMAIN, Indicators.INDICATOR as INDICATOR, METRIC_VAR " +
   "FROM MetricVariables " +
   "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID " +
@@ -565,36 +564,36 @@ function createDataStructure() {
     }
     rows.forEach((row) => {
 
-      if (!dataStructure.METRIC_GROUP.hasOwnProperty(row.METRIC_GROUP)) {
-        dataStructure.METRIC_GROUP[row.METRIC_GROUP] = new Node(row.METRIC_GROUP, [], 0, 0, 0, null, "METRIC_GROUP");
+      if (!obj.METRIC_GROUP.hasOwnProperty(row.METRIC_GROUP)) {
+        obj.METRIC_GROUP[row.METRIC_GROUP] = new Node(row.METRIC_GROUP, [], 0, 0, 0, null, "METRIC_GROUP");
       }
 
-      if (!dataStructure.DOMAIN.hasOwnProperty(row.DOMAIN)) {
-        dataStructure.DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, dataStructure.METRIC_GROUP[row.METRIC_GROUP], "DOMAIN");
-      } else if (dataStructure.DOMAIN[row.DOMAIN].parent.name !== row.METRIC_GROUP) {
-        console.log("This domain exists already... " + row.DOMAIN + " BUT " + dataStructure.DOMAIN[row.DOMAIN].parent.name + " != " + row.METRIC_GROUP)
-        //dataStructure.INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
+      if (!obj.DOMAIN.hasOwnProperty(row.DOMAIN)) {
+        obj.DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, obj.METRIC_GROUP[row.METRIC_GROUP], "DOMAIN");
+      } else if (obj.DOMAIN[row.DOMAIN].parent.name !== row.METRIC_GROUP) {
+        console.log("This domain exists already... " + row.DOMAIN + " BUT " + obj.DOMAIN[row.DOMAIN].parent.name + " != " + row.METRIC_GROUP)
+        //obj.INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, obj.DOMAIN[row.DOMAIN], "INDICATOR");
       }
 
-      if (!dataStructure.INDICATOR.hasOwnProperty(row.DOMAIN + '_' + row.INDICATOR)) {
-        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0, dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
-      } else if (dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name !== row.DOMAIN) {
-        console.log("This indicator exists already... " + row.DOMAIN + '_' + row.INDICATOR + " BUT " + dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name + " != " + row.DOMAIN)
-        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0,dataStructure.DOMAIN[row.DOMAIN], "INDICATOR");
+      if (!obj.INDICATOR.hasOwnProperty(row.DOMAIN + '_' + row.INDICATOR)) {
+        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0, obj.DOMAIN[row.DOMAIN], "INDICATOR");
+      } else if (obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name !== row.DOMAIN) {
+        console.log("This indicator exists already... " + row.DOMAIN + '_' + row.INDICATOR + " BUT " + obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].parent.name + " != " + row.DOMAIN)
+        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR] = new Node(row.DOMAIN + '_' + row.INDICATOR, [], 0, 0, 0,obj.DOMAIN[row.DOMAIN], "INDICATOR");
       }
 
-      if (!dataStructure.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
-        dataStructure.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR], "METRIC_VAR");
+      if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
+        obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR], "METRIC_VAR");
       }
 
-      if (dataStructure.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(dataStructure.DOMAIN[row.DOMAIN]) < 0) {
-        dataStructure.METRIC_GROUP[row.METRIC_GROUP].children.push(dataStructure.DOMAIN[row.DOMAIN]);
+      if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.DOMAIN[row.DOMAIN]) < 0) {
+        obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.DOMAIN[row.DOMAIN]);
       }
-      if (dataStructure.DOMAIN[row.DOMAIN].children.indexOf(dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]) < 0) {
-        dataStructure.DOMAIN[row.DOMAIN].children.push(dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]);
+      if (obj.DOMAIN[row.DOMAIN].children.indexOf(obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]) < 0) {
+        obj.DOMAIN[row.DOMAIN].children.push(obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR]);
       }
-      if (dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.indexOf(dataStructure.METRIC_VAR[row.METRIC_VAR]) < 0) {
-        dataStructure.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.push(dataStructure.METRIC_VAR[row.METRIC_VAR]);
+      if (obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
+        obj.INDICATOR[row.DOMAIN + '_' + row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
       }
     });
   });
@@ -615,20 +614,20 @@ function Node(name, children, original_val, adjusted_val, scenario_val, parent, 
 
 // a('INDICATOR', 'original_val'); // calculate the indicator scores by averaging each indicator's child metrics
 // set the 'value' to the average of the children Node's 'value' for the specified 'thing'
-function updateAllAvgValues(thing, value) {
-	for (var indicator in dataStructure[thing]) {
+function updateAllAvgValues(thing, value, obj) {
+	for (var indicator in obj[thing]) {
     var sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
       }, 0);
     };
-    var avg = sum(dataStructure[thing][indicator].children, value) / dataStructure[thing][indicator].children.length;
-		dataStructure[thing][indicator][value] = avg;
+    var avg = sum(obj[thing][indicator].children, value) / obj[thing][indicator].children.length;
+		obj[thing][indicator][value] = avg;
   }
 }
 
-function updateAllWeightedAvgValues(thing, value) {
-	for (var indicator in dataStructure[thing]) {
+function updateAllWeightedAvgValues(thing, value, obj) {
+	for (var indicator in obj[thing]) {
     var sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
@@ -639,27 +638,27 @@ function updateAllWeightedAvgValues(thing, value) {
         return a + b[prop] * b.weight;
       }, 0);
     };
-    var avg = weightedSum(dataStructure[thing][indicator].children, value) / sum(dataStructure[thing][indicator].children, "weight");
-		dataStructure[thing][indicator][value] = avg;
+    var avg = weightedSum(obj[thing][indicator].children, value) / sum(obj[thing][indicator].children, "weight");
+		obj[thing][indicator][value] = avg;
   }
 }
 
-function setAllInitialAvgValues(thing) {
-	for (var indicator in dataStructure[thing]) {
+function setAllInitialAvgValues(thing, obj) {
+	for (var indicator in obj[thing]) {
     var sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
       }, 0);
     };
-    var avg = sum(dataStructure[thing][indicator].children, "original_val") / dataStructure[thing][indicator].children.length;
-    dataStructure[thing][indicator]["original_val"] = avg;
-    dataStructure[thing][indicator]["adjusted_val"] = avg;
-    dataStructure[thing][indicator]["scenario_val"] = avg;
+    var avg = sum(obj[thing][indicator].children, "original_val") / obj[thing][indicator].children.length;
+    obj[thing][indicator]["original_val"] = avg;
+    obj[thing][indicator]["adjusted_val"] = avg;
+    obj[thing][indicator]["scenario_val"] = avg;
   }
 }
 
-function setAllInitialWeightedAvgValues(thing) {
-	for (var indicator in dataStructure[thing]) {
+function setAllInitialWeightedAvgValues(thing, obj) {
+	for (var indicator in obj[thing]) {
     var sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
@@ -670,10 +669,10 @@ function setAllInitialWeightedAvgValues(thing) {
         return a + b[prop] * b.weight;
       }, 0);
     };
-    var avg = weightedSum(dataStructure[thing][indicator].children, "original_val") / sum(dataStructure[thing][indicator].children, "weight");
-    dataStructure[thing][indicator]["original_val"] = avg;
-    dataStructure[thing][indicator]["adjusted_val"] = avg;
-    dataStructure[thing][indicator]["scenario_val"] = avg;
+    var avg = weightedSum(obj[thing][indicator].children, "original_val") / sum(obj[thing][indicator].children, "weight");
+    obj[thing][indicator]["original_val"] = avg;
+    obj[thing][indicator]["adjusted_val"] = avg;
+    obj[thing][indicator]["scenario_val"] = avg;
   }
 }
 
@@ -696,4 +695,118 @@ function runAsterPlot() {
   }
 }
 
-createDataStructure();
+createDataStructure(dataStructure);
+
+function getStateDomainScore(state, domain) {
+
+  var sql = "SELECT avg(MetricScores.SCORE) " +
+  "FROM MetricScores " +
+  "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
+  "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
+  "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID " +
+  "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
+  "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
+  'WHERE Counties.STATE_CODE ==? AND METRIC_GROUP="HWBI" AND Domains.DOMAIN=?';
+
+  db.all(sql, [state, domain], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      console.log(row.SCORE)
+    });
+  });
+}
+
+function getStateDomainScores(state) {
+  var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
+      FROM MetricScores
+      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
+      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
+      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
+      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
+      WHERE Counties.STATE_CODE ==? AND METRIC_GROUP="HWBI"
+      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN`;
+  db.all(sql, [state], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#" + slugify(row.DOMAIN) + "_state_score").html(round(row.SCORE * 100, 1));
+    });
+  });
+}
+
+function getNationalDomainScores() {
+  var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
+      FROM MetricScores
+      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
+      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
+      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
+      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
+      WHERE METRIC_GROUP="HWBI"
+      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
+    });
+  });
+}
+
+function getStateDISCScore(state) {
+  var sql = `SELECT avg(SCORE) as SCORE FROM (
+    SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
+      FROM MetricScores
+      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
+      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
+      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
+      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
+      WHERE Counties.STATE_CODE=? AND METRIC_GROUP="HWBI"
+      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN)`;
+  db.all(sql, [state], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#disc_state_score").html(round(row.SCORE * 100, 1));
+    });
+  });
+}
+
+function getNationalDISCScore() {
+  var sql = `SELECT avg(SCORE) as SCORE FROM (
+    SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
+      FROM MetricScores
+      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
+      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
+      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
+      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
+      WHERE METRIC_GROUP="HWBI"
+      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN)`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#disc_national_score").html(round(row.SCORE * 100, 1));
+    });
+  });
+}
+
+function slugify(string) {
+  return string.replace(/ /g, '-').replace(/[^0-9a-z-_]/gi, '').toLowerCase().trim();
+}
+
+getNationalDomainScores();
+getNationalDISCScore();
