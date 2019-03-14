@@ -150,7 +150,7 @@ $('.rankinglist input').on("change", function() {
   //useRIVWeights();
   dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
 
-  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val'); // calculate the metric group scores by averaging each metric group's child domains
+  updateAllWeightedAvgValues('METRIC_GROUP', 'adjusted_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(location.state_abbr, location.county, "adjusted_val"); // set the domain scores
   runAsterPlot();
 });
