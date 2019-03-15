@@ -213,7 +213,7 @@ $('.thumb').on('input', function() {
     val = -1 * ((+$ele.val() - 1) * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
   }
 
-  if (units.toLowerCase().trim() === "percent") {
+  if (units.toLowerCase().trim() === "percent" && $ele.hasClass('customize-hwbi-metrics')) {
     val *= 100;
   }
 
@@ -560,7 +560,8 @@ function getMetricsForCounty(state = "", county = "") {
         rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
       }
 
-      if (row.ORIG_UNITS.toLowerCase().trim() === "percent") {
+      if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
+        console.log(row.METRIC_GROUP +" - "+row.METRIC_VAR + ": " + rawVal)
         rawVal *= 100;
       }
 
