@@ -204,14 +204,19 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
 $('.thumb').on('input', function() {
   var $ele = $(this);
   var sign = $ele.attr("data-sign");
-
+  var units = $ele.attr("data-units");
+  var val = 0;
   if (sign === "P") {
-    var val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
+    val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
   } else if (sign === "N") {
-    var val = -1 * ((+$ele.val() - 1) * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
+    val = -1 * ((+$ele.val() - 1) * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
   }
 
-  $ele.prev().html("<span> " + round(val, 3) + "</span>");
+  if (units.toLowerCase().trim() === "percent") {
+    val *= 100;
+  }
+
+  $ele.prev().html("<span> " + round(val, 3) + " (" + units + ")</span>");
 });
 
 function getScoreDataAJAXCall(location){
@@ -531,7 +536,8 @@ function getMetricsForCounty(state = "", county = "") {
                     "MetricScores.MINVAL, " +
                     "MetricScores.MAXVAL, " +
                     "MetricScores.POS_NEG_METRIC, " +
-                    "MetricVariables.SHORT_DESCRIPTION " +
+                    "MetricVariables.SHORT_DESCRIPTION, " +
+                    "MetricVariables.ORIG_UNITS " +
   "FROM MetricScores " +
   "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
   "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
@@ -553,8 +559,12 @@ function getMetricsForCounty(state = "", county = "") {
         rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
       }
 
+      if (row.ORIG_UNITS.toLowerCase().trim() === "percent") {
+        rawVal *= 100;
+      }
+
       $ele.val(row.SCORE); // set the metric scores
-      $ele.prev().html("<span> " + round(rawVal, 3) + "</span>");
+      $ele.prev().html("<span> " + round(rawVal, 3) + " (" + row.ORIG_UNITS + ")</span>");
       dataStructure.METRIC_VAR[row.METRIC_VAR].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
       dataStructure.METRIC_VAR[row.METRIC_VAR].original_val = row.SCORE; // add the metric score to the data structure
       dataStructure.METRIC_VAR[row.METRIC_VAR].custom_val = row.SCORE; // add the metric score to the data structure
