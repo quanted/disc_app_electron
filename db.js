@@ -86,6 +86,7 @@ function setScoreData(state, county, valueType) {
 
   var HWBI_score = round(dataStructure.METRIC_GROUP["HWBI"][valueType] * 100, 1); // Set location score
   $('#wellbeing-score').html(HWBI_score);
+  $('.modal-disc-score span').html(HWBI_score);
 
   document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
   $('#report-wellbeing-score').html(HWBI_score);
@@ -559,8 +560,14 @@ function getMetricsForCounty(state = "", county = "") {
     setScoreData(state, county, "original_val"); // set the domain scores
     loadSkillbar(); // update the colored bars on the snapshot page
     runAsterPlot(); //draw aster plot
-  });
-}
+
+    console.log('yeah');
+    $('.preload').fadeOut();
+    $('.preload-wrapper').delay(350).fadeOut('slow');
+    $('#community-snapshot-tab').delay(350).show();
+
+    }
+  )};
 
 var dataStructure = {
   METRIC_GROUP: {},
