@@ -203,7 +203,14 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
 
 $('.thumb').on('input', function() {
   var $ele = $(this);
-  var val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min")) + +$ele.attr("data-min"));
+  var sign = $ele.attr("data-sign");
+
+  if (sign === "P") {
+    var val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
+  } else if (sign === "N") {
+    var val = -1 * ((+$ele.val() - 1) * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
+  }
+
   $ele.prev().html("<span> " + round(val, 3) + "</span>");
 });
 
@@ -539,7 +546,13 @@ function getMetricsForCounty(state = "", county = "") {
     }
     rows.forEach((row) => {
       var $ele = $('.' + row.METRIC_VAR.toLowerCase());
-      var rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
+      var rawVal = 0;
+      if (row.POS_NEG_METRIC === "P") {
+        rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
+      } else if (row.POS_NEG_METRIC === "N") {
+        rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
+      }
+
       $ele.val(row.SCORE); // set the metric scores
       $ele.prev().html("<span> " + round(rawVal, 3) + "</span>");
       dataStructure.METRIC_VAR[row.METRIC_VAR].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
