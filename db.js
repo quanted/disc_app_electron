@@ -154,7 +154,6 @@ $('.rankinglist-modal input').on("change", function() {
 
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(location.state_abbr, location.county, "custom_val"); // set the domain scores
-  runAsterPlot();
 });
 
 /**
@@ -177,7 +176,6 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(state, county, "custom_val"); // set the domain scores
   loadSkillbar(); // update the colored bars on the snapshot page
-  runAsterPlot();
 });
 
 /**
@@ -187,20 +185,27 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
 $('.customize-service-metrics').on('change', function() { // customize metric listeners
   var ele = $(this);
   var val = +ele.val();
-  var loc = JSON.parse(locationValue);
-  var state = loc.state_abbr;
-  var county = loc.county;
   var metric = dataStructure.METRIC_VAR[ele.attr('data-var').toUpperCase()];
   
   metric.custom_val = val;
 
   updateAllAvgValues('SERVICE_INDICATOR', 'custom_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
   updateAllAvgValues('SERVICE_DOMAIN', 'custom_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
-
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
-  //setScoreData(state, county, "custom_val"); // set the domain scores
-  //loadSkillbar(); // update the colored bars on the snapshot page
-  //runAsterPlot();
+});
+
+$('.scenario-builder-metric').on('change', function() { // customize metric listeners
+  var ele = $(this);
+  var val = +ele.val();
+  var metric = dataStructure.METRIC_VAR[ele.attr('data-var').toUpperCase()];
+  
+  metric.scenario_val = val;
+
+  updateAllAvgValues('SERVICE_INDICATOR', 'scenario_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  updateAllAvgValues('SERVICE_DOMAIN', 'scenario_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+  updateAllWeightedAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+  calculateServiceHWBI('scenario_val');
+  runAsterPlot();
 });
 
 $('.thumb').on('input', function() {
@@ -562,7 +567,6 @@ function getMetricsForCounty(state = "", county = "") {
       }
 
       if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
-        console.log(row.METRIC_GROUP +" - "+row.METRIC_VAR + ": " + rawVal)
         rawVal *= 100;
       }
 
@@ -580,19 +584,19 @@ function getMetricsForCounty(state = "", county = "") {
     setAllInitialAvgValues('HWBI_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
     setAllInitialAvgValues('HWBI_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
 
+    setAllInitialAvgValues('METRIC_GROUP', dataStructure); // calculate the domain scores by averaging each domain's child indicators
     setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
     setScoreData(state, county, "original_val"); // set the domain scores
     loadSkillbar(); // update the colored bars on the snapshot page
+    calculateServiceHWBI('scenario_val')
     runAsterPlot(); //draw aster plot
 
-    console.log('yeah');
     $('.preload').fadeOut();
     $('.preload-wrapper').delay(350).fadeOut('slow');
     $('#community-snapshot-tab').delay(350).show();
-
-    }
-  )};
+  }
+)};
 
 var dataStructure = {
   METRIC_GROUP: {},
@@ -692,18 +696,20 @@ function updateAllAvgValues(thing, value, obj) {
 
 function updateAllWeightedAvgValues(thing, value, obj) {
 	for (var indicator in obj[thing]) {
-    var sum = function (items, prop) {
-      return items.reduce( function(a, b) {
-        return a + b[prop];
-      }, 0);
-    };
-    var weightedSum = function (items, prop) {
-      return items.reduce( function(a, b) {
-        return a + b[prop] * b.weight;
-      }, 0);
-    };
-    var avg = weightedSum(obj[thing][indicator].children, value) / sum(obj[thing][indicator].children, "weight");
-		obj[thing][indicator][value] = avg;
+    if (obj[thing][indicator].children[0].hasOwnProperty("weight")) {
+      var sum = function (items, prop) {
+        return items.reduce( function(a, b) {
+          return a + b[prop];
+        }, 0);
+      };
+      var weightedSum = function (items, prop) {
+        return items.reduce( function(a, b) {
+          return a + b[prop] * b.weight;
+        }, 0);
+      };
+      var avg = weightedSum(obj[thing][indicator].children, value) / sum(obj[thing][indicator].children, "weight");
+      obj[thing][indicator][value] = avg;
+    }
   }
 }
 
@@ -723,20 +729,22 @@ function setAllInitialAvgValues(thing, obj) {
 
 function setAllInitialWeightedAvgValues(thing, obj) {
 	for (var indicator in obj[thing]) {
-    var sum = function (items, prop) {
-      return items.reduce( function(a, b) {
-        return a + b[prop];
-      }, 0);
-    };
-    var weightedSum = function (items, prop) {
-      return items.reduce( function(a, b) {
-        return a + b[prop] * b.weight;
-      }, 0);
-    };
-    var avg = weightedSum(obj[thing][indicator].children, "original_val") / sum(obj[thing][indicator].children, "weight");
-    obj[thing][indicator]["original_val"] = avg;
-    obj[thing][indicator]["custom_val"] = avg;
-    obj[thing][indicator]["scenario_val"] = avg;
+    if (obj[thing][indicator].children[0].hasOwnProperty("weight")) {
+      var sum = function (items, prop) {
+        return items.reduce( function(a, b) {
+          return a + b[prop];
+        }, 0);
+      };
+      var weightedSum = function (items, prop) {
+        return items.reduce( function(a, b) {
+          return a + b[prop] * b.weight;
+        }, 0);
+      };
+      var avg = weightedSum(obj[thing][indicator].children, "original_val") / sum(obj[thing][indicator].children, "weight");
+      obj[thing][indicator]["original_val"] = avg;
+      obj[thing][indicator]["custom_val"] = avg;
+      obj[thing][indicator]["scenario_val"] = avg;
+    }
   }
 }
 
@@ -747,7 +755,7 @@ function runAsterPlot() {
       asterData.push({
           description: domain,
           weight: dataStructure.HWBI_DOMAIN[domain].weight,
-          score: dataStructure.HWBI_DOMAIN[domain].custom_val * 100
+          score: dataStructure.HWBI_DOMAIN[domain].scenario_val
       });
     }
   }
@@ -875,122 +883,122 @@ function slugify(string) {
 getNationalDomainScores();
 getNationalDISCScore();
 
-function calculateHWBI() {
+function calculateServiceHWBI(val) {
 
-  dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = (2.431227 +
-    0.577159 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    -1.755944 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val +
-    -0.370377 * dataStructure.SERVICE_DOMAIN["Re-Distribution"].custom_val +
-    0.465541 * dataStructure.SERVICE_DOMAIN["Consumption"].custom_val +
-    -0.111739 * dataStructure.SERVICE_DOMAIN["Healthcare"].custom_val +
-    -2.388524 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    -0.524012 * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val +
-    0.05051 * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val +
-    -1.934059 * dataStructure.SERVICE_DOMAIN["Labor"].custom_val +
-    0.211648 * dataStructure.SERVICE_DOMAIN["Education"].custom_val +
-    -1.998989 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    2.103267 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    3.222831 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val * dataStructure.SERVICE_DOMAIN["Labor"].custom_val
+  dataStructure.HWBI_DOMAIN["Connection to Nature"]["scenario_val"] = (2.431227 +
+    0.577159 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    -1.755944 * dataStructure.SERVICE_DOMAIN["Activism"][val] +
+    -0.370377 * dataStructure.SERVICE_DOMAIN["Re-Distribution"][val] +
+    0.465541 * dataStructure.SERVICE_DOMAIN["Consumption"][val] +
+    -0.111739 * dataStructure.SERVICE_DOMAIN["Healthcare"][val] +
+    -2.388524 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    -0.524012 * dataStructure.SERVICE_DOMAIN["Greenspace"][val] +
+    0.05051 * dataStructure.SERVICE_DOMAIN["Water Quality"][val] +
+    -1.934059 * dataStructure.SERVICE_DOMAIN["Labor"][val] +
+    0.211648 * dataStructure.SERVICE_DOMAIN["Education"][val] +
+    -1.998989 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    2.103267 * dataStructure.SERVICE_DOMAIN["Activism"][val] * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    3.222831 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] * dataStructure.SERVICE_DOMAIN["Labor"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = (-0.22391 +
-    2.429595 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    -0.100712 * dataStructure.SERVICE_DOMAIN["Air Quality"].custom_val +
-    -0.131353 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val +
-    0.084694 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    0.191835 * dataStructure.SERVICE_DOMAIN["Education"].custom_val +
-    0.09992 * dataStructure.SERVICE_DOMAIN["Innovation"].custom_val +
-    1.280481 * dataStructure.SERVICE_DOMAIN["Communication"].custom_val +
-    -0.097182 * dataStructure.SERVICE_DOMAIN["Production"].custom_val +
-    -4.405586 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val * dataStructure.SERVICE_DOMAIN["Communication"].custom_val +
-    0.23472 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val * dataStructure.SERVICE_DOMAIN["Air Quality"].custom_val
+  dataStructure.HWBI_DOMAIN["Cultural Fulfillment"]["scenario_val"] = (-0.22391 +
+    2.429595 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    -0.100712 * dataStructure.SERVICE_DOMAIN["Air Quality"][val] +
+    -0.131353 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] +
+    0.084694 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    0.191835 * dataStructure.SERVICE_DOMAIN["Education"][val] +
+    0.09992 * dataStructure.SERVICE_DOMAIN["Innovation"][val] +
+    1.280481 * dataStructure.SERVICE_DOMAIN["Communication"][val] +
+    -0.097182 * dataStructure.SERVICE_DOMAIN["Production"][val] +
+    -4.405586 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] * dataStructure.SERVICE_DOMAIN["Communication"][val] +
+    0.23472 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] * dataStructure.SERVICE_DOMAIN["Air Quality"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Education"].scenario_val = (0.392837 +
-    0.350783 * dataStructure.SERVICE_DOMAIN["Family Services"].custom_val +
-    0.463786 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    -0.48866 * dataStructure.SERVICE_DOMAIN["Production"].custom_val +
-    0.078233 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val +
-    -0.441537 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val +
-    0.574752 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val +
-    -0.37372 * dataStructure.SERVICE_DOMAIN["Consumption"].custom_val +
-    0.390576 * dataStructure.SERVICE_DOMAIN["Re-Distribution"].custom_val * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val
+  dataStructure.HWBI_DOMAIN["Education"]["scenario_val"] = (0.392837 +
+    0.350783 * dataStructure.SERVICE_DOMAIN["Family Services"][val] +
+    0.463786 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    -0.48866 * dataStructure.SERVICE_DOMAIN["Production"][val] +
+    0.078233 * dataStructure.SERVICE_DOMAIN["Public Works"][val] +
+    -0.441537 * dataStructure.SERVICE_DOMAIN["Justice"][val] +
+    0.574752 * dataStructure.SERVICE_DOMAIN["Activism"][val] +
+    -0.37372 * dataStructure.SERVICE_DOMAIN["Consumption"][val] +
+    0.390576 * dataStructure.SERVICE_DOMAIN["Re-Distribution"][val] * dataStructure.SERVICE_DOMAIN["Greenspace"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Health"].scenario_val = (0.231086 +
-    0.072714 * dataStructure.SERVICE_DOMAIN["Family Services"].custom_val +
-    0.194939 * dataStructure.SERVICE_DOMAIN["Communication"].custom_val +
-    0.097708 * dataStructure.SERVICE_DOMAIN["Labor"].custom_val +
-    0.020422 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val +
-    0.095983 * dataStructure.SERVICE_DOMAIN["Innovation"].custom_val +
-    0.04914 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    0.52497 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    0.149127 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val +
-    0.050258 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val * dataStructure.SERVICE_DOMAIN["Education"].custom_val +
-    -0.866259 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val * dataStructure.SERVICE_DOMAIN["Justice"].custom_val
+  dataStructure.HWBI_DOMAIN["Health"]["scenario_val"] = (0.231086 +
+    0.072714 * dataStructure.SERVICE_DOMAIN["Family Services"][val] +
+    0.194939 * dataStructure.SERVICE_DOMAIN["Communication"][val] +
+    0.097708 * dataStructure.SERVICE_DOMAIN["Labor"][val] +
+    0.020422 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] +
+    0.095983 * dataStructure.SERVICE_DOMAIN["Innovation"][val] +
+    0.04914 * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    0.52497 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    0.149127 * dataStructure.SERVICE_DOMAIN["Justice"][val] +
+    0.050258 * dataStructure.SERVICE_DOMAIN["Activism"][val] * dataStructure.SERVICE_DOMAIN["Education"][val] +
+    -0.866259 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] * dataStructure.SERVICE_DOMAIN["Justice"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Leisure Time"].scenario_val = (0.506212 +
-    -0.340958 * dataStructure.SERVICE_DOMAIN["Employment"].custom_val +
-    -0.719677 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val +
-    -0.39237 * dataStructure.SERVICE_DOMAIN["Consumption"].custom_val +
-    0.682084 * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"].custom_val +
-    -0.053742 * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val +
-    0.138196 * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val +
-    -0.544925 * dataStructure.SERVICE_DOMAIN["Education"].custom_val +
-    0.577271 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val +
-    -0.217388 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    0.934746 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val +
-    1.599972 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val * dataStructure.SERVICE_DOMAIN["Education"].custom_val +
-    0.206249 * dataStructure.SERVICE_DOMAIN["Finance"].custom_val * dataStructure.SERVICE_DOMAIN["Communication"].custom_val +
-    -1.29474 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val * dataStructure.SERVICE_DOMAIN["Activism"].custom_val +
-    -0.171528 * dataStructure.SERVICE_DOMAIN["Education"].custom_val * dataStructure.SERVICE_DOMAIN["Innovation"].custom_val
+  dataStructure.HWBI_DOMAIN["Leisure Time"]["scenario_val"] = (0.506212 +
+    -0.340958 * dataStructure.SERVICE_DOMAIN["Employment"][val] +
+    -0.719677 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] +
+    -0.39237 * dataStructure.SERVICE_DOMAIN["Consumption"][val] +
+    0.682084 * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"][val] +
+    -0.053742 * dataStructure.SERVICE_DOMAIN["Water Quality"][val] +
+    0.138196 * dataStructure.SERVICE_DOMAIN["Greenspace"][val] +
+    -0.544925 * dataStructure.SERVICE_DOMAIN["Education"][val] +
+    0.577271 * dataStructure.SERVICE_DOMAIN["Public Works"][val] +
+    -0.217388 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    0.934746 * dataStructure.SERVICE_DOMAIN["Activism"][val] +
+    1.599972 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] * dataStructure.SERVICE_DOMAIN["Education"][val] +
+    0.206249 * dataStructure.SERVICE_DOMAIN["Finance"][val] * dataStructure.SERVICE_DOMAIN["Communication"][val] +
+    -1.29474 * dataStructure.SERVICE_DOMAIN["Public Works"][val] * dataStructure.SERVICE_DOMAIN["Activism"][val] +
+    -0.171528 * dataStructure.SERVICE_DOMAIN["Education"][val] * dataStructure.SERVICE_DOMAIN["Innovation"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Living Standards"].scenario_val = (0.275027 +
-    0.092259 * dataStructure.SERVICE_DOMAIN["Employment"].custom_val +
-    -0.146247 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val +
-    0.134713 * dataStructure.SERVICE_DOMAIN["Labor"].custom_val +
-    0.367559 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val +
-    -0.259411 * dataStructure.SERVICE_DOMAIN["Finance"].custom_val +
-    -0.17859 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val +
-    0.078427 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val +
-    -0.024932 * dataStructure.SERVICE_DOMAIN["Capital Investment"].custom_val +
-    0.708609 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val * dataStructure.SERVICE_DOMAIN["Finance"].custom_val +
-    -0.038308 * dataStructure.SERVICE_DOMAIN["Capital Investment"].custom_val * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val +
-    0.177212 * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"].custom_val * dataStructure.SERVICE_DOMAIN["Communication"].custom_val
+  dataStructure.HWBI_DOMAIN["Living Standards"]["scenario_val"] = (0.275027 +
+    0.092259 * dataStructure.SERVICE_DOMAIN["Employment"][val] +
+    -0.146247 * dataStructure.SERVICE_DOMAIN["Public Works"][val] +
+    0.134713 * dataStructure.SERVICE_DOMAIN["Labor"][val] +
+    0.367559 * dataStructure.SERVICE_DOMAIN["Activism"][val] +
+    -0.259411 * dataStructure.SERVICE_DOMAIN["Finance"][val] +
+    -0.17859 * dataStructure.SERVICE_DOMAIN["Justice"][val] +
+    0.078427 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] +
+    -0.024932 * dataStructure.SERVICE_DOMAIN["Capital Investment"][val] +
+    0.708609 * dataStructure.SERVICE_DOMAIN["Public Works"][val] * dataStructure.SERVICE_DOMAIN["Finance"][val] +
+    -0.038308 * dataStructure.SERVICE_DOMAIN["Capital Investment"][val] * dataStructure.SERVICE_DOMAIN["Water Quality"][val] +
+    0.177212 * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"][val] * dataStructure.SERVICE_DOMAIN["Communication"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Safety and Security"].scenario_val = (0.603914 +
-    0.294092 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    -0.380562 * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val +
-    -0.385317 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val +
-    0.085398 * dataStructure.SERVICE_DOMAIN["Water Quantity"].custom_val +
-    1.35322 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val * dataStructure.SERVICE_DOMAIN["Labor"].custom_val +
-    -0.304328 * dataStructure.SERVICE_DOMAIN["Production"].custom_val * dataStructure.SERVICE_DOMAIN["Healthcare"].custom_val +
-    -1.147411 * dataStructure.SERVICE_DOMAIN["Labor"].custom_val * dataStructure.SERVICE_DOMAIN["Justice"].custom_val +
-    0.295058 * dataStructure.SERVICE_DOMAIN["Production"].custom_val * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"].custom_val +
-    -0.742299 * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    -0.602264 * dataStructure.SERVICE_DOMAIN["Activism"].custom_val * dataStructure.SERVICE_DOMAIN["Finance"].custom_val +
-    0.898598 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].custom_val +
-    0.574027 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val * dataStructure.SERVICE_DOMAIN["Finance"].custom_val +
-    0.655645 * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val
+  dataStructure.HWBI_DOMAIN["Safety and Security"]["scenario_val"] = (0.603914 +
+    0.294092 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    -0.380562 * dataStructure.SERVICE_DOMAIN["Water Quality"][val] +
+    -0.385317 * dataStructure.SERVICE_DOMAIN["Public Works"][val] +
+    0.085398 * dataStructure.SERVICE_DOMAIN["Water Quantity"][val] +
+    1.35322 * dataStructure.SERVICE_DOMAIN["Activism"][val] * dataStructure.SERVICE_DOMAIN["Labor"][val] +
+    -0.304328 * dataStructure.SERVICE_DOMAIN["Production"][val] * dataStructure.SERVICE_DOMAIN["Healthcare"][val] +
+    -1.147411 * dataStructure.SERVICE_DOMAIN["Labor"][val] * dataStructure.SERVICE_DOMAIN["Justice"][val] +
+    0.295058 * dataStructure.SERVICE_DOMAIN["Production"][val] * dataStructure.SERVICE_DOMAIN["Food, Fiber and Fuel Provisioning"][val] +
+    -0.742299 * dataStructure.SERVICE_DOMAIN["Greenspace"][val] * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    -0.602264 * dataStructure.SERVICE_DOMAIN["Activism"][val] * dataStructure.SERVICE_DOMAIN["Finance"][val] +
+    0.898598 * dataStructure.SERVICE_DOMAIN["Justice"][val] * dataStructure.SERVICE_DOMAIN["Emergency Preparedness"][val] +
+    0.574027 * dataStructure.SERVICE_DOMAIN["Public Works"][val] * dataStructure.SERVICE_DOMAIN["Finance"][val] +
+    0.655645 * dataStructure.SERVICE_DOMAIN["Water Quality"][val] * dataStructure.SERVICE_DOMAIN["Public Works"][val]
   ) * 100;
 
-  dataStructure.HWBI_DOMAIN["Social Cohesion"].scenario_val = (-0.810156 +
-    1.07278 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val +
-    0.042486 * dataStructure.SERVICE_DOMAIN["Air Quality"].custom_val +
-    -0.382991 * dataStructure.SERVICE_DOMAIN["Production"].custom_val +
-    1.980596 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val +
-    0.047261 * dataStructure.SERVICE_DOMAIN["Public Works"].custom_val +
-    1.282272 * dataStructure.SERVICE_DOMAIN["Re-Distribution"].custom_val +
-    0.100406 * dataStructure.SERVICE_DOMAIN["Capital Investment"].custom_val +
-    0.152944 * dataStructure.SERVICE_DOMAIN["Family Services"].custom_val +
-    0.120707 * dataStructure.SERVICE_DOMAIN["Labor"].custom_val + 
-    1.291316 * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val + 
-    -0.148073 * dataStructure.SERVICE_DOMAIN["Consumption"].custom_val + 
-    -3.59425 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"].custom_val * dataStructure.SERVICE_DOMAIN["Re-Distribution"].custom_val +
-    -2.048002 * dataStructure.SERVICE_DOMAIN["Justice"].custom_val * dataStructure.SERVICE_DOMAIN["Greenspace"].custom_val +
-    -0.036457 * dataStructure.SERVICE_DOMAIN["Employment"].custom_val * dataStructure.SERVICE_DOMAIN["Water Quality"].custom_val
+  dataStructure.HWBI_DOMAIN["Social Cohesion"]["scenario_val"] = (-0.810156 +
+    1.07278 * dataStructure.SERVICE_DOMAIN["Justice"][val] +
+    0.042486 * dataStructure.SERVICE_DOMAIN["Air Quality"][val] +
+    -0.382991 * dataStructure.SERVICE_DOMAIN["Production"][val] +
+    1.980596 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] +
+    0.047261 * dataStructure.SERVICE_DOMAIN["Public Works"][val] +
+    1.282272 * dataStructure.SERVICE_DOMAIN["Re-Distribution"][val] +
+    0.100406 * dataStructure.SERVICE_DOMAIN["Capital Investment"][val] +
+    0.152944 * dataStructure.SERVICE_DOMAIN["Family Services"][val] +
+    0.120707 * dataStructure.SERVICE_DOMAIN["Labor"][val] + 
+    1.291316 * dataStructure.SERVICE_DOMAIN["Greenspace"][val] + 
+    -0.148073 * dataStructure.SERVICE_DOMAIN["Consumption"][val] + 
+    -3.59425 * dataStructure.SERVICE_DOMAIN["Community and Faith-Based Initiatives"][val] * dataStructure.SERVICE_DOMAIN["Re-Distribution"][val] +
+    -2.048002 * dataStructure.SERVICE_DOMAIN["Justice"][val] * dataStructure.SERVICE_DOMAIN["Greenspace"][val] +
+    -0.036457 * dataStructure.SERVICE_DOMAIN["Employment"][val] * dataStructure.SERVICE_DOMAIN["Water Quality"][val]
   ) * 100;
 }
