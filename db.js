@@ -588,6 +588,11 @@ function getMetricsForCounty(state = "", county = "") {
     setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
     setScoreData(state, county, "original_val"); // set the domain scores
+
+    econChart.updateSeries([round(dataStructure.METRIC_GROUP.Economic.original_val * 100, 1)]);
+    ecoChart.updateSeries([round(dataStructure.METRIC_GROUP.Ecosystem.original_val * 100, 1)]);
+    socialChart.updateSeries([round(dataStructure.METRIC_GROUP.Social.original_val * 100, 1)]);
+
     loadSkillbar(); // update the colored bars on the snapshot page
     calculateServiceHWBI('scenario_val')
     runAsterPlot(); //draw aster plot
