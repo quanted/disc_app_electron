@@ -45,11 +45,26 @@ hwbi_metrics = cur.fetchall()
 
 try:
     os.makedirs('disc_app_electron/hwbi_app')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+try:
     os.makedirs('disc_app_electron/static_qed/hwbi/disc/css')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+try:
     os.makedirs('disc_app_electron/static_qed/hwbi/disc/img')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+try:
     os.makedirs('disc_app_electron/static_qed/hwbi/disc/js')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+try:
     os.makedirs('disc_app_electron/templates_qed/hwbi/disc')
-    os.makedirs('disc_app_electron/hwbi_app')
 except OSError as e:
     if e.errno != errno.EEXIST:
         raise
@@ -63,6 +78,9 @@ copyfile('static_qed/hwbi/disc/js/hwbi-disc-report-v2.js', 'disc_app_electron/st
 copyfile('static_qed/hwbi/disc/js/jquery-3.3.1.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-3.3.1.min.js')
 copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
 copyfile('static_qed/hwbi/disc/js/apexcharts.js', 'disc_app_electron/static_qed/hwbi/disc/js/apexcharts.js')
+copyfile('static_qed/hwbi/disc/js/d3.v3.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v3.min.js')
+copyfile('static_qed/hwbi/disc/js/d3-tip.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3-tip.min.js')
+copyfile('static_qed/hwbi/disc/js/draw.js', 'disc_app_electron/static_qed/hwbi/disc/js/draw.js')
 
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')
