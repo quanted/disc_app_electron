@@ -18,10 +18,10 @@
     "electron-builder": "^20.28.4"
   },
   "dependencies": {
-    "sql.js": "^0.4.0",
-    "wkhtmltopdf": "^0.3.4",
     "jquery-slinky": "^4.1.0",
-    "sqlite3": "^4.0.6"
+    "sql.js": "^0.4.0",
+    "sqlite3": "^4.0.6",
+    "wkhtmltopdf": "^0.3.4"
   },
   "build": {
     "asar": true,
