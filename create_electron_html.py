@@ -23,7 +23,9 @@ cur.execute('select * from MetricGroups WHERE METRIC_GROUP != "HWBI"')
 metricGroups = cur.fetchall()
 #print(metricGroups)
 
-cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS " +
+cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " +
+        "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
+        "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION " +
     "FROM MetricScores " +
     "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
     "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
@@ -33,7 +35,9 @@ cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTI
     "WHERE Counties.COUNTY_NAME ==\"Benton\" AND Counties.STATE_CODE ==\"OR\"")
 service_metrics = cur.fetchall()
 
-cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS " +
+cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " + 
+        "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
+        "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION " +
     "FROM MetricScores " +
     "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
     "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
