@@ -115,3 +115,16 @@ ipc.on('print-to-pdf', function (event) {
     });
   });
 });
+
+
+
+
+/* ipc.on('snap', function(event, arg) {
+  let snapshot = new BrowserWindow({ width: 800, height: 600 })
+  snapshot.on('closed', () => {
+  snapshot = null
+  });
+  const win = BrowserWindow.fromWebContents(arg);
+  snapshot.webContents.send('')
+});
+ */

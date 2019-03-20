@@ -21,6 +21,10 @@ function generateReport() {
   ipc.send('print-to-pdf');
 }
 
+function generateSnapshot() {
+  ipc.send('snap', $('#community-snapshot-tab').html());
+}
+
 const electron = nodeRequire('electron');
 const app = electron.app;
 const path = nodeRequire('path');
