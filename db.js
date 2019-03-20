@@ -166,7 +166,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   var loc = JSON.parse(locationValue);
   var state = loc.state_abbr;
   var county = loc.county;
-  var metric = dataStructure.METRIC_VAR[ele.attr('id').toUpperCase()];
+  var metric = dataStructure.HWBI_METRIC[ele.attr('id').toUpperCase()];
   
   metric.custom_val = val;
 
@@ -185,7 +185,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
 $('.customize-service-metrics').on('change', function() { // customize metric listeners
   var ele = $(this);
   var val = +ele.val();
-  var metric = dataStructure.METRIC_VAR[ele.attr('data-var').toUpperCase()];
+  var metric = dataStructure.SERVICE_METRIC[ele.attr('data-var').toUpperCase()];
   
   metric.custom_val = val;
 
@@ -197,7 +197,7 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
   var ele = $(this);
   var val = +ele.val();
-  var metric = dataStructure.METRIC_VAR[ele.attr('data-var').toUpperCase()];
+  var metric = dataStructure.SERVICE_METRIC[ele.attr('data-var').toUpperCase()];
   
   metric.scenario_val = val;
 
@@ -572,10 +572,15 @@ function getMetricsForCounty(state = "", county = "") {
 
       $ele.val(row.SCORE); // set the metric scores
       $ele.prev().html("<span> " + round(rawVal, 3) + " (" + row.ORIG_UNITS + ")</span>");
-      dataStructure.METRIC_VAR[row.METRIC_VAR].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
-      dataStructure.METRIC_VAR[row.METRIC_VAR].original_val = row.SCORE; // add the metric score to the data structure
-      dataStructure.METRIC_VAR[row.METRIC_VAR].custom_val = row.SCORE; // add the metric score to the data structure
-      dataStructure.METRIC_VAR[row.METRIC_VAR].scenario_val = row.SCORE; // add the metric score to the data structure
+      if (row.METRIC_GROUP === "HWBI") {
+        metricType = "HWBI_METRIC";
+      } else if (row.METRIC_GROUP === "Social" || row.METRIC_GROUP === "Economic" || row.METRIC_GROUP === "Ecosystem") {
+        metricType = "SERVICE_METRIC";
+      }
+      dataStructure[metricType][row.METRIC_VAR].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
+      dataStructure[metricType][row.METRIC_VAR].original_val = row.SCORE; // add the metric score to the data structure
+      dataStructure[metricType][row.METRIC_VAR].custom_val = row.SCORE; // add the metric score to the data structure
+      dataStructure[metricType][row.METRIC_VAR].scenario_val = row.SCORE; // add the metric score to the data structure
     });
    
     setAllInitialAvgValues('SERVICE_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
@@ -609,7 +614,8 @@ var dataStructure = {
   SERVICE_DOMAIN: {},
   HWBI_INDICATOR: {},
   SERVICE_INDICATOR: {},
-  METRIC_VAR: {}
+  HWBI_METRIC: {},
+  SERVICE_METRIC: {}
 };
 
 function createDataStructure(obj) {
@@ -636,8 +642,8 @@ function createDataStructure(obj) {
         if (!obj.HWBI_INDICATOR.hasOwnProperty(row.INDICATOR)) {
           obj.HWBI_INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, 0, obj.HWBI_DOMAIN[row.DOMAIN], "HWBI_INDICATOR");
         }
-        if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
-          obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.HWBI_INDICATOR[row.INDICATOR], "METRIC_VAR");
+        if (!obj.HWBI_METRIC.hasOwnProperty(row.METRIC_VAR)) {
+          obj.HWBI_METRIC[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.HWBI_INDICATOR[row.INDICATOR], "HWBI_METRIC");
         }
         if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.HWBI_DOMAIN[row.DOMAIN]) < 0) {
           obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.HWBI_DOMAIN[row.DOMAIN]);
@@ -645,18 +651,18 @@ function createDataStructure(obj) {
         if (obj.HWBI_DOMAIN[row.DOMAIN].children.indexOf(obj.HWBI_INDICATOR[row.INDICATOR]) < 0) {
           obj.HWBI_DOMAIN[row.DOMAIN].children.push(obj.HWBI_INDICATOR[row.INDICATOR]);
         }
-        if (obj.HWBI_INDICATOR[row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
-          obj.HWBI_INDICATOR[row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
+        if (obj.HWBI_INDICATOR[row.INDICATOR].children.indexOf(obj.HWBI_METRIC[row.METRIC_VAR]) < 0) {
+          obj.HWBI_INDICATOR[row.INDICATOR].children.push(obj.HWBI_METRIC[row.METRIC_VAR]);
         }
-      } else {
+      } else if (row.METRIC_GROUP === "Social" || row.METRIC_GROUP === "Economic" || row.METRIC_GROUP === "Ecosystem") {
         if (!obj.SERVICE_DOMAIN.hasOwnProperty(row.DOMAIN)) {
           obj.SERVICE_DOMAIN[row.DOMAIN] = new Node(row.DOMAIN, [], 0, 0, 0, obj.METRIC_GROUP[row.METRIC_GROUP], "SERVICE_DOMAIN");
         }
         if (!obj.SERVICE_INDICATOR.hasOwnProperty(row.INDICATOR)) {
           obj.SERVICE_INDICATOR[row.INDICATOR] = new Node(row.INDICATOR, [], 0, 0, 0, obj.SERVICE_DOMAIN[row.DOMAIN], "SERVICE_INDICATOR");
         }
-        if (!obj.METRIC_VAR.hasOwnProperty(row.METRIC_VAR)) {
-          obj.METRIC_VAR[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.SERVICE_INDICATOR[row.INDICATOR], "METRIC_VAR");
+        if (!obj.SERVICE_METRIC.hasOwnProperty(row.METRIC_VAR)) {
+          obj.SERVICE_METRIC[row.METRIC_VAR] = new Node(row.METRIC_VAR, [], 0, 0, 0, obj.SERVICE_INDICATOR[row.INDICATOR], "SERVICE_METRIC");
         }
         if (obj.METRIC_GROUP[row.METRIC_GROUP].children.indexOf(obj.SERVICE_DOMAIN[row.DOMAIN]) < 0) {
           obj.METRIC_GROUP[row.METRIC_GROUP].children.push(obj.SERVICE_DOMAIN[row.DOMAIN]);
@@ -664,8 +670,8 @@ function createDataStructure(obj) {
         if (obj.SERVICE_DOMAIN[row.DOMAIN].children.indexOf(obj.SERVICE_INDICATOR[row.INDICATOR]) < 0) {
           obj.SERVICE_DOMAIN[row.DOMAIN].children.push(obj.SERVICE_INDICATOR[row.INDICATOR]);
         }
-        if (obj.SERVICE_INDICATOR[row.INDICATOR].children.indexOf(obj.METRIC_VAR[row.METRIC_VAR]) < 0) {
-          obj.SERVICE_INDICATOR[row.INDICATOR].children.push(obj.METRIC_VAR[row.METRIC_VAR]);
+        if (obj.SERVICE_INDICATOR[row.INDICATOR].children.indexOf(obj.SERVICE_METRIC[row.METRIC_VAR]) < 0) {
+          obj.SERVICE_INDICATOR[row.INDICATOR].children.push(obj.SERVICE_METRIC[row.METRIC_VAR]);
         }
       }
     });
@@ -1006,4 +1012,31 @@ function calculateServiceHWBI(val) {
     -2.048002 * dataStructure.SERVICE_DOMAIN["Justice"][val] * dataStructure.SERVICE_DOMAIN["Greenspace"][val] +
     -0.036457 * dataStructure.SERVICE_DOMAIN["Employment"][val] * dataStructure.SERVICE_DOMAIN["Water Quality"][val]
   ) * 100;
+}
+
+function loadMetricValues(valueType) {
+  const { dialog } = nodeRequire('electron').remote
+
+  var choice = dialog.showMessageBox(
+    {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Load Customized Service Metric Values',
+      message: 'Loading customized values will reset any changes you have made below.\n\nDo you still want to proceed?'
+    });
+  if (choice === 0) {
+    setServiceScenarioValue(valueType);
+    updateAllAvgValues('SERVICE_INDICATOR', 'scenario_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+    updateAllAvgValues('SERVICE_DOMAIN', 'scenario_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+    updateAllWeightedAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+    calculateServiceHWBI('scenario_val');
+    runAsterPlot();
+  }
+}
+
+function setServiceScenarioValue(valueType) {
+  for (var metricName in dataStructure.SERVICE_METRIC) {
+      var metric = dataStructure.SERVICE_METRIC[metricName];
+      metric.scenario_val = metric[valueType];
+  }
 }
