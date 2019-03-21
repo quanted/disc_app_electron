@@ -2094,7 +2094,7 @@ label.option {
   display: inline;
 }
 
-input[type='checkbox'],
+/* input[type='checkbox'],
 input[type='radio'] {
   padding: 0;
   position: absolute;
@@ -2143,7 +2143,7 @@ input[type='checkbox']:disabled + label:before,
 input[type='radio']:disabled + label:before {
   background: #d6d7d9;
   box-shadow: 0 0 0 1px #aeb0b5;
-}
+} */
 
 .password-indicator div {
   background-color: #4aa564;
