@@ -1,11 +1,19 @@
+const electron = nodeRequire('electron');
+const app = electron.app;
+const path = nodeRequire('path');
+const fs = nodeRequire('fs');
 var dragVal = {};
 
 var shell = nodeRequire('electron').shell;
 try {
 	var sqlite3 = nodeRequire('sqlite3').verbose();
 } catch (e) { 
-	console.log(e);
-	var sqlite3 = nodeRequire('./resources/app.asar/node_modules/sqlite3').verbose();
+  
+  try {
+    var sqlite3 = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/sqlite3')).verbose();
+  } catch (e) { 
+    console.log(e);
+  }
 }
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
@@ -25,11 +33,6 @@ function generateSnapshot() {
   ipc.send('snap', $('#community-snapshot-tab').html());
 }
 
-const electron = nodeRequire('electron');
-const app = electron.app;
-const path = nodeRequire('path');
-const fs = nodeRequire('fs');
-
 // fs.readdirSync('.').forEach(file => {
 //   console.log(file);
 // })
@@ -46,8 +49,10 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
   dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
 } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/DISC.db'))) {
   dbPath = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
+} else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/DISC.db'))) {
+  dbPath = path.join(process.resourcesPath, '/hwbi_app/DISC.db');
 } else {
-  dbPath = 'resources\app.asar\hwbi_app\DISC.db';
+  console.log("Database not found.")
 }
 
 var db = new sqlite3.Database(dbPath);
