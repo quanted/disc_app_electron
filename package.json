@@ -33,6 +33,8 @@
     "nsis": {
       "oneClick": false
     },
-    "extraResources": ["hwbi_app/DISC.db"]
+    "extraResources": [
+      "hwbi_app/DISC.db"
+    ]
   }
 }
