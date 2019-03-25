@@ -152,17 +152,18 @@ function getScoreData() {
  * Change the relative importance weight of a domain
  * @listens change
  */
-$('.rankinglist-modal input').on("change", function() {
+$('.rankinglist input').on("change", function() {
   var location = JSON.parse(locationValue);
   var $this = $(this)
-  /* var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<')); */
-  var label = $this.attr('data-domain');
+  var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<'));
+  // var label = $this.attr('data-domain');
 
-  //useRIVWeights();
   dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
 
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(location.state_abbr, location.county, "custom_val"); // set the domain scores
+  calculateServiceHWBI();
+  runAsterPlot();
 });
 
 /**
