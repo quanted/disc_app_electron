@@ -541,25 +541,18 @@ function getIndicatorsForCounty(state = "", county = ""){
 
 function getMetricsForCounty(state = "", county = "") {
   var sql = "SELECT  MetricVariables.METRIC_VAR, " +
-                    "MetricVariables.METRIC_DESCRIPTION, " +
                     "MetricScores.SCORE, " +
-                    "MetricScores.FIPS, " +
                     "Counties.COUNTY_NAME, " +
                     "Counties.STATE_CODE, " +
-                    "Domains.DOMAIN, " +
-                    "Indicators.INDICATOR, " +
                     "MetricGroups.METRIC_GROUP, " +
                     "MetricScores.MINVAL, " +
                     "MetricScores.MAXVAL, " +
                     "MetricScores.POS_NEG_METRIC, " +
-                    "MetricVariables.SHORT_DESCRIPTION, " +
                     "MetricVariables.ORIG_UNITS " +
   "FROM MetricScores " +
   "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
   "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
   "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  " +
-  "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
-  "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
   "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?";
 
   db.all(sql, [county, state], (err, rows) => {
