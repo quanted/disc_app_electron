@@ -14,8 +14,8 @@
   "author": "",
   "license": "",
   "devDependencies": {
-    "electron": "^3.0.0",
-    "electron-builder": "^20.28.4"
+    "electron": "4.0.3",
+    "electron-builder": "^20.39.0"
   },
   "dependencies": {
     "sql.js": "^0.4.0",
