@@ -564,15 +564,15 @@ object {
 @media print {
   * {
     background: transparent !important;
-    color: #000 !important;
+    /* color: #000 !important;
     -ms-filter: none !important;
     filter: none !important;
-    text-shadow: none !important;
+    text-shadow: none !important; */
   }
 
   a,
   a:visited {
-    color: #444 !important;
+    /* color: #444 !important; */
   }
 
   /*
