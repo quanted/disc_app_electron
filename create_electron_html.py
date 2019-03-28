@@ -77,6 +77,7 @@ except OSError as e:
 
 copyfile('static_qed/hwbi/disc/css/hwbi-disc-app.css', 'disc_app_electron/static_qed/hwbi/disc/css/hwbi-disc-app.css')
 copyfile('static_qed/hwbi/disc/css/jquery-ui.min.css', 'disc_app_electron/static_qed/hwbi/disc/css/jquery-ui.min.css')
+copyfile('static_qed/hwbi/disc/css/donut.css', 'disc_app_electron/static_qed/hwbi/disc/css/donut.css')
 
 copyfile('static_qed/hwbi/disc/js/jquery-ui.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-ui.min.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-app.js')
@@ -84,9 +85,11 @@ copyfile('static_qed/hwbi/disc/js/hwbi-disc-report-v2.js', 'disc_app_electron/st
 copyfile('static_qed/hwbi/disc/js/jquery-3.3.1.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-3.3.1.min.js')
 copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
 copyfile('static_qed/hwbi/disc/js/apexcharts.js', 'disc_app_electron/static_qed/hwbi/disc/js/apexcharts.js')
-copyfile('static_qed/hwbi/disc/js/d3.v3.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v3.min.js')
-copyfile('static_qed/hwbi/disc/js/d3-tip.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3-tip.min.js')
+#copyfile('static_qed/hwbi/disc/js/d3.v3.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v3.min.js')
+copyfile('static_qed/hwbi/disc/js/d3.v5.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v5.min.js')
+#copyfile('static_qed/hwbi/disc/js/d3-tip.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3-tip.min.js')
 copyfile('static_qed/hwbi/disc/js/draw.js', 'disc_app_electron/static_qed/hwbi/disc/js/draw.js')
+copyfile('static_qed/hwbi/disc/js/donut.js', 'disc_app_electron/static_qed/hwbi/disc/js/donut.js')
 
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')
@@ -97,7 +100,7 @@ copyfile('static_qed/hwbi/disc/img/domain_arrow.png', 'disc_app_electron/static_
 copyfile('static_qed/hwbi/disc/img/domain_bar.png', 'disc_app_electron/static_qed/hwbi/disc/img/domain_bar.png')
 copyfile('static_qed/hwbi/disc/img/education.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/education.jpg')
 copyfile('static_qed/hwbi/disc/img/health.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/health.jpg')
-copyfile('static_qed/hwbi/disc/img/leisure-time.png', 'disc_app_electron/static_qed/hwbi/disc/img/leisure-time.jpg')
+copyfile('static_qed/hwbi/disc/img/leisure-time.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/leisure-time.jpg')
 copyfile('static_qed/hwbi/disc/img/living-standards.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/living-standards.jpg')
 copyfile('static_qed/hwbi/disc/img/safety-and-security.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/safety-and-security.jpg')
 copyfile('static_qed/hwbi/disc/img/social-cohesion.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social-cohesion.jpg')

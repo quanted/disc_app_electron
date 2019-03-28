@@ -20,6 +20,7 @@
   "dependencies": {
     "sql.js": "^0.4.0",
     "wkhtmltopdf": "^0.3.4",
+    "d3-tip": "^0.9.1",
     "jquery-slinky": "^4.1.0",
     "sqlite3": "^4.0.6"
   },

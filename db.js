@@ -1,8 +1,22 @@
+$(function() {
+  dataStructure = {
+    METRIC_GROUP: {},
+    HWBI_DOMAIN: {},
+    SERVICE_DOMAIN: {},
+    HWBI_INDICATOR: {},
+    SERVICE_INDICATOR: {},
+    HWBI_METRIC: {},
+    SERVICE_METRIC: {}
+  };
+  createDataStructure(dataStructure);
+});
 const electron = nodeRequire('electron');
 const app = electron.app;
 const path = nodeRequire('path');
 const fs = nodeRequire('fs');
-var dragVal = {};
+const ipc = electron.ipcRenderer;
+d3.tip = nodeRequire('d3-tip');
+var dataStructure;
 
 var shell = nodeRequire('electron').shell;
 try {
@@ -15,15 +29,12 @@ try {
     console.log(e);
   }
 }
+
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
     event.preventDefault();
     shell.openExternal(this.href);
 });
-
-
-
-const ipc = nodeRequire('electron').ipcRenderer;
 
 function generateReport() {
   ipc.send('print-to-pdf');
@@ -128,6 +139,7 @@ function getScoreData() {
   }
   var location = JSON.parse(location_data);
   
+  initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
   getStateDISCScore(location.state_abbr);
   getMetricsForCounty(location.state_abbr, location.county);
@@ -152,13 +164,21 @@ function getScoreData() {
  * Change the relative importance weight of a domain
  * @listens change
  */
-$('.rankinglist input').on("change", function() {
+$('.rankinglist input').on("input", function() {
   var location = JSON.parse(locationValue);
   var $this = $(this)
   var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<'));
   // var label = $this.attr('data-domain');
 
   dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
+  var data = [];
+  for (var domain in dataStructure.HWBI_DOMAIN) {
+      data.push({
+          Domain: domain,
+          Weight: dataStructure.HWBI_DOMAIN[domain].weight	
+      });
+  }
+  donut.data(data);
 
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   setScoreData(location.state_abbr, location.county, "custom_val"); // set the domain scores
@@ -563,6 +583,7 @@ function getMetricsForCounty(state = "", county = "") {
     rows.forEach((row) => {
       var $ele = $('.' + row.METRIC_VAR.toLowerCase());
       var rawVal = 0;
+      var metricType;
       if (row.POS_NEG_METRIC === "P") {
         rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
       } else if (row.POS_NEG_METRIC === "N") {
@@ -610,18 +631,8 @@ function getMetricsForCounty(state = "", county = "") {
   }
 )};
 
-var dataStructure = {
-  METRIC_GROUP: {},
-  HWBI_DOMAIN: {},
-  SERVICE_DOMAIN: {},
-  HWBI_INDICATOR: {},
-  SERVICE_INDICATOR: {},
-  HWBI_METRIC: {},
-  SERVICE_METRIC: {}
-};
-
 function createDataStructure(obj) {
-  sql = "SELECT MetricGroups.METRIC_GROUP as METRIC_GROUP, Domains.DOMAIN AS DOMAIN, Indicators.INDICATOR as INDICATOR, METRIC_VAR " +
+  var sql = "SELECT MetricGroups.METRIC_GROUP as METRIC_GROUP, Domains.DOMAIN AS DOMAIN, Indicators.INDICATOR as INDICATOR, METRIC_VAR " +
   "FROM MetricVariables " +
   "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID " +
   "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
@@ -779,8 +790,6 @@ function runAsterPlot() {
     updateAsterPlot(asterData);
   }
 }
-
-createDataStructure(dataStructure);
 
 function getStateDomainScore(state, domain) {
 
@@ -1204,5 +1213,29 @@ function setServiceScenarioValue(valueType) {
   for (var metricName in dataStructure.SERVICE_METRIC) {
       var metric = dataStructure.SERVICE_METRIC[metricName];
       metric.scenario_val = metric[valueType];
+  }
+}
+
+var donut = donutChart()
+        .width(670)
+        .height(300)
+        .transTime(250) // length of transitions in ms
+        .cornerRadius(3) // sets how rounded the corners are on each slice
+        .padAngle(0.015) // effectively dictates the gap between slices
+        .variable('Weight')
+        .category('Domain');
+
+function initializeRankingDonut() {
+  if (!$('#ranking-chart svg').length) {
+    var data = [];
+    for (var domain in dataStructure.HWBI_DOMAIN) {
+      data.push({
+              Domain: domain,
+              Weight: dataStructure.HWBI_DOMAIN[domain].weight	
+          });
+    }
+    donut.data(data);
+    d3.select('#ranking-chart')
+                .call(donut); // draw chart in div
   }
 }
