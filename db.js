@@ -15,7 +15,6 @@ const app = electron.app;
 const path = nodeRequire('path');
 const fs = nodeRequire('fs');
 const ipc = electron.ipcRenderer;
-d3.tip = nodeRequire('d3-tip');
 var dataStructure;
 
 var shell = nodeRequire('electron').shell;
@@ -25,6 +24,17 @@ try {
   
   try {
     var sqlite3 = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/sqlite3')).verbose();
+  } catch (e) { 
+    console.log(e);
+  }
+}
+
+try {
+  d3.tip = nodeRequire('d3-tip');
+} catch (e) { 
+  
+  try {
+    d3.tip = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/d3-tip'));
   } catch (e) { 
     console.log(e);
   }
