@@ -1240,7 +1240,7 @@ function setServiceScenarioValue(valueType) {
 }
 
 var donut = donutChart()
-        .width(670)
+        .width(540)
         .height(300)
         .transTime(250) // length of transitions in ms
         .cornerRadius(3) // sets how rounded the corners are on each slice
