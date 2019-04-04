@@ -64,7 +64,38 @@ function generateReport() {
 }
 
 function generateSnapshot() {
-  ipc.send('snap', $('#community-snapshot-tab').html());
+  var domainData = {
+    HWBI_DOMAIN: {},
+    Service: {},
+    DISC: {},
+      National_DOMAIN: {},
+      State_DOMAIN: {},
+    National_DISC: {},
+      State_DISC: {},
+    location: ''
+  };
+
+  for (var domain in dataStructure.HWBI_DOMAIN) {
+    domainData.HWBI_DOMAIN[domain] = {
+        score: dataStructure.HWBI_DOMAIN[domain].custom_val,
+      locationValues: $('#' + slugify(domain) + '_location').html()
+    }
+  }
+
+  for (var domain in dataStructure.METRIC_GROUP) {
+    if (domain !== "HWBI") {
+          domainData.Service[domain] = {
+              score: dataStructure.METRIC_GROUP[domain].custom_val
+          }
+      } else {
+      domainData.DISC = {
+              score: dataStructure.METRIC_GROUP[domain].custom_val
+          }
+    }
+  }
+  domainData.location = $('#location').html();
+  domainData.locationScores = $('#wellbeing-score-location').html();
+  ipc.send('snap', domainData);
 }
 
 // fs.readdirSync('.').forEach(file => {
@@ -266,6 +297,7 @@ $('.thumb').on('input', function() {
   var sign = $ele.attr("data-sign");
   var units = $ele.attr("data-units");
   var val = 0;
+  var roundValue = 2;
   if (sign === "P") {
     val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
   } else if (sign === "N") {

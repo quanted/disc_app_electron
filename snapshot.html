@@ -1,0 +1,551 @@
+<!-- start 01epa_drupal_header.html -->
+<!DOCTYPE html>
+<!--[if IEMobile 7]><html class="iem7 no-js" lang="en" dir="ltr"><![endif]-->
+<!--[if lt IE 7]><html class="lt-ie9 lt-ie8 lt-ie7 no-js" lang="en" dir="ltr"><![endif]-->
+<!--[if (IE 7)&(!IEMobile)]><html class="lt-ie9 lt-ie8 no-js" lang="en" dir="ltr"><![endif]-->
+<!--[if IE 8]><html class="lt-ie9 no-js" lang="en" dir="ltr"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)]><!--> <html class="no-js not-oldie" lang="en" dir="ltr"> <!--<![endif]-->
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="true" />
+  <link rel="shortcut icon" href="https://www.epa.gov/sites/all/themes/epa/favicon.ico" type="image/vnd.microsoft.icon" />
+  <meta name="MobileOptimized" content="width" />
+  <meta http-equiv="cleartype" content="on" />
+  <meta http-equiv="ImageToolbar" content="false" />
+  <meta name="viewport" content="width=device-width" />
+  <meta name="version" content="20161218" />
+<!--googleon: all-->
+  <meta name="DC.description" content="" />
+  <meta name="DC.title" content="" />
+  <title>Conceptual Decision Integration for Strong Communities | Q.E.D. | US EPA</title>
+<!--googleoff: snippet-->
+  <meta name="keywords" content="" />
+  <link rel="shortlink" href="" />
+  <link rel="canonical" href="" />
+  <meta name="DC.creator" content="" />
+  <meta name="DC.language" content="en" />
+  <meta name="DC.Subject.epachannel" content="" />
+  <meta name="DC.type" content="" />
+  <meta name="DC.date.created" content="" />
+  <meta name="DC.date.modified" content="" />
+<!--googleoff: all-->
+  
+  <link type="text/css" rel="stylesheet" href="/external_resources/s.css" media="all" />
+  
+</head>
+
+<script>
+  window.nodeRequire = require;
+  delete window.require;
+  delete window.exports;
+  delete window.module;
+</script>
+
+<script src="/static_qed/hwbi/disc/js/jquery-3.3.1.min.js"></script>
+<!-- end 01epa_drupal_header.html --><!-- Start imports for HWBI disc app page-->
+<script type="text/javascript" src="/static_qed/hwbi/disc/js/jquery-ui.min.js"></script>
+
+
+
+
+<!-- <script src="/static_qed/hwbi/disc/js/d3.v5.min.js"></script>
+<script type="text/javascript" src="/static_qed/hwbi/disc/js/donut.js"></script>
+<script type="text/javascript" src="/static_qed/hwbi/disc/js/hwbi-disc-app.js"></script>
+
+<script type="text/javascript" src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+<script type="text/javascript" src="/static_qed/hwbi/disc/js/hwbi-disc-report-v2.js"></script> -->
+
+<link rel="stylesheet" href="/static_qed/hwbi/disc/css/hwbi-disc-app.css"/>
+<link rel="stylesheet" href="/static_qed/hwbi/disc/css/jquery-ui.min.css"/>
+<!-- <link rel="stylesheet" href="/static_qed/hwbi/disc/css/donut.css"/> -->
+
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g&libraries=places&callback=initializeGoogleMaps" async defer></script> -->
+
+
+<link rel="stylesheet" href="/static_qed/hwbi/disc/css/mainstyle.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="/static_qed/hwbi/disc/js/main.js"></script>
+<script src="/static_qed/hwbi/disc/js/apexcharts.js"></script>
+<!-- End imports for HWBI disc app page--><body>
+<main>
+<div id="community-snapshot-tab" class="disc-body">
+        <div id="community-snapshot-content">
+            <div id="results_body">
+                <div id="snapshot_results">
+                    <div id="hwbi-score">
+                        <p id="location">Snapshot results for:<br>[location]</p>
+                        <div id="score_graph_div">
+                            <span class="score_indicator" id="score_indicator_span"></span>
+                            <p id="wellbeing-score">0</p>
+                            <p id="wellbeing-score-scale"><b>DISC Score</b><br>(Scale: 0 - 100)</p>
+                            <p id="wellbeing-score-location">Nation: <span id="disc_national_score"></span>, State: <span id="disc_state_score"></span></p>
+                        </div>
+                        <div id="hwbi-info">
+                            <h4>DISC Score</h4>
+                            <p>The Decision Integration for Strong Communities (DISC) index is a summary measure that
+                                provides a profile about select community characteristics. The index is based on
+                                indicators and metrics derived from existing cultural, economic, health, and other
+                                related data. The DISC profile index provides a snapshot about quality of life
+                                characteristics common across all communities and is sensitive to changes in the
+                                economic, social and ecological environments.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="wellbeing-scores">
+                    <h3 id="domain-scores_data-title">Community Characteristic Scores</h3>
+                    <button type="button" id="rank_btn" onclick="priorityText()">&bull; &bull; &bull;</button>
+                    <!-- <button id="snapshot-btn" onclick="generateSnapshot();">Create Snapshot</button> -->
+                    <br><br>
+                    <div id="priorityexplanation" style="display: none;">Well-being and resilience measures are often used to characterize the drivers that influence human behavior and affect the human condition. These quality of life attributes are multi-dimensional that are best described using a host of metrics that respond to the changing environment in which people live. A synthesis of this knowledge helps shape our understanding about people and their needs, both actual and perceived.</div>
+                    <div id="domain-scores">
+                        <div class="domain-blocks">
+                        
+                        <div id="nature-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="nature_data-title" class="domain-data-title">Connection to Nature:</div>
+                                <div id="connection-to-nature_score" class="domain-score">0.0</div>
+                                <div id="connection-to-nature_location" class="domain-location">Nation: <span id="connection-to-nature_national_score"></span>, State: <span id="connection-to-nature_state_score"></span></div>
+                                <div id="connection-to-nature_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar nature-bar" id="nature-score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="nature-slider-bar" class="rank-slider nature-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="nature_details" class="domain-description">
+                                    <p>
+                                        The Connection to Nature domain describes how people feel about nature. It is measured by people's perception of nature and how it affects them.
+                                        More . . .
+
+                                    </p>
+                                    <!-- <figure class="domain_image_left">
+                                        <img src="/static_qed/hwbi/disc/img/connection-to-nature.jpg"
+                                             alt="Connection to Nature">
+                                        <figcaption>Courtesy of Evgeni Dinev; freedigitalphotos.net</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                        
+                        <div id="cultural-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="cultural_data-title" class="domain-data-title">Cultural Fulfillment:</div>
+                                <div id="cultural-fulfillment_score" class="domain-score">0.0</div>
+                                <div id="cultural-fulfillment_location" class="domain-location">Nation: <span id="cultural-fulfillment_national_score"></span>, State: <span id="cultural-fulfillment_state_score"></span></div>
+                                <div id="cultural-fulfillment_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar cultural-bar" id="cultural-fulfillment-score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="cultural-slider-bar" class="rank-slider cultural-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="cultural_details" class="domain-description">
+                                    <p>
+                                        The Cultural Fulfillment domain describes people's cultural involvement. measures include how often people participate in the arts and spiritual activities. 
+                                        More . . .
+                                    </p>
+                                    <!-- <figure class="domain_image_left">
+                                        <img src="/static_qed/hwbi/disc/img/cultural-fulfillment.jpg"
+                                             alt="Cultural Fulfillment">
+                                        <figcaption>Courtesy of iStockphoto</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                        
+                        <div id="education-block" class="domain-score-block">
+                            <button class="accordion domain-expand"></button>
+                            <div id="education_data-title" class="domain-data-title">Education:</div>
+                            <div id="education_score" class="domain-score">0.0</div>
+                            <div id="education_location" class="domain-location">Nation: <span id="education_national_score"></span>, State: <span id="education_state_score"></span></div>
+                            
+                            <div id="education_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                <div class="score-bar education-bar" id="education-score-bar"></div>
+                            </div>
+                            <div class="slider-block">
+                                <span class="left-slider-legend">Less</span>
+                                <div class="slider-container">
+                                    <div id="education-slider-bar" class="rank-slider education-slider"></div>
+                                </div>
+                                <span class="right-slider-legend">More</span>
+                            </div>
+                            <div id="education_details" class="domain-description">
+                                <p>
+                                    The Education domain covers basic skills in reading, math and science. measures of student safety and health are also included. 
+                                    More . . .
+                                </p>
+                                <!-- <figure class="domain_image_right">
+                                    <img src="/static_qed/hwbi/disc/img/education.jpg"
+                                         alt="Education">
+                                    <figcaption>Courtesy of U.S. FWS</figcaption>
+                                </figure> -->
+                                
+                            </div>
+                        </div>
+                        
+                        <div id="health-block" class="domain-score-block">
+                            <button class="accordion domain-expand"></button>
+                            <div id="health_data-title" class="domain-data-title">Health:</div>
+                            <div id="health_score" class="domain-score">0.0</div>
+                            <div id="health_location" class="domain-location">Nation: <span id="health_national_score"></span>, State: <span id="health_state_score"></span></div>
+                            <div id="health_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                <div class="score-bar health-bar" id="health-score-bar"></div>
+                            </div>
+                            <div class="slider-block">
+                                <span class="left-slider-legend">Less</span>
+                                <div class="slider-container">
+                                    <div id="health-slider-bar" class="rank-slider health-slider"></div>
+                                </div>
+                                <span class="right-slider-legend">More</span>
+                            </div>
+                            <div id="health_details" class="domain-description">
+                                <p>
+                                    The Health domain describes people's involvement in healthy behaviors, prevalence of illness, access to healthcare, mortality and life expectancy. 
+                                    More . . .
+
+                                </p>
+                                <!-- <figure class="domain_image_left">
+                                    <img src="/static_qed/hwbi/disc/img/health.jpg"
+                                         alt="Health">
+                                    <figcaption>Courtesy of iStockphoto</figcaption>
+                                </figure> -->
+                                
+                            </div>
+                        </div>
+                        
+                        <div id="leisure-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="leisure_data-title" class="domain-data-title">Leisure Time:</div>
+                                <div id="leisure-time_score" class="domain-score">0.0</div>
+                                <div id="leisure-time_location" class="domain-location">Nation: <span id="leisure-time_national_score"></span>, State: <span id="leisure-time_state_score"></span></div>
+                                <div id="leisure-time_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar leisure-bar" id="leisure-time-score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="leisure-slider-bar" class="rank-slider leisure-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="leisure_details" class="domain-description">
+                                    <p>
+                                        The Leisure Time domain describes how our time is spent including: employment, care for seniors and activities that people partake in for personal enjoyment. a higher score may represent a positive or a negative characteristic in context of other domain indicators. More . . .
+                                    </p>
+                                    <!-- <figure class="domain_image_left">
+                                        <img src="/static_qed/hwbi/disc/img/leisure-time.jpg"
+                                             alt="Leisure Time">
+                                        <figcaption>Courtesy of U.S. EPA</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                        
+                        <div id="living-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="living_data-title" class="domain-data-title">Living Standards:</div>
+                                <div id="living-standards_score" class="domain-score">0.0</div>
+                                <div id="living-standards_location" class="domain-location">Nation: <span id="living-standards_national_score"></span>, State: <span id="living-standards_state_score"></span></div>
+                                <div id="living-standards_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar living-bar" id="living-standards_score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="living-slider-bar" class="rank-slider living-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="living_details" class="domain-description">
+                                    <p>
+                                        The Living Standards domain contains information about lifestyles. it includes measure of basic necessities, wealth and income. 
+                                        More . . .
+                                    </p>
+                                    <!-- <figure class="domain_image_left">
+                                        <img src="/static_qed/hwbi/disc/img/living-standards.jpg"
+                                             alt="Living Standards">
+                                        <figcaption>Courtesy of Microsoft.com</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                        
+                        <div id="safety-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="safety_data-title" class="domain-data-title">Safety & Security:</div>
+                                <div id="safety-and-security_score" class="domain-score">0.0</div>
+                                <div id="safety-and-security_location" class="domain-location">Nation: <span id="safety-and-security_national_score"></span>, State: <span id="safety-and-security_state_score"></span></div>
+                                <div id="safety-and-security_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar safety-bar" id="safety-and-security_score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="safety-slider-bar" class="rank-slider safety-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="safety_details" class="domain-description">
+                                    <p>
+                                        The Safety and Security domain includes information about perceived safety, actual safety and potential for danger. 
+                                        More . . .
+                                    </p>
+                                    <!-- <figure class="domain_image_right">
+                                        <img src="/static_qed/hwbi/disc/img/safety-and-security.jpg"
+                                             alt="Safety">
+                                        <figcaption>Courtesy of iStockphoto.com</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                        
+                        <div id="cohesion-block" class="domain-score-block">
+                                <button class="accordion domain-expand"></button>
+                                <div id="cohesion_data-title" class="domain-data-title">Social Cohesion:</div>
+                                <div id="social-cohesion_score" class="domain-score">0.0</div>
+                                <div id="social-cohesion_location" class="domain-location">Nation: <span id="social-cohesion_national_score"></span>, State: <span id="social-cohesion_state_score"></span></div>
+                                <div id="social-cohesion_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                    <div class="score-bar cohesion-bar" id="social-cohesion_score-bar"></div>
+                                </div>
+                                <div class="slider-block">
+                                    <span class="left-slider-legend">Less</span>
+                                    <div class="slider-container">
+                                        <div id="cohesion-slider-bar" class="rank-slider cohesion-slider"></div>
+                                    </div>
+                                    <span class="right-slider-legend">More</span>
+                                </div>
+                                <div id="cohesion_details" class="domain-description">
+                                    <p>
+                                        Social Cohesion	The Social Cohesion domain describes people's connection to each other and their community by measuring involvement in family, democracy, and the community as a whole. More . . .
+                                    </p>
+                                    <!-- <figure class="domain_image_left">
+                                        <img src="/static_qed/hwbi/disc/img/social-cohesion.jpg"
+                                             alt="Social Cohesion">
+                                        <figcaption>Courtesy of iStockphoto.com</figcaption>
+                                    </figure> -->
+                                    
+                                </div>
+                            </div>
+                            </div> <!--end domain-blocks -->
+
+                            <div class="service-blocks">
+                                <button type="button" id="servicedesc_btn" onclick="serviceText();">&bull; &bull; &bull;</button>
+                                <h3>Services</h3>
+                                <div id="service-explanation" style="display: none;">There exists a myriad of currencies that frame the underpinnings of a thriving society-not all are dollars and cents. The wants and needs of people are met through the availability of items (i.e., goods) and delivery of assistance (i.e., services). The availability and flow of economic, social and ecosystem services serve many purposes within a community-everything from health to employment to clean water. New investment in or redistribution of economic, social and natural resources is the conduit for introducing change that influence quality of life outcomes.</div>
+                                <div class="chartcontainer">
+                                    <div id="chart" class="radialbar"></div>
+                                    <div id="chart2" class="radialbar"></div>
+                                    <div id="chart3" class="radialbar"></div>
+                                </div>
+
+                                <!-- <div class="chartdesc-container">
+                                    <div class="chartdesc" id="desc1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos saepe harum, architecto cumque itaque corporis aliquid, error totam et animi quibusdam, fugiat dolor ea molestias quas modi iusto sapiente odio.</div>
+                                    <div class="chartdesc" id="desc2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio perspiciatis laboriosam similique quaerat numquam voluptate assumenda asperiores! Quae vel corrupti aliquid culpa sunt, unde quisquam! Itaque voluptates quos eos nemo.</div>
+                                    <div class="chartdesc" id="desc3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Asperiores ipsum provident qui eveniet dicta dolores ea, perspiciatis vero. Delectus provident similique necessitatibus officia repellendus sapiente suscipit quaerat placeat fuga rerum?</div>
+                                </div> -->
+                                <script>
+                                var options = {
+                                    chart: {
+                                        height: 220,
+                                        type: 'radialBar',
+                                    },
+                                    plotOptions: {
+                                        radialBar: {
+                                            dataLabels: {
+                                                name: {
+                                                    color: 'black',
+                                                },
+                                                value: {
+                                                    show: true,
+                                                    formatter: function (val) {
+                                                        return val
+                                                    }
+                                                },
+                                            },
+                                            hollow: {
+                                                size: '60%',
+                                            }
+                                        },
+                                    },
+                                    series: [70],
+                                    labels: ['Economic'],
+                                    colors: ['#4fa4dc'],
+                                }
+
+                                var options2 = {
+                                    chart: {
+                                        height: 220,
+                                        type: 'radialBar',
+                                    },
+                                    plotOptions: {
+                                        radialBar: {
+                                            dataLabels: {
+                                                name: {
+                                                    color: 'black',
+                                                },
+                                                value: {
+                                                show: true,
+                                                formatter: function (val) {
+                                                        return val
+                                                    }
+                                                },
+                                            },
+                                            hollow: {
+                                                size: '60%',
+                                            }
+                                        },
+                                    },
+                                    series: [51],
+                                    labels: ['Ecosystem'],
+                                    colors: ['#20E647'],
+                                }
+
+                                var options3 = {
+                                    chart: {
+                                        height: 220,
+                                        type: 'radialBar',
+                                    },
+                                    plotOptions: {
+                                        radialBar: {
+                                            dataLabels: {
+                                                name: {
+                                                    color: 'black',
+                                                },
+                                                value: {
+                                                show: true,
+                                                formatter: function (val) {
+                                                        return val
+                                                    }
+                                                },
+                                            },
+                                            hollow: {
+                                                size: '60%',
+                                            }
+                                        },
+                                    },
+                                    series: [63],
+                                    labels: ['Social'],
+                                    colors: ['#9d3f3f'],
+                                }
+
+                                var econChart = new ApexCharts(
+                                    document.querySelector("#chart"),
+                                    options);
+                                econChart.render();
+
+                                var ecoChart = new ApexCharts(
+                                    document.querySelector("#chart2"),
+                                    options2);
+                                ecoChart.render();
+
+                                var socialChart = new ApexCharts(
+                                    document.querySelector("#chart3"),
+                                    options3);
+                                socialChart.render();
+
+
+                                </script>
+                            </div> <!-- end service-blocks -->                        
+                    </div> <!-- end domain scores -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    
+    <!-- <script src="/sql.js"></script> -->
+
+    <!-- <script src="/node_modules/jquery-slinky/dist/slinky.min.js"></script>
+    <link rel="stylesheet" src="/node_modules/jquery-slinky/dist/slinky.min.css">   -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script src="/render.js"></script>
+    <!-- <script src="/db.js"></script> -->
+    
+    <script>
+        function slugify(string) {
+            return string.replace(/ /g, '-').replace(/[^0-9a-z-_]/gi, '').toLowerCase().trim();
+        }
+
+        function round(number, precision) {
+            var shift = function(number, precision, reverseShift) {
+            if (reverseShift) {
+                precision = -precision;
+            }
+            var numArray = ("" + number).split("e");
+            return +(numArray[0] + "e" + (numArray[1] ? (+numArray[1] + precision) : precision));
+            };
+            return shift(Math.round(shift(number, precision, false)), precision, true);
+        }
+
+        function loadSkillbar() {
+            $('.domain-score-bar').each(function () {
+                $(this).find('.score-bar').animate({
+                    width: jQuery(this).attr('data-percent')
+                }, 800);
+            });
+        }
+
+        var data;
+        function show(shown, hidden) {
+            document.getElementById(shown).style.display='block';
+            document.getElementById(hidden).style.display='none';
+            return false;
+        }
+
+        $('.disc-body').show();
+        $(".domain-expand").hide()
+        $("#rank_btn").hide()
+        $("#servicedesc_btn").hide()
+
+        // renderer process
+        var ipcRenderer = nodeRequire('electron').ipcRenderer;
+        ipcRenderer.on('snapshot-data', function (event, data) {
+            data = data;
+            console.log(data)
+            for (var domain in data.HWBI_DOMAIN) { // Set Domain scores
+                var slugifiedDomain = slugify(domain);
+                var score = round(data.HWBI_DOMAIN[domain]["score"] * 100, 1);
+                $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score);
+                $('#' + slugifiedDomain + '_score_bar').attr('data-percent', score + "%");
+                $('#' + slugifiedDomain + '_score_summary').html(score);
+
+                $('#' + slugifiedDomain + '_location').html(data.HWBI_DOMAIN[domain].locationValues)
+            }
+            loadSkillbar(); // update the colored bars on the snapshot page
+
+            econChart.updateSeries([round(data.Service.Economic.score * 100, 1)]);
+            ecoChart.updateSeries([round(data.Service.Ecosystem.score * 100, 1)]);
+            socialChart.updateSeries([round(data.Service.Social.score * 100, 1)]);
+
+
+
+            document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
+  
+            $('#location').html(data.location); // Set location info
+            $('#wellbeing-score-location').html(data.locationScores);
+
+            var HWBI_score = round(data.DISC.score * 100, 1); // Set location score
+            $('#wellbeing-score').html(HWBI_score);
+
+            document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
+
+
+
+        });
+
+        ipcRenderer.send('did-finish-load');
+
+
+    </script>
+</body>
+</html>

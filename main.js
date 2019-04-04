@@ -116,15 +116,29 @@ ipc.on('print-to-pdf', function (event) {
   });
 });
 
-
-
-
-/* ipc.on('snap', function(event, arg) {
-  let snapshot = new BrowserWindow({ width: 800, height: 600 })
-  snapshot.on('closed', () => {
-  snapshot = null
+ipc.on('snap', function(event, data) {
+  const PROTOCOL = 'file';
+  let snapshot = new BrowserWindow({
+    width: 1100,
+    height: 825,
+    center: true,
+    resizable: true,
+    frame: true,
+    transparent: false,
+    parent: mainWindow
   });
-  const win = BrowserWindow.fromWebContents(arg);
-  snapshot.webContents.send('')
+
+  snapshot.loadURL(url.format({
+    pathname: 'snapshot.html',
+    protocol: PROTOCOL + ':',
+    slashes: true
+  }));
+
+  snapshot.webContents.on('did-finish-load', function() {
+    snapshot.webContents.send('snapshot-data', data);
+  });
+
+  // snapshot.custom = {
+  //   'data': data
+  // };
 });
- */
