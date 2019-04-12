@@ -282,9 +282,14 @@ $('.thumb').on('input', function() {
 
   if (units.toLowerCase().trim() === "percent" && $ele.hasClass('customize-hwbi-metrics')) {
     val *= 100;
+    roundValue = 1;
   }
 
-  $ele.prev().html("<span> " + round(val, 3) + " (" + units + ")</span>");
+  if (units.toLowerCase().trim() === "dollars") {
+    roundValue = 2;
+  }
+
+  $ele.prev().html("<span> " + round(val, roundValue) + " (" + units + ")</span>");
 });
 
 function getScoreDataAJAXCall(location){
@@ -614,6 +619,7 @@ function getMetricsForCounty(state = "", county = "") {
       var $ele = $('.' + row.METRIC_VAR.toLowerCase());
       var rawVal = 0;
       var metricType;
+      var roundValue = 3;
       if (row.POS_NEG_METRIC === "P") {
         rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
       } else if (row.POS_NEG_METRIC === "N") {
@@ -622,10 +628,15 @@ function getMetricsForCounty(state = "", county = "") {
 
       if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
         rawVal *= 100;
+        roundValue = 1;
+      }
+
+      if (row.ORIG_UNITS.toLowerCase().trim() === "dollars") {
+        roundValue = 2;
       }
 
       $ele.val(row.SCORE); // set the metric scores
-      $ele.prev().html("<span> " + round(rawVal, 3) + " (" + row.ORIG_UNITS + ")</span>");
+      $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + row.ORIG_UNITS + ")</span>");
       if (row.METRIC_GROUP === "HWBI") {
         metricType = "HWBI_METRIC";
       } else if (row.METRIC_GROUP === "Social" || row.METRIC_GROUP === "Economic" || row.METRIC_GROUP === "Ecosystem") {
