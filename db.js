@@ -1,27 +1,13 @@
-$(function() {
-  dataStructure = {
-    METRIC_GROUP: {},
-    HWBI_DOMAIN: {},
-    SERVICE_DOMAIN: {},
-    HWBI_INDICATOR: {},
-    SERVICE_INDICATOR: {},
-    HWBI_METRIC: {},
-    SERVICE_METRIC: {}
-  };
-  createDataStructure(dataStructure);
-});
 const electron = nodeRequire('electron');
-const app = electron.app;
+const { app, ipcRenderer, dialog, shell } = electron;
+
 const path = nodeRequire('path');
 const fs = nodeRequire('fs');
-const ipc = electron.ipcRenderer;
-var dataStructure;
 
-var shell = nodeRequire('electron').shell;
 try {
 	var sqlite3 = nodeRequire('sqlite3').verbose();
 } catch (e) { 
-  
+  console.log(e);
   try {
     var sqlite3 = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/sqlite3')).verbose();
   } catch (e) { 
@@ -39,6 +25,21 @@ try {
     console.log(e);
   }
 }
+
+let dataStructure;
+
+$(function() {
+  dataStructure = {
+    METRIC_GROUP: {},
+    HWBI_DOMAIN: {},
+    SERVICE_DOMAIN: {},
+    HWBI_INDICATOR: {},
+    SERVICE_INDICATOR: {},
+    HWBI_METRIC: {},
+    SERVICE_METRIC: {}
+  };
+  createDataStructure(dataStructure);
+});
 
 //open links externally by default
 $(document).on('click', 'a[href^="http"]', function(event) {
@@ -60,7 +61,7 @@ function generateReport() {
         
       }
     }
-  ipc.send('print-to-pdf');
+  ipcRenderer.send('print-to-pdf');
 }
 
 function generateSnapshot() {
@@ -95,7 +96,7 @@ function generateSnapshot() {
   }
   domainData.location = $('#location').html();
   domainData.locationScores = $('#wellbeing-score-location').html();
-  ipc.send('snap', domainData);
+  ipcRenderer.send('snap', domainData);
 }
 
 // fs.readdirSync('.').forEach(file => {
@@ -1245,8 +1246,6 @@ function calculateServiceHWBI() {
 }
 
 function loadMetricValues(valueType) {
-  const { dialog } = nodeRequire('electron').remote
-
   var choice = dialog.showMessageBox(
     {
       type: 'question',
