@@ -1278,3 +1278,9 @@ function initializeRankingDonut() {
                 .call(donut); // draw chart in div
   }
 }
+
+// Listen for open file from main process
+ipcRenderer.on('open-file', (event, arg) => {
+  console.log(arg);
+});
+

@@ -4,6 +4,10 @@ const { app, BrowserWindow, Menu, ipcMain, shell, dialog } = electron;
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const Papa = require('papaparse');
+
+// SET ENV
+//process.env.NODE_ENV = 'production';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -18,8 +22,6 @@ function createWindow () {
       let url = request.url.substr(PROTOCOL.length + 1);
       // Build complete path for node require function
       url = path.join(__dirname, WEB_FOLDER, url);
-      // Replace backslashes by forward slashes (windows)
-      // url = url.replace(/\\/g, '/');
       url = path.normalize(url);
       callback({path: url});
   });
@@ -45,15 +47,108 @@ function createWindow () {
     slashes: true
   }));
 
+  const menuTemplate = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Load Community Data...',
+          accelerator: process.platform === 'darwin' ? 'Command+O' : "CTRL+O",
+          click: () => {
+            openFile();
+          }
+        }, {
+          label: 'Save Community Data',
+          accelerator: process.platform === 'darwin' ? 'Command+S' : "CTRL+S",
+          click: () => {
+            saveFile();
+          }
+        }, {
+          label: 'Save Community Data As...',
+          accelerator: process.platform === 'darwin' ? 'Command+Shift+S' : "CTRL+Shift+S",
+          click: () => {
+            saveFileAs();
+          }
+        }, {
+          type: 'separator'
+        }, {
+          type: 'separator'
+        }, {
+          label: 'Quit',
+          accelerator: process.platform === 'darwin' ? 'Command+Q' : "CTRL+Q",
+          click: () => {
+            quit();
+          }
+        }
+      ]
+    }
+  ];
+
+  // add dev tools item if not in production
+  if (process.env.node_env !== 'production') {
+    menuTemplate.push({
+      label: "Developer Tools",
+      submenu: [
+        {
+          label: "Toggle DevTools",
+          accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
+          click (item, focusedWindow) {
+            focusedWindow.toggleDevTools();
+          }
+        },
+        {
+          role: 'reload'
+        }
+      ]
+    })
+  }
+
+  // if mac add empty object to menu
+  if (process.platform === "darwin") {
+    menuTemplate.unshift({});
+  };
+
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
+
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
+  mainWindow.on('close', function(e) {
+    let choice;
+    if (saved) {
+      choice = dialog.showMessageBox(this,
+        {
+          type: 'question',
+          buttons: ['Yes', 'No'],
+          title: 'Decision Integration for Strong Communities',
+          message: 'Are you sure you want to quit?'
+        });
+      if (choice == 1) {
+        e.preventDefault();
+      }
+    } else {
+      choice = dialog.showMessageBox(this,
+        {
+          type: 'question',
+          buttons: ["Save", "Don't Save", "Cancel"],
+          title: 'Decision Integration for Strong Communities',
+          message: 'Do you want to save your changes to ' + savedFileName + '?'
+        });
+        console.log(choice);
+        if (choice == 0) {
+          console.log("Save and Quit");
+          e.preventDefault();
+          mainWindow.webContents.send('save-and-quit');
+        } else if (choice == 2) {
+          console.log("Cancel quit");
+          e.preventDefault();
+          return;
+        } else {
+          console.log("just quit")
+        }
+      }
   });
 }
 
@@ -156,4 +251,175 @@ ipcMain.on('snap', function(event, data) {
     snapshot = null;
   });
 });
+
+// File open and close
+let saved = true;
+function openFile() {
+  console.log("open file")
+  dialog.showOpenDialog({filters: [
+    {name: 'Custom File Type', extensions: ['csv']}
+  ]},
+  function (fileNames) {
+    if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+      console.log("No file selected");
+    } else {
+      if (!saved) { // Check if unsaved
+        console.log("not saved")
+        dialog.showMessageBox(mainWindow,
+        {
+          type: 'question',
+          buttons: ["Save", "Don't Save", "Cancel"],
+          title: 'Decision Integration for Strong Communities',
+          message: 'Do you want to save your changes to ' + savedFileName + '?'
+        },
+        function (response) {
+          console.log(response);
+          if (response == 0) {
+            console.log("Save and Open");
+            mainWindow.webContents.send('save-and-open', fileNames);
+          } else if (response == 2) {
+            console.log("Cancel");
+            return;
+          } else {
+            console.log("Just open");
+            let data = parseCSVFile(fileNames[0]);
+            mainWindow.webContents.send('open-file', data);
+            savedFileName = fileNames;
+            saved = true;
+          }
+        });
+      } else {
+        console.log("saved")
+        let data = parseCSVFile(fileNames[0]);
+        mainWindow.webContents.send('open-file', data);
+        savedFileName = fileNames;
+        saved = true;
+      }
+    }
+  });
+}
+
+function parseCSVFile(fileName) {
+  importedData = require('fs').readFileSync(fileName, "utf8");
+  let rows;
+  Papa.parse(importedData, {
+      header: true,
+      delimiter: ",",
+      worker: true,
+      complete: function(results) {
+        rows = results.data;
+      }
+  });
+
+  return rows;
+}
+
+function saveFile() {
+  mainWindow.webContents.send('save');
+}
+
+function saveFileAs() {
+  var nameToUse = savedFileName;
+  console.log(savedFileName)
+  dialog.showSaveDialog(
+  {
+    defaultPath: nameToUse,
+    filters: [
+      {
+        name: 'Custom File Type',
+        extensions: ['csv']
+      }
+    ]
+  },
+  function (fileNames) {
+    if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+      console.log("No file selected");
+    } else {
+      if(!fileNames.endsWith(".csv")) {
+        fileNames += ".csv";
+      }
+      mainWindow.webContents.send('save-as', fileNames);
+    }
+  });
+}
+
+function saveFileAsAndOpen(saveName, openName) {
+  var nameToUse = savedFileName;
+  console.log(savedFileName)
+  dialog.showSaveDialog(
+  {
+    defaultPath: nameToUse,
+    filters: [
+      {
+        name: 'Custom File Type',
+        extensions: ['csv']
+      }
+    ]
+  },
+  function (fileNames) {
+    if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+      console.log("No file selected");
+    } else {
+      if(!fileNames.endsWith(".csv")) {
+        fileNames += ".csv";
+      }
+      mainWindow.webContents.send('save-as-and-open', fileNames, openName);
+    }
+  });
+}
+
+function saveFileAsAndQuit() {
+  const nameToUse = savedFileName;
+  console.log(savedFileName)
+  dialog.showSaveDialog(
+  {
+    defaultPath: nameToUse,
+    filters: [
+      {
+        name: 'Custom File Type',
+        extensions: ['csv']
+      }
+    ]
+  },
+  function (fileNames) {
+    if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+      console.log("No file selected");
+    } else {
+      if(!fileNames.endsWith(".csv")) {
+        fileNames += ".csv";
+      }
+      mainWindow.webContents.send('save-as-and-quit', fileNames);
+    }
+  });
+}
+
+// Saves the file when the renderer returns the data
+ipcMain.on('save-as', function(event, arg) {
+  saveFileAs(arg);
+});
+
+// Saves the file then open when the renderer returns the data
+ipcMain.on('save-as-and-open', function(event, saveName, openName) {
+  saveFileAsAndOpen(saveName, openName);
+});
+
+// Saves the file then quit when the renderer returns the data
+ipcMain.on('save-as-and-quit', function(event, saveName) {
+  saveFileAsAndQuit(saveName);
+});
+
+ipcMain.on('has-been-saved', function(event, arg) {
+  console.log("has-been-saved");
+  console.log(arg);
+  savedFileName = arg;
+  saved = true;
+});
+
+ipcMain.on('has-been-changed', function(event, arg) {
+  console.log("has-been-changed");
+  saved = false;
+});
+
+ipcMain.on('quit', function(event, arg) {
+  quit();
 });
