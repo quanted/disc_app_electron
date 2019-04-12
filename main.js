@@ -35,6 +35,11 @@ function createWindow () {
     }
   });
 
+  // show the window once it's ready
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
   // Load the index.html of the app.
   mainWindow.loadURL(url.format({
     pathname: 'index.html',
@@ -61,12 +66,16 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
+  quit();
+});
+
+function quit() {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
     app.quit();
   }
-});
+}
 
 app.on('activate', function () {
   // On OS X it's common to re-create a window in the app when the
@@ -118,6 +127,7 @@ ipc.on('print-to-pdf', function (event) {
 
 ipc.on('snap', function(event, data) {
   const PROTOCOL = 'file';
+  
   let snapshot = new BrowserWindow({
     width: 1100,
     height: 825,
@@ -125,20 +135,33 @@ ipc.on('snap', function(event, data) {
     resizable: true,
     frame: true,
     transparent: false,
+    show: false,
     parent: mainWindow
   });
 
+  // remove the menu from snapshot
+  snapshot.setMenu(null);
+
+  // load the snapshot file
   snapshot.loadURL(url.format({
     pathname: 'snapshot.html',
     protocol: PROTOCOL + ':',
     slashes: true
   }));
 
+  // show the window once it's ready
+  snapshot.once('ready-to-show', () => {
+    snapshot.show();
+  });
+
+  // send data when the page is ready to accept it
   snapshot.webContents.on('did-finish-load', function() {
     snapshot.webContents.send('snapshot-data', data);
   });
 
-  // snapshot.custom = {
-  //   'data': data
-  // };
+  // garbage collection handle
+  snapshot.on('closed', function() {
+    snapshot = null;
+  });
+});
 });
