@@ -18,11 +18,11 @@
     "electron-builder": "^20.39.0"
   },
   "dependencies": {
-    "sql.js": "^0.4.0",
-    "wkhtmltopdf": "^0.3.4",
     "d3-tip": "^0.9.1",
     "jquery-slinky": "^4.1.0",
-    "sqlite3": "^4.0.6"
+    "papaparse": "^4.6.3",
+    "sqlite3": "^4.0.6",
+    "wkhtmltopdf": "^0.3.4"
   },
   "build": {
     "asar": true,
