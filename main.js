@@ -1,9 +1,7 @@
 const electron = require('electron');
-// Module to control application life.
-const app = electron.app;
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow;
+const { app, BrowserWindow, Menu, ipcMain, shell, dialog } = electron;
 
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
@@ -85,13 +83,7 @@ app.on('activate', function () {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-const ipc = electron.ipcMain;
-const fs = require('fs');
-const shell = electron.shell;
-const {dialog} = require('electron');
-ipc.on('print-to-pdf', function (event) {
+ipcMain.on('print-to-pdf', function (event) {
   const pdfPath = path.join(__dirname, '/print.pdf');
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF({printBackground: true, landscape: true}, function (error, data) {
@@ -125,7 +117,7 @@ ipc.on('print-to-pdf', function (event) {
   });
 });
 
-ipc.on('snap', function(event, data) {
+ipcMain.on('snap', function(event, data) {
   const PROTOCOL = 'file';
   
   let snapshot = new BrowserWindow({
