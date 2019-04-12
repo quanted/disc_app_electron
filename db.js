@@ -52,13 +52,10 @@ function generateReport() {
     let a;
 
     for (a = 0; a < chkbx.length; a++) {
-
-      
       if($(chkbx[a]).is(':checked') && !$(chkbx[a]).parent().parent().parent().prev('.accordion-metrics').hasClass('active-metric')) {
         /* $('input:checkbox').closest('button').addClass('active-metric');
         $('input:checkbox').closest('div.metric-accordion-panel').css('display','block'); */
         $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics').trigger('click');
-        
       }
     }
   ipcRenderer.send('print-to-pdf');
@@ -99,17 +96,7 @@ function generateSnapshot() {
   ipcRenderer.send('snap', domainData);
 }
 
-// fs.readdirSync('.').forEach(file => {
-//   console.log(file);
-// })
-
 let dbPath;
-
-//console.log(path.join(__dirname, '/hwbi_app/hwbi_dbOLD2.sqlite3'));
-//console.log(path.join(__dirname, '/resources/app/hwbi_app/hwbi_dbOLD2.sqlite3'));
-//console.log(fs.existsSync(path.join(__dirname, '/hwbi_app/hwbi_dbOLD2.sqlite3')));
-//console.log(fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/hwbi_dbOLD2.sqlite3')));
-//console.log(fs.existsSync(path.join(__dirname, '/resources/app.asar/hwbi_app/hwbi_dbOLD2.sqlite3')));
 
 if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
   dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
@@ -156,9 +143,6 @@ function setScoreData(state, county, valueType) {
   $('#location').html("Snapshot results for:<br>" + county + " County, " + state); // Set location info
   $('#reportlocation').html("Report for " + county + " County, " + state);
 
-   /* $('#wellbeing-score-location').html("Nation: " + data.outputs.nationhwbi.toFixed(1) + ", State: " +
-       data.outputs.statehwbi.toFixed(1)); */
-
   var HWBI_score = round(dataStructure.METRIC_GROUP["HWBI"][valueType] * 100, 1); // Set location score
   $('#wellbeing-score').html(HWBI_score);
   $('.modal-disc-score span').html(HWBI_score);
@@ -200,18 +184,9 @@ function getScoreData() {
   getMetricsForCounty(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
-  
   show('mainpage', 'homepage');
- 
   $('#community-snapshot-tab-link').trigger("click");
-  
-  //setCompareData(data, 0);
-  //displayCompareData(JSON.parse(sessionStorage.getItem("compareCommunities")).length);
-  
   $('#customize_location').html(location.county + " County, " + location.state);
-  
-  //hwbi_disc_data = JSON.parse(data);
-
   setCookie('EPAHWBIDISC', location_data, 0.5);
 }
 
@@ -314,7 +289,6 @@ $('.thumb').on('input', function() {
 
 function getScoreDataAJAXCall(location){
   var data = {};
-  //data.outputs = getIndicatorsForCounty(location.state_abbr, location.county);
 
   hwbi_indicator_data = formatIndicatorData(setIndicatorData(JSON.stringify(data)));
   console.log(data)
