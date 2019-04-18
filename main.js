@@ -87,19 +87,11 @@ function createWindow () {
   // add dev tools item if not in production
   if (process.env.node_env !== 'production') {
     menuTemplate.push({
-      label: "Developer Tools",
-      submenu: [
-        {
-          label: "Toggle DevTools",
-          accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
-          click (item, focusedWindow) {
-            focusedWindow.toggleDevTools();
-          }
-        },
-        {
-          role: 'reload'
+      label: "Toggle DevTools",
+        accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
+        click (item, focusedWindow) {
+          focusedWindow.toggleDevTools();
         }
-      ]
     })
   }
 
