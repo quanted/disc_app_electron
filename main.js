@@ -81,6 +81,20 @@ function createWindow () {
           }
         }
       ]
+    }, {
+      label: 'Settings',
+      submenu: [
+        {
+          label: 'Toggle Offline Search',
+          type: 'checkbox',
+          click: () => {
+            let focusedWin = BrowserWindow.getFocusedWindow();
+            focusedWin.webContents.send('toggleSearch');
+
+
+          }
+        }
+      ]
     }
   ];
 

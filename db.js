@@ -61,6 +61,15 @@ function generateReport() {
   ipcRenderer.send('print-to-pdf');
 }
 
+ipcRenderer.on('toggleSearch', function() {
+
+  $('#statecounty').toggle();
+  $('.autocomplete-container').toggle();
+
+  $('#mainpage-statecounty').toggle();
+  $('.search').toggle();
+});
+
 function generateSnapshot() {
   var domainData = {
     HWBI_DOMAIN: {},
