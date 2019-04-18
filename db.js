@@ -238,7 +238,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   var loc = JSON.parse(locationValue);
   var state = loc.state_abbr;
   var county = loc.county;
-  var metric = dataStructure.HWBI_METRIC[ele.attr('id')];
+  var metric = dataStructure.HWBI_METRIC[ele.attr('data-var')];
   
   metric.custom_val = val;
 
