@@ -630,7 +630,7 @@ function getMetricsForCounty(state = "", county = "") {
       throw err;
     }
     rows.forEach((row) => {
-      var $ele = $('.' + row.METRIC_ID); //change to id?
+      var $ele = $('[data-var="' + row.METRIC_ID + '"]'); //change to id?
       var rawVal = 0;
       var metricType;
       var roundValue = 3;
