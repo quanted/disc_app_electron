@@ -19,34 +19,34 @@ domains = cur.fetchall()
 cur.execute('select * from Indicators')
 indicators = cur.fetchall()
 
-cur.execute('select * from MetricGroups WHERE METRIC_GROUP != "HWBI"')
+cur.execute("select * from MetricGroups WHERE METRIC_GROUP != 'HWBI'")
 metricGroups = cur.fetchall()
 #print(metricGroups)
 
 cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " +
         "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
         "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION, " +
-        "Domains.DOMAIN_DESCRIPTION " +
+        "Domains.DOMAIN_DESCRIPTION, MetricScores.METRIC_VAR_ID " +
     "FROM MetricScores " +
     "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
     "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  AND MetricGroups.METRIC_GROUP != \"HWBI\" " +
+    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP != 'HWBI' " +
     "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
     "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME ==\"Benton\" AND Counties.STATE_CODE ==\"OR\"")
+    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'")
 service_metrics = cur.fetchall()
 
 cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " + 
         "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
         "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION, " +
-        "Domains.DOMAIN_DESCRIPTION " +
+        "Domains.DOMAIN_DESCRIPTION, MetricScores.METRIC_VAR_ID " +
     "FROM MetricScores " +
     "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
     "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  AND MetricGroups.METRIC_GROUP == \"HWBI\" " +
+    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP == 'HWBI' " +
     "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
     "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME ==\"Benton\" AND Counties.STATE_CODE ==\"OR\"")
+    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'")
 hwbi_metrics = cur.fetchall()
 
 try:
