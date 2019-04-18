@@ -1275,6 +1275,7 @@ function setServiceScenarioValue(valueType) {
   for (var metricName in dataStructure.SERVICE_METRIC) {
       var metric = dataStructure.SERVICE_METRIC[metricName];
       metric.scenario_val = metric[valueType];
+      $('[data-var="' + metric.id + '"].scenario-builder-metric').val(metric[valueType]);
   }
 }
 
