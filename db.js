@@ -40,6 +40,7 @@ $(function() {
     SERVICE_METRIC: {}
   };
   createDataStructure(dataStructure);
+  getNationalDomainScores();
 });
 
 //open links externally by default
@@ -165,7 +166,6 @@ function getScoreData() {
   
   initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
-  getStateDISCScore(location.state_abbr);
   getMetricsForCounty(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
@@ -525,27 +525,6 @@ function runAsterPlot() {
   }
 }
 
-function getStateDomainScore(state, domain) {
-
-  var sql = "SELECT avg(MetricScores.SCORE) " +
-  "FROM MetricScores " +
-  "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
-  "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-  "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID " +
-  "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
-  "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-  'WHERE Counties.STATE_CODE ==? AND METRIC_GROUP="HWBI" AND Domains.DOMAIN=?';
-
-  db.all(sql, [state, domain], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach((row) => {
-      console.log(row.SCORE)
-    });
-  });
-}
-
 function getStateDomainScores(state) {
   var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
     SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
@@ -555,15 +534,18 @@ function getStateDomainScores(state) {
       INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
       INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
       INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
-      WHERE Counties.STATE_CODE ==? AND METRIC_GROUP="HWBI"
+      WHERE Counties.STATE_CODE ==? AND METRIC_GROUP='HWBI'
       Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN`;
   db.all(sql, [state], (err, rows) => {
     if (err) {
       throw err;
     }
+    let avg = 0;
     rows.forEach((row) => {
       $("#" + slugify(row.DOMAIN) + "_state_score").html(round(row.SCORE * 100, 1));
+      avg += row.SCORE;
     });
+    $("#disc_state_score").html(round(avg / rows.length * 100, 1));
   });
 }
 
@@ -576,68 +558,24 @@ function getNationalDomainScores() {
       INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
       INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
       INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
-      WHERE METRIC_GROUP="HWBI"
+      WHERE METRIC_GROUP='HWBI'
       Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       throw err;
     }
+    let avg = 0;
     rows.forEach((row) => {
       $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
+      avg += row.SCORE;
     });
-  });
-}
-
-function getStateDISCScore(state) {
-  var sql = `SELECT avg(SCORE) as SCORE FROM (
-    SELECT DOMAIN, avg(SCORE) as SCORE from(
-    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
-      FROM MetricScores
-      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
-      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
-      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
-      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
-      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
-      WHERE Counties.STATE_CODE=? AND METRIC_GROUP="HWBI"
-      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN)`;
-  db.all(sql, [state], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach((row) => {
-      $("#disc_state_score").html(round(row.SCORE * 100, 1));
-    });
-  });
-}
-
-function getNationalDISCScore() {
-  var sql = `SELECT avg(SCORE) as SCORE FROM (
-    SELECT DOMAIN, avg(SCORE) as SCORE from(
-    SELECT Domains.DOMAIN, Indicators.INDICATOR, avg(MetricScores.SCORE) as SCORE
-      FROM MetricScores
-      INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS
-      INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID
-      INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID 
-      INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID
-      INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID
-      WHERE METRIC_GROUP="HWBI"
-      Group By Domains.DOMAIN, Indicators.INDICATOR) Group By DOMAIN)`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach((row) => {
-      $("#disc_national_score").html(round(row.SCORE * 100, 1));
-    });
+    $("#disc_national_score").html(round(avg / rows.length * 100, 1));
   });
 }
 
 function slugify(string) {
   return string.replace(/ /g, '-').replace(/[^0-9a-z-_]/gi, '').toLowerCase().trim();
 }
-
-getNationalDomainScores();
-getNationalDISCScore();
 
 function calculateServiceHWBI() {
   var val;
