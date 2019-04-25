@@ -52,13 +52,16 @@ $(document).on('click', 'a[href^="http"]', function(event) {
 function generateReport() {
     let chkbx = $('.resources-checkbox');
     let a;
-
+    
+    $('.active-metric').trigger('click');
+    
     for (a = 0; a < chkbx.length; a++) {
-      if($(chkbx[a]).is(':checked') && !$(chkbx[a]).parent().parent().parent().prev('.accordion-metrics').hasClass('active-metric')) {
-        /* $('input:checkbox').closest('button').addClass('active-metric');
-        $('input:checkbox').closest('div.metric-accordion-panel').css('display','block'); */
-        $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics').trigger('click');
-      }
+      
+      let grandparent = $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics');
+
+      if($(chkbx[a]).is(':checked') && !$(grandparent).hasClass('active-metric')) {
+        $(grandparent).trigger('click');
+      } 
     }
   ipcRenderer.send('print-to-pdf');
 }
