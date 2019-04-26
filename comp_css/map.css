@@ -1,0 +1,93 @@
+
+.map-wrapper p {
+	font-family: Georgia, serif;
+	font-size: 16px;
+	line-height: 1.4em;
+}
+
+.map-wrapper {
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	position: relative;
+}
+
+/*this is the svg element*/
+.county-map {
+	margin: 5px;
+}
+
+.legend .legendheader {
+	font-family: Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 12px;
+}
+.legend .ticklabel {
+	font-size: 11px;
+	font-family: Helvetica, sans-serif;
+}
+
+.tooltip, .result-panel {
+    position: absolute;
+    top: 0;
+    text-align: left;
+    width: 240px;
+    padding: 8px;
+    font-size: 14px;
+    font-family: Helvetica, sans-serif;
+    background: #ffffff;
+    pointer-events: none;
+    border: 1px solid #CCCCCC;
+}
+.tooltip {
+    right: 0;
+    opacity: 0;
+}
+.result-panel {
+    left: 0;
+}
+
+div .cn, span.cn_moe, div .ed, span.ed_moe, div .lt, span.lt_moe, div .ss, span.ss_moe, div .re, span.re_moe {
+	background-color: #CCFFFF;
+}
+
+span.moe, span.cn_moe, span.cf_moe, span.ed_moe, span.he_moe, span.lt_moe, span.ls_moe, span.ss_moe, span.sc_moe, span.re_moe {
+	color: #AAAAAA;
+}
+
+div.cn, div.cf, div.ed, div.he, div.lt, div.ls, div.ss, div.sc, div.re {
+	padding: 1px;
+}
+
+.tooltip h3, .result-panel h3 {
+	border-bottom: 2px solid #000000;
+	padding-bottom: 6px;
+	line-height: 1.2em;
+}
+.hwbi {
+	font-weight: bold;
+	border-bottom: 2px solid #000000;
+	margin-bottom: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.counties {
+	fill: none;
+	stroke: #FFFFFF;
+	stroke-width: 0.5px;
+    stroke-linejoin: round;
+}
+.states {
+	fill: none;
+	stroke: #FFFFFF;
+	stroke-width: 1.5px;
+	stroke-linejoin: round;
+}
+
+.better {
+	color: #32BA46;
+}
+.worse {
+	color: #FF0000;
+}

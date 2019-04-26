@@ -72,7 +72,7 @@ function get_county_indicator_data (state = "", county = ""){
   if (state === "" || county === "") {
     return [];
   }
-  var indicators = [];  
+  var indicators = [];
 
   var stmt = dbOLD2.prepare("SELECT Indicators.indicator, CountyIndicatorScores.score, CountyIndicatorScores.countyFIPS, Counties.county, Counties.stateID " +
     "FROM CountyIndicatorScores " +
@@ -143,6 +143,8 @@ function getScoreData() {
   getStateDomainScores(location.state_abbr);
   getStateDISCScore(location.state_abbr);
   getMetricsForCounty(location.state_abbr, location.county);
+  // set data for compare map
+  comp_setCompareMapData(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
   
@@ -166,7 +168,7 @@ function getScoreData() {
  */
 $('.rankinglist input').on("input", function() {
   var location = JSON.parse(locationValue);
-  var $this = $(this)
+  var $this = $(this);
   var label = $this.parent().html().substring(0, $this.parent().html().indexOf('<'));
   // var label = $this.attr('data-domain');
 
@@ -325,10 +327,10 @@ function get_state_details(state = ''){
 }
 
 function get_domains() {
-    var domains = []
+    var domains = [];
     var stmt = dbOLD.prepare("Select * from Domains");
     while (stmt.step()) {
-      var row = stmt.get()
+      var row = stmt.get();
       domains.push(row);
     }
     stmt.free();
