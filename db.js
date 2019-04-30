@@ -127,6 +127,8 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
 var db = new sqlite3.Database(dbPath);
 
 function setScoreData(state, county, valueType) {
+  // set data for compare map
+  comp_setCompareMapData(state, county);
   document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
   
   $('#location').html("Snapshot results for:<br>" + county + " County, " + state); // Set location info
@@ -170,8 +172,6 @@ function getScoreData() {
   initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
   getMetricsForCounty(location.state_abbr, location.county);
-  // set data for compare map
-  comp_setCompareMapData(location.state_abbr, location.county);
 
   locationValue = JSON.stringify(location);
   show('mainpage', 'homepage');

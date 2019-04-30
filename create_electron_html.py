@@ -78,6 +78,7 @@ except OSError as e:
 copyfile('static_qed/hwbi/disc/css/hwbi-disc-app.css', 'disc_app_electron/static_qed/hwbi/disc/css/hwbi-disc-app.css')
 copyfile('static_qed/hwbi/disc/css/jquery-ui.min.css', 'disc_app_electron/static_qed/hwbi/disc/css/jquery-ui.min.css')
 copyfile('static_qed/hwbi/disc/css/donut.css', 'disc_app_electron/static_qed/hwbi/disc/css/donut.css')
+copyfile('static_qed/hwbi/disc/css/hwbi-disc-compare-map.css', 'disc_app_electron/static_qed/hwbi/disc/css/hwbi-disc-compare-map.css')
 
 copyfile('static_qed/hwbi/disc/js/jquery-ui.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-ui.min.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-app.js')
@@ -90,6 +91,8 @@ copyfile('static_qed/hwbi/disc/js/d3.v5.min.js', 'disc_app_electron/static_qed/h
 #copyfile('static_qed/hwbi/disc/js/d3-tip.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3-tip.min.js')
 copyfile('static_qed/hwbi/disc/js/draw.js', 'disc_app_electron/static_qed/hwbi/disc/js/draw.js')
 copyfile('static_qed/hwbi/disc/js/donut.js', 'disc_app_electron/static_qed/hwbi/disc/js/donut.js')
+copyfile('static_qed/hwbi/disc/js/topojson.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/topojson.min.js')
+copyfile('static_qed/hwbi/disc/js/hwbi-disc-compare.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-compare.js')
 
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')
