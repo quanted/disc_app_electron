@@ -12,6 +12,7 @@ const Papa = require('papaparse');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
+let savedFileName = '';
 
 function createWindow () {
   const WEB_FOLDER = '';
@@ -52,22 +53,31 @@ function createWindow () {
       label: 'File',
       submenu: [
         {
-          label: 'Load Community Data...',
+          label: 'Open Community Data...',
           accelerator: process.platform === 'darwin' ? 'Command+O' : "CTRL+O",
           click: () => {
-            openFile();
+            loadState();
           }
-        }, {
+        },
+        {
           label: 'Save Community Data',
           accelerator: process.platform === 'darwin' ? 'Command+S' : "CTRL+S",
           click: () => {
-            saveFile();
+            mainWindow.webContents.send('request-json', 'save');
           }
-        }, {
+        },
+        {
           label: 'Save Community Data As...',
           accelerator: process.platform === 'darwin' ? 'Command+Shift+S' : "CTRL+Shift+S",
           click: () => {
-            saveFileAs();
+            mainWindow.webContents.send('request-json', 'save-as');
+          }
+        },
+        {
+          label: 'Import Metric Data...',
+          accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
+          click: () => {
+            openFile();
           }
         }, {
           type: 'separator'
@@ -86,12 +96,11 @@ function createWindow () {
       submenu: [
         {
           label: 'Toggle Offline Search',
+          accelerator: process.platform === 'darwin' ? 'Command+D' : "CTRL+D",
           type: 'checkbox',
           click: () => {
             let focusedWin = BrowserWindow.getFocusedWindow();
             focusedWin.webContents.send('toggleSearch');
-
-
           }
         }
       ]
@@ -262,6 +271,22 @@ ipcMain.on('snap', function(event, data) {
 let saved = true;
 function openFile() {
   console.log("open file")
+  let dataType;
+  const choice = dialog.showMessageBox({
+    type: 'question',
+    buttons: ['Customized Metrics', 'Scenario Builder Metrics', 'Cancel'],
+    title: 'Decision Integration for Strong Communities',
+    message: 'Which Metric data do you want to load?'
+  });
+
+  if (choice === 0) {
+    dataType = "custom_val";
+  } else if (choice === 1) {
+    dataType = "scenario_val";
+  } else {
+    return;
+  }
+
   dialog.showOpenDialog({filters: [
     {name: 'Custom File Type', extensions: ['csv']}
   ]},
@@ -289,16 +314,16 @@ function openFile() {
           } else {
             console.log("Just open");
             let data = parseCSVFile(fileNames[0]);
-            mainWindow.webContents.send('open-file', data);
-            savedFileName = fileNames;
+            mainWindow.webContents.send('open-file', [data, dataType]);
+            savedFileName = fileNames[0];
             saved = true;
           }
         });
       } else {
         console.log("saved")
         let data = parseCSVFile(fileNames[0]);
-        mainWindow.webContents.send('open-file', data);
-        savedFileName = fileNames;
+        mainWindow.webContents.send('open-file', [data, dataType]);
+        savedFileName = fileNames[0];
         saved = true;
       }
     }
@@ -306,13 +331,13 @@ function openFile() {
 }
 
 function parseCSVFile(fileName) {
-  importedData = require('fs').readFileSync(fileName, "utf8");
+  const importedData = fs.readFileSync(fileName, "utf8");
   let rows;
   Papa.parse(importedData, {
       header: true,
       delimiter: ",",
       worker: true,
-      complete: function(results) {
+      complete: function (results) {
         rows = results.data;
       }
   });
@@ -320,20 +345,25 @@ function parseCSVFile(fileName) {
   return rows;
 }
 
-function saveFile() {
-  mainWindow.webContents.send('save');
+function saveFile(data) {
+  console.log(savedFileName)
+  if (savedFileName) {
+    fs.writeFile(savedFileName, data, () => {
+      mainWindow.webContents.send('has-been-saved', savedFileName);
+    });
+  } else {
+    saveFileAs(data);
+  }
 }
 
-function saveFileAs() {
-  var nameToUse = savedFileName;
-  console.log(savedFileName)
-  dialog.showSaveDialog(
-  {
+function saveFileAs(data) { 
+  const nameToUse = savedFileName;
+  dialog.showSaveDialog({
     defaultPath: nameToUse,
     filters: [
       {
-        name: 'Custom File Type',
-        extensions: ['csv']
+        name: 'JSON',
+        extensions: ['json']
       }
     ]
   },
@@ -341,10 +371,14 @@ function saveFileAs() {
     if (fileNames === undefined) { // fileNames is an array that contains all the selected files
       console.log("No file selected");
     } else {
-      if(!fileNames.endsWith(".csv")) {
-        fileNames += ".csv";
+      const fileExtension = path.extname(fileNames);
+      if (fileExtension.toLowerCase() !== ".json") {
+        fileNames += ".json";
       }
-      mainWindow.webContents.send('save-as', fileNames);
+      fs.writeFile(fileNames, data, () => {
+        mainWindow.webContents.send('has-been-saved', fileNames);
+        savedFileName = fileNames;
+      });
     }
   });
 }
@@ -399,11 +433,6 @@ function saveFileAsAndQuit() {
   });
 }
 
-// Saves the file when the renderer returns the data
-ipcMain.on('save-as', function(event, arg) {
-  saveFileAs(arg);
-});
-
 // Saves the file then open when the renderer returns the data
 ipcMain.on('save-as-and-open', function(event, saveName, openName) {
   saveFileAsAndOpen(saveName, openName);
@@ -414,13 +443,6 @@ ipcMain.on('save-as-and-quit', function(event, saveName) {
   saveFileAsAndQuit(saveName);
 });
 
-ipcMain.on('has-been-saved', function(event, arg) {
-  console.log("has-been-saved");
-  console.log(arg);
-  savedFileName = arg;
-  saved = true;
-});
-
 ipcMain.on('has-been-changed', function(event, arg) {
   console.log("has-been-changed");
   saved = false;
@@ -429,3 +451,49 @@ ipcMain.on('has-been-changed', function(event, arg) {
 ipcMain.on('quit', function(event, arg) {
   quit();
 });
+
+/**
+ * Listens for json-save message from render thread. Saves the JSON data to a file.
+ * @param {event} e - The storage event.
+ * @param {objec6} e - The JSON object to save.
+ * @listens json-save
+ */
+ipcMain.on('json-save', function(event, arg) {
+  if (savedFileName) {
+    saveFile(arg);
+  } else {
+    saveFileAs(arg);
+  }
+});
+
+/**
+ * Listens for json-save-as message from render thread. Saves the JSON data to a file.
+ * @param {event} e - The storage event.
+ * @param {objec6} e - The JSON object to save.
+ * @listens json-save-as
+ */
+ipcMain.on('json-save-as', function(event, arg) {
+  saveFileAs(arg);
+});
+
+/**
+ * Opens a file sends the JSON contents to the render thread.
+ * @function
+ */
+function loadState() {
+  dialog.showOpenDialog({filters: [
+    {name: 'JSON File', extensions: ['json']}
+  ]},
+  function (fileNames) {
+    if (fileNames === undefined) { // fileNames is an array that contains all the selected files
+      console.log("No file selected");
+    } else {
+      fs.readFile(fileNames[0], 'utf8', (err, data) => {
+        if (err) throw err;
+        let json = JSON.parse(data);
+        mainWindow.webContents.send('load-json', json);
+        savedFileName = fileNames[0];
+      });
+    }
+  });
+}
