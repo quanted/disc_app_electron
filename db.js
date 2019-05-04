@@ -263,12 +263,12 @@ $('.rankinglist input').on("input", function() {
  * @listens change
  */
 $('.customize-hwbi-metrics').on('change', function() { // customize metric listeners
-  var ele = $(this);
-  var val = +ele.val();
-  var loc = JSON.parse(locationValue);
-  var state = loc.state_abbr;
-  var county = loc.county;
-  var metric = dataStructure.HWBI_METRIC[ele.attr('data-var')];
+  const ele = this;
+  const val = +ele.value;
+  const loc = JSON.parse(locationValue);
+  const state = loc.state_abbr;
+  const county = loc.county;
+  const metric = dataStructure.HWBI_METRIC[ele.dataset.var];
   
   metric.custom_val = val;
 
@@ -276,6 +276,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   updateAllAvgValues('HWBI_DOMAIN', 'custom_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
 
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+  
   setScoreData(state, county, "custom_val"); // set the domain scores
   loadSkillbar(); // update the colored bars on the snapshot page
 });
@@ -285,22 +286,24 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
  * @listens change
  */
 $('.customize-service-metrics').on('change', function() { // customize metric listeners
-  var ele = $(this);
-  var val = +ele.val();
-  var metric = dataStructure.SERVICE_METRIC[ele.attr('data-var')];
+  const ele = this;
+  const val = +ele.value;
+  const metric = dataStructure.SERVICE_METRIC[ele.dataset.var];
   
   metric.custom_val = val;
 
   updateAllAvgValues('SERVICE_INDICATOR', 'custom_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
   updateAllAvgValues('SERVICE_DOMAIN', 'custom_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+
   updateApexCharts("custom_val");
 });
 
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
-  var ele = $(this);
-  var val = +ele.val();
-  var metric = dataStructure.SERVICE_METRIC[ele.attr('data-var')];
+  console.log("scenario-builder-metric")
+  const ele = this;
+  const val = +ele.value;
+  const metric = dataStructure.SERVICE_METRIC[ele.dataset.var];
   
   metric.scenario_val = val;
 
