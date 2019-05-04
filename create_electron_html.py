@@ -130,7 +130,7 @@ temp_google_key = 'AIzaSyDEC5r_Tq31qfF8BKIdhUAH1KorOfjLV4g'
 electron = True
 # EPA drupal page template
 html = render_to_string('disc/drupal_2017/01epa_drupal_header.html', {
-    'title': 'Conceptual Decision Integration for Strong Communities',
+    'title': 'Conceptual Decision Integration for Strong Communities | BETA',
     'electron': electron
 })
 """ html += render_to_string('disc/drupal_2017/02epa_drupal_header_bluestripe.html', {
@@ -139,7 +139,7 @@ html = render_to_string('disc/drupal_2017/01epa_drupal_header.html', {
 imports = render_to_string('disc/hwbi-disc-app-imports.html', {'API_KEY': temp_google_key}) # Modify?
 html += imports
 """ html += render_to_string('disc/drupal_2017/03epa_drupal_section_title_generic.html', {
-    'HEADER': 'Conceptual Decision Integration for Strong Communities',
+    'HEADER': 'Conceptual Decision Integration for Strong Communities | BETA',
     "electron": electron
 }) """
 # body = render_to_string('disc/hwbi-disc-app-body1.html') # Modify (tabs)
