@@ -315,27 +315,8 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
 });
 
 $('.thumb').on('input', function() {
-  var $ele = $(this);
-  var sign = $ele.attr("data-sign");
-  var units = $ele.attr("data-units");
-  var val = 0;
-  var roundValue = 2;
-  if (sign === "P") {
-    val = (+$ele.val() * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
-  } else if (sign === "N") {
-    val = -1 * ((+$ele.val() - 1) * (+$ele.attr("data-max") - +$ele.attr("data-min"))) + +$ele.attr("data-min");
-  }
-
-  if (units.toLowerCase().trim() === "percent" && $ele.hasClass('customize-hwbi-metrics')) {
-    val *= 100;
-    roundValue = 1;
-  }
-
-  if (units.toLowerCase().trim() === "dollars") {
-    roundValue = 2;
-  }
-
-  $ele.prev().html("<span> " + round(val, roundValue) + " (" + units + ")</span>");
+  const ele = this;
+  updateSliderLabel(ele);
 });
 
 function getMetricsForCounty(county = "", state = "") {
@@ -891,10 +872,12 @@ function loadMetricValues(valueType) {
 }
 
 function setServiceScenarioValue(valueType) {
-  for (var metricName in dataStructure.SERVICE_METRIC) {
-      var metric = dataStructure.SERVICE_METRIC[metricName];
+  for (let metricName in dataStructure.SERVICE_METRIC) {
+      const metric = dataStructure.SERVICE_METRIC[metricName];
       metric.scenario_val = metric[valueType];
-      $('[data-var="' + metric.id + '"].scenario-builder-metric').val(metric[valueType]);
+      let ele = document.querySelector('[data-var="' + metric.id + '"].scenario-builder-metric');
+      ele.value = metric[valueType];
+      updateSliderLabel(ele);
   }
 }
 
