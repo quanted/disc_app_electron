@@ -218,9 +218,7 @@ async function getScoreData() {
   // set data for compare map
   comp_setCompareMapData(location.state_abbr, location.county);
 
-  econChart.updateSeries([round(dataStructure.METRIC_GROUP["2"].original_val * 100, 1)]);
-  ecoChart.updateSeries([round(dataStructure.METRIC_GROUP["3"].original_val * 100, 1)]);
-  socialChart.updateSeries([round(dataStructure.METRIC_GROUP["4"].original_val * 100, 1)]);
+  updateApexCharts('original_val');
 
   loadSkillbar(); // update the colored bars on the snapshot page
   runAsterPlot(); //draw aster plot
@@ -296,6 +294,7 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   updateAllAvgValues('SERVICE_INDICATOR', 'custom_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
   updateAllAvgValues('SERVICE_DOMAIN', 'custom_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
   updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+  updateApexCharts("custom_val");
 });
 
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
@@ -1030,9 +1029,7 @@ ipcRenderer.on('open-file', (event, arg) => {
 
     setScoreData(state, county, "custom_val"); // set the domain scores
 
-    econChart.updateSeries([round(dataStructure.METRIC_GROUP["2"].custom_val * 100, 1)]);
-    ecoChart.updateSeries([round(dataStructure.METRIC_GROUP["3"].custom_val * 100, 1)]);
-    socialChart.updateSeries([round(dataStructure.METRIC_GROUP["4"].custom_val * 100, 1)]);
+    updateApexCharts("custom_val");
 
     loadSkillbar(); // update the colored bars on the snapshot page
     calculateServiceHWBI();
@@ -1245,9 +1242,9 @@ ipcRenderer.on('load-json', (event, arg) => {
 
   // Load data into the UI
   setScoreData(state, county, "custom_val"); // set the domain scores
-  econChart.updateSeries([round(dataStructure.METRIC_GROUP["2"].custom_val * 100, 1)]);
-  ecoChart.updateSeries([round(dataStructure.METRIC_GROUP["3"].custom_val * 100, 1)]);
-  socialChart.updateSeries([round(dataStructure.METRIC_GROUP["4"].custom_val * 100, 1)]);
+
+  updateApexCharts("custom_val");
+  
   loadSkillbar(); // update the colored bars on the snapshot page
   calculateServiceHWBI();
   runAsterPlot(); //draw aster plot
