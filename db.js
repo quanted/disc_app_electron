@@ -166,33 +166,16 @@ async function getScoreData() {
       }
   }
   var location = JSON.parse(location_data);
-  
+  resetRivs();
   initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
   
   let rows = await getMetricsForCounty(location.county, location.state_abbr);
   rows.forEach((row) => {
-    var $ele = $('[data-var="' + row.METRIC_ID + '"]');
-    var rawVal = 0;
-    var metricType;
-    var roundValue = 3;
-    if (row.POS_NEG_METRIC === "P") {
-      rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
-    } else if (row.POS_NEG_METRIC === "N") {
-      rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
-    }
+    var ele = document.querySelector('[data-var="' + row.METRIC_ID + '"]');
 
-    if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
-      rawVal *= 100;
-      roundValue = 1;
-    }
+    updateSliderLabel(ele);
 
-    if (row.ORIG_UNITS.toLowerCase().trim() === "dollars") {
-      roundValue = 2;
-    }
-
-    $ele.val(row.SCORE); // set the metric scores
-    $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + row.ORIG_UNITS + ")</span>");
     if (row.METRIC_GROUP_ID == 1) {
       metricType = "HWBI_METRIC";
     } else if (row.METRIC_GROUP_ID == 2 || row.METRIC_GROUP_ID == 3 || row.METRIC_GROUP_ID == 4) {
@@ -238,24 +221,12 @@ async function getScoreData() {
  * @listens change
  */
 $('.rankinglist input').on("input", function() {
-  var location = JSON.parse(locationValue);
   var $this = $(this)
   var label = $this.attr('data-did');
 
   dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
-  var data = [];
-  for (var domain in dataStructure.HWBI_DOMAIN) {
-      data.push({
-          Domain: dataStructure.HWBI_DOMAIN[domain].name,
-          Weight: dataStructure.HWBI_DOMAIN[domain].weight	
-      });
-  }
-  donut.data(data);
 
-  updateAllWeightedAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
-  setScoreData(location.state_abbr, location.county, "custom_val"); // set the domain scores
-  calculateServiceHWBI();
-  runAsterPlot();
+  updateRivUi();
 });
 
 /**
@@ -878,34 +849,6 @@ function setServiceScenarioValue(valueType) {
       let ele = document.querySelector('[data-var="' + metric.id + '"].scenario-builder-metric');
       ele.value = metric[valueType];
       updateSliderLabel(ele);
-  }
-}
-
-var donut = donutChart()
-        .width(540)
-        .height(300)
-        .transTime(250) // length of transitions in ms
-        .cornerRadius(3) // sets how rounded the corners are on each slice
-        .padAngle(0.015) // effectively dictates the gap between slices
-        .variable('Weight')
-        .category('Domain');
-
-/**
- * Initialized the ranking donut with the domain name and weights in the datastructure
- * @function
- */
-function initializeRankingDonut() {
-  if (!$('#ranking-chart svg').length) {
-    var data = [];
-    for (var domain in dataStructure.HWBI_DOMAIN) {
-      data.push({
-              Domain: dataStructure.HWBI_DOMAIN[domain].name,
-              Weight: dataStructure.HWBI_DOMAIN[domain].weight	
-          });
-    }
-    donut.data(data);
-    d3.select('#ranking-chart')
-                .call(donut); // draw chart in div
   }
 }
 
