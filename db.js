@@ -127,8 +127,6 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
 var db = new sqlite3.Database(dbPath);
 
 function setScoreData(state, county, valueType) {
-  // set data for compare map
-  comp_setCompareMapData(state, county);
   document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
   
   $('#location').html("Snapshot results for:<br>" + county + " County, " + state); // Set location info
@@ -156,7 +154,7 @@ function setScoreData(state, county, valueType) {
   }
 }
 
-function getScoreData() {
+async function getScoreData() {
   var location_data = locationValue;
   if (location_data === "{}") {
       var locationCookie = getCookie("EPAHWBIDISC");
@@ -171,7 +169,64 @@ function getScoreData() {
   
   initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
-  getMetricsForCounty(location.state_abbr, location.county);
+  
+  let rows = await getMetricsForCounty(location.county, location.state_abbr);
+  rows.forEach((row) => {
+    var $ele = $('[data-var="' + row.METRIC_ID + '"]');
+    var rawVal = 0;
+    var metricType;
+    var roundValue = 3;
+    if (row.POS_NEG_METRIC === "P") {
+      rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
+    } else if (row.POS_NEG_METRIC === "N") {
+      rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
+    }
+
+    if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
+      rawVal *= 100;
+      roundValue = 1;
+    }
+
+    if (row.ORIG_UNITS.toLowerCase().trim() === "dollars") {
+      roundValue = 2;
+    }
+
+    $ele.val(row.SCORE); // set the metric scores
+    $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + row.ORIG_UNITS + ")</span>");
+    if (row.METRIC_GROUP_ID == 1) {
+      metricType = "HWBI_METRIC";
+    } else if (row.METRIC_GROUP_ID == 2 || row.METRIC_GROUP_ID == 3 || row.METRIC_GROUP_ID == 4) {
+      metricType = "SERVICE_METRIC";
+    }
+    dataStructure[metricType][row.METRIC_ID].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
+    dataStructure[metricType][row.METRIC_ID].original_val = row.SCORE; // add the metric score to the data structure
+    dataStructure[metricType][row.METRIC_ID].custom_val = row.SCORE; // add the metric score to the data structure
+    dataStructure[metricType][row.METRIC_ID].scenario_val = row.SCORE; // add the metric score to the data structure
+  });
+ 
+  setAllInitialAvgValues('SERVICE_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  setAllInitialAvgValues('SERVICE_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
+  setAllInitialAvgValues('HWBI_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  setAllInitialAvgValues('HWBI_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+
+  setAllInitialAvgValues('METRIC_GROUP', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+  setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+
+  setScoreData(location.state, location.county, "original_val"); // set the domain scores
+
+  // set data for compare map
+  comp_setCompareMapData(location.state_abbr, location.county);
+
+  econChart.updateSeries([round(dataStructure.METRIC_GROUP["2"].original_val * 100, 1)]);
+  ecoChart.updateSeries([round(dataStructure.METRIC_GROUP["3"].original_val * 100, 1)]);
+  socialChart.updateSeries([round(dataStructure.METRIC_GROUP["4"].original_val * 100, 1)]);
+
+  loadSkillbar(); // update the colored bars on the snapshot page
+  runAsterPlot(); //draw aster plot
+
+  $('.preload').fadeOut();
+  $('.preload-wrapper').delay(350).fadeOut('slow');
 
   locationValue = JSON.stringify(location);
   show('mainpage', 'homepage');
@@ -281,8 +336,8 @@ $('.thumb').on('input', function() {
   $ele.prev().html("<span> " + round(val, roundValue) + " (" + units + ")</span>");
 });
 
-function getMetricsForCounty(state = "", county = "") {
-  var sql = "SELECT  MetricVariables.METRIC_VAR, " +
+function getMetricsForCounty(county = "", state = "") {
+  let sql = "SELECT  MetricVariables.METRIC_VAR, " +
                     "MetricScores.SCORE, " +
                     "Counties.COUNTY_NAME, " +
                     "Counties.STATE_CODE, " +
@@ -299,66 +354,16 @@ function getMetricsForCounty(state = "", county = "") {
   "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID  " +
   "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?";
 
-  db.all(sql, [county, state], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    rows.forEach((row) => {
-      var $ele = $('[data-var="' + row.METRIC_ID + '"]'); //change to id?
-      var rawVal = 0;
-      var metricType;
-      var roundValue = 3;
-      if (row.POS_NEG_METRIC === "P") {
-        rawVal = (row.SCORE * (row.MAXVAL - row.MINVAL) + row.MINVAL);
-      } else if (row.POS_NEG_METRIC === "N") {
-        rawVal = -1 * ((row.SCORE - 1) * (row.MAXVAL - row.MINVAL)) + row.MINVAL;
-      }
-
-      if (row.ORIG_UNITS.toLowerCase().trim() === "percent" && row.METRIC_GROUP.toLowerCase() === "hwbi") {
-        rawVal *= 100;
-        roundValue = 1;
-      }
-
-      if (row.ORIG_UNITS.toLowerCase().trim() === "dollars") {
-        roundValue = 2;
-      }
-
-      $ele.val(row.SCORE); // set the metric scores
-      $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + row.ORIG_UNITS + ")</span>");
-      if (row.METRIC_GROUP_ID == 1) {
-        metricType = "HWBI_METRIC";
-      } else if (row.METRIC_GROUP_ID == 2 || row.METRIC_GROUP_ID == 3 || row.METRIC_GROUP_ID == 4) {
-        metricType = "SERVICE_METRIC";
-      }
-      dataStructure[metricType][row.METRIC_ID].pos_neg = row.POS_NEG_METRIC; // add the metric score to the data structure
-      dataStructure[metricType][row.METRIC_ID].original_val = row.SCORE; // add the metric score to the data structure
-      dataStructure[metricType][row.METRIC_ID].custom_val = row.SCORE; // add the metric score to the data structure
-      dataStructure[metricType][row.METRIC_ID].scenario_val = row.SCORE; // add the metric score to the data structure
+  return new Promise( ( resolve, reject ) => {
+    db.all(sql, [county, state], (err, rows) => {
+        if (err) {
+            console.log('Error - getMetricsForCounty(' + county + ', ' + state + '): ' + err);
+            reject(err);
+        }
+        resolve(rows);
     });
-   
-    setAllInitialAvgValues('SERVICE_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
-    setAllInitialAvgValues('SERVICE_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
-
-    setAllInitialAvgValues('HWBI_INDICATOR', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
-    setAllInitialAvgValues('HWBI_DOMAIN', dataStructure); // calculate the domain scores by averaging each domain's child indicators
-
-    setAllInitialAvgValues('METRIC_GROUP', dataStructure); // calculate the domain scores by averaging each domain's child indicators
-    setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
-
-    setScoreData(state, county, "original_val"); // set the domain scores
-
-    econChart.updateSeries([round(dataStructure.METRIC_GROUP["2"].original_val * 100, 1)]);
-    ecoChart.updateSeries([round(dataStructure.METRIC_GROUP["3"].original_val * 100, 1)]);
-    socialChart.updateSeries([round(dataStructure.METRIC_GROUP["4"].original_val * 100, 1)]);
-
-    loadSkillbar(); // update the colored bars on the snapshot page
-    runAsterPlot(); //draw aster plot
-
-    $('.preload').fadeOut();
-    $('.preload-wrapper').delay(350).fadeOut('slow');
-    $('#community-snapshot-tab').delay(350).show();
-  }
-)};
+  });
+}
 
 function createDataStructure(obj) {
   var sql = "SELECT MetricGroups.METRIC_GROUP as METRIC_GROUP, Domains.DOMAIN AS DOMAIN, Indicators.INDICATOR as INDICATOR, MetricVariables.METRIC_VAR, " +
