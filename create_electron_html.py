@@ -85,7 +85,7 @@ copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_q
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-report-v2.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-report-v2.js')
 copyfile('static_qed/hwbi/disc/js/jquery-3.3.1.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-3.3.1.min.js')
 copyfile('static_qed/hwbi/disc/js/main.js', 'disc_app_electron/static_qed/hwbi/disc/js/main.js')
-copyfile('static_qed/hwbi/disc/js/apexcharts.js', 'disc_app_electron/static_qed/hwbi/disc/js/apexcharts.js')
+copyfile('static_qed/hwbi/disc/js/apexcharts.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/apexcharts.min.js')
 #copyfile('static_qed/hwbi/disc/js/d3.v3.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v3.min.js')
 copyfile('static_qed/hwbi/disc/js/d3.v5.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3.v5.min.js')
 #copyfile('static_qed/hwbi/disc/js/d3-tip.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/d3-tip.min.js')
