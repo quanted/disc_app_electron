@@ -994,6 +994,7 @@ ipcRenderer.on('save', (event, arg) => {
   csv += '"Living Standards",' + dataStructure.HWBI_DOMAIN[6].weight + '\n';
   csv += '"Safety and Security",' + dataStructure.HWBI_DOMAIN[7].weight + '\n';
   csv += '"Social Cohesion",' + dataStructure.HWBI_DOMAIN[8].weight + '\n';
+  csv += '"Resilience",' + dataStructure.HWBI_DOMAIN[9].weight + '\n';
 
 	const allMetrics = {...dataStructure.HWBI_METRIC, ...dataStructure.SERVICE_METRIC};
   const query = 'select ID from MetricVariables;';
