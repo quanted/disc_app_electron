@@ -115,6 +115,7 @@ copyfile('static_qed/hwbi/disc/img/rainbow_need_to_replace.png', 'disc_app_elect
 copyfile('static_qed/hwbi/disc/img/searchdark.png', 'disc_app_electron/static_qed/hwbi/disc/img/searchdark.png')
 copyfile('static_qed/hwbi/disc/img/no-internet.png', 'disc_app_electron/static_qed/hwbi/disc/img/no-internet.png')
 copyfile('static_qed/hwbi/disc/img/connected.png', 'disc_app_electron/static_qed/hwbi/disc/img/connected.png')
+copyfile('static_qed/hwbi/disc/img/gradient.png', 'disc_app_electron/static_qed/hwbi/disc/img/gradient.png')
 
 copyfile('hwbi_app/DISC.db', 'disc_app_electron/hwbi_app/DISC.db')
 

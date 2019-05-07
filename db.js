@@ -127,8 +127,6 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
 var db = new sqlite3.Database(dbPath);
 
 function setScoreData(state, county, valueType) {
-  document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
-  
   $('#location').html("Snapshot results for:<br>" + county + " County, " + state); // Set location info
   $('#reportlocation').html("Report for " + county + " County, " + state);
 
@@ -136,7 +134,7 @@ function setScoreData(state, county, valueType) {
   $('#wellbeing-score').html(HWBI_score);
   $('.modal-disc-score span').html(HWBI_score);
 
-  document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
+  chart.updateSeries([HWBI_score]);
   $('#report-wellbeing-score').html(HWBI_score);
 
   for (var domain in dataStructure.HWBI_DOMAIN) { // Set Domain scores
@@ -1185,3 +1183,74 @@ ipcRenderer.on('load-json', (event, arg) => {
   show('mainpage', 'homepage');
   $('#community-snapshot-tab-link').trigger("click");
 });
+
+var discOptions = {
+  chart: {
+    type: "radialBar"
+  },
+  states: {
+    normal: {
+      filter: {
+        type: 'none',
+        value: 0,
+      }
+    },
+    hover: {
+      filter: {
+        type: 'none',
+        value: 0,
+      }
+    },
+    active: {
+      filter: {
+        type: 'none',
+        value: 0,
+      }
+    },
+  },
+  plotOptions: {
+    radialBar: {
+      startAngle: -90,
+      endAngle: 90,
+      track: {
+        background: "#e7e7e7",
+        strokeWidth: "97%",
+        margin: 5, // margin is in pixels
+        shadow: {
+          enabled: true,
+          top: 2,
+          left: 0,
+          color: "#999",
+          opacity: 1,
+          blur: 2
+        }
+      },
+      dataLabels: {
+        name: {
+          show: true
+        },
+        value: {
+          offsetY: -50,
+          fontSize: "30px",
+          formatter: function(val) {
+            return val;
+          }
+        }
+      }
+    }
+  },
+  fill: {
+    type: 'image',
+    image: {
+        src: ['../static_qed/hwbi/disc/img/gradient.png'],
+        width: 235,  // optional
+        height: 50  //optional
+      }
+},
+  series: [100],
+  labels: ["DISC Score"]
+};
+
+var chart = new ApexCharts(document.querySelector("#disc-chart"), discOptions);
+
+chart.render();
