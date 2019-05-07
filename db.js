@@ -1186,7 +1186,9 @@ ipcRenderer.on('load-json', (event, arg) => {
 
 var discOptions = {
   chart: {
-    type: "radialBar"
+    type: "radialBar",
+    height: 300,
+
   },
   states: {
     normal: {
@@ -1230,8 +1232,9 @@ var discOptions = {
           show: true
         },
         value: {
-          offsetY: -50,
-          fontSize: "30px",
+          offsetY: -13,
+          fontSize: "38px",
+          color: "#36bc28",
           formatter: function(val) {
             return val;
           }
@@ -1248,7 +1251,7 @@ var discOptions = {
       }
 },
   series: [100],
-  labels: ["DISC Score"]
+  labels: ['']
 };
 
 var chart = new ApexCharts(document.querySelector("#disc-chart"), discOptions);
