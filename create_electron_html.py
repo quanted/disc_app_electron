@@ -33,8 +33,10 @@ cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTI
     "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP != 'HWBI' " +
     "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
     "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'")
+    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'" +
+    "ORDER BY METRIC_GROUP ASC,	DOMAIN ASC,	INDICATOR ASC")
 service_metrics = cur.fetchall()
+#print(service_metrics)
 
 cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " + 
         "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
@@ -46,7 +48,8 @@ cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTI
     "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP == 'HWBI' " +
     "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
     "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'")
+    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'" +
+    "ORDER BY METRIC_GROUP ASC,	DOMAIN ASC,	INDICATOR ASC")
 hwbi_metrics = cur.fetchall()
 
 try:
@@ -107,6 +110,7 @@ copyfile('static_qed/hwbi/disc/img/leisure-time.jpg', 'disc_app_electron/static_
 copyfile('static_qed/hwbi/disc/img/living-standards.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/living-standards.jpg')
 copyfile('static_qed/hwbi/disc/img/safety-and-security.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/safety-and-security.jpg')
 copyfile('static_qed/hwbi/disc/img/social-cohesion.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social-cohesion.jpg')
+copyfile('static_qed/hwbi/disc/img/basic-resilience.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/basic-resilience.jpg')
 copyfile('static_qed/hwbi/disc/img/economic.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/economic.jpg')
 copyfile('static_qed/hwbi/disc/img/ecosystem.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/ecosystem.jpg')
 copyfile('static_qed/hwbi/disc/img/social.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social.jpg')

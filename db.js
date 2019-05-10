@@ -41,6 +41,7 @@ $(function() {
   };
   createDataStructure(dataStructure);
   getNationalDomainScores();
+  nationalRes();
 });
 
 //open links externally by default
@@ -169,8 +170,19 @@ async function getScoreData() {
   resetRivs();
   initializeRankingDonut();
   getStateDomainScores(location.state_abbr);
-  
+  stateRes(location.state_abbr);
+
   let rows = await getMetricsForCounty(location.county, location.state_abbr);
+  
+  let resilience = await getResilienceIndicators(location.county, location.state_abbr);
+  $('#basic-resilience_governance_value').html(round(+resilience[0].SCORE * 100, 1));
+  $('#basic-resilience_risk_value').html(round(+resilience[1].SCORE * 100, 1));
+  $('#basic-resilience_modal_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+
+  $('#basic-resilience_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+  $('#basic-resilience_score_bar').attr('data-percent', round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1) + "%");
+  $('#basic-resilience_score_summary').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+
   rows.forEach((row) => {
     var ele = document.querySelector('[data-var="' + row.METRIC_ID + '"]');
 
@@ -195,6 +207,14 @@ async function getScoreData() {
 
   setAllInitialAvgValues('METRIC_GROUP', dataStructure); // calculate the domain scores by averaging each domain's child indicators
   setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+
+  // fix slider inital values quickly...
+  $('#reset-service-btn').click();
+  $('#reset-hwbi-domains').click();
+  resetValues(dataStructure.METRIC_GROUP[2], 'scenario_val', 'original_val');
+  resetValues(dataStructure.METRIC_GROUP[3], 'scenario_val', 'original_val');
+  resetValues(dataStructure.METRIC_GROUP[4], 'scenario_val', 'original_val');
+  resetSliders(dataStructure.SERVICE_METRIC, 'scenario_val', 'scenario-builder-metric');
 
   setScoreData(location.state, location.county, "original_val"); // set the domain scores
 
@@ -312,6 +332,22 @@ function getMetricsForCounty(county = "", state = "") {
     db.all(sql, [county, state], (err, rows) => {
         if (err) {
             console.log('Error - getMetricsForCounty(' + county + ', ' + state + '): ' + err);
+            reject(err);
+        }
+        resolve(rows);
+    });
+  });
+}
+
+function getResilienceIndicators(county = "", state = "") {
+  let sql = "SELECT INDICATOR_ID, SCORE FROM ResilienceScores " + 
+              "INNER JOIN Counties ON ResilienceScores.FIPS == Counties.FIPS " +
+              "WHERE Counties.COUNTY_NAME ==? AND Counties.STATE_CODE ==?";
+
+  return new Promise( ( resolve, reject ) => {
+    db.all(sql, [county, state], (err, rows) => {
+        if (err) {
+            console.log('Error - getResilienceIndicators(' + county + ', ' + state + '): ' + err);
             reject(err);
         }
         resolve(rows);
@@ -533,6 +569,36 @@ function getNationalDomainScores() {
       avg += row.SCORE;
     });
     $("#disc_national_score").html(round(avg / rows.length * 100, 1));
+  });
+}
+
+function nationalRes() {
+  let sql = `SELECT DOMAIN, avg(SCORE) as SCORE FROM ResilienceScores 
+  INNER JOIN Domains on Domains.ID = DOMAIN_ID
+  INNER JOIN Counties ON ResilienceScores.FIPS = Counties.FIPS`
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#basic-resilience_national_score").html(round(row.SCORE * 100, 1));
+    });
+  });
+}
+
+function stateRes(state) {
+  let sql = `SELECT DOMAIN, avg(SCORE) as SCORE FROM ResilienceScores
+      INNER JOIN Counties ON ResilienceScores.FIPS == Counties.FIPS
+      INNER JOIN Domains ON ResilienceScores.DOMAIN_ID == Domains.ID
+      WHERE Counties.STATE_CODE ==?`;
+
+  db.all(sql, [state], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    rows.forEach((row) => {
+      $("#basic-resilience_state_score").html(round(row.SCORE * 100, 1));
+    });
   });
 }
 
