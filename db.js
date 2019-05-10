@@ -1116,8 +1116,12 @@ ipcRenderer.on('load-json', (event, arg) => {
       if ($ele.attr('data-units').toLowerCase().trim() === "dollars") {
         roundValue = 2;
       }
-      $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + $ele.attr('data-units') + ")</span>");
 
+      if ($ele.attr('data-units')) {
+        $ele.prev().html("<span> " + round(rawVal, roundValue) + " (" + $ele.attr('data-units') + ")</span>");
+      } else {
+        $ele.prev().html("<span> " + round(rawVal, roundValue) + "</span>");
+      }
 
     } else {
       // Set Service Scenario Builder Values
