@@ -60,6 +60,11 @@ except OSError as e:
     if e.errno != errno.EEXIST:
         raise
 try:
+    os.makedirs('disc_app_electron/static_qed/hwbi/disc/fonts')
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+try:
     os.makedirs('disc_app_electron/static_qed/hwbi/disc/img')
 except OSError as e:
     if e.errno != errno.EEXIST:
@@ -79,6 +84,9 @@ copyfile('static_qed/hwbi/disc/css/hwbi-disc-app.css', 'disc_app_electron/static
 copyfile('static_qed/hwbi/disc/css/jquery-ui.min.css', 'disc_app_electron/static_qed/hwbi/disc/css/jquery-ui.min.css')
 copyfile('static_qed/hwbi/disc/css/donut.css', 'disc_app_electron/static_qed/hwbi/disc/css/donut.css')
 copyfile('static_qed/hwbi/disc/css/hwbi-disc-compare-map.css', 'disc_app_electron/static_qed/hwbi/disc/css/hwbi-disc-compare-map.css')
+copyfile('static_qed/hwbi/disc/css/material-icons.css', 'disc_app_electron/static_qed/hwbi/disc/css/material-icons.css')
+
+copyfile('static_qed/hwbi/disc/fonts/material-icons.woff2', 'disc_app_electron/static_qed/hwbi/disc/fonts/material-icons.woff2')
 
 copyfile('static_qed/hwbi/disc/js/jquery-ui.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/jquery-ui.min.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-app.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-app.js')
