@@ -142,6 +142,7 @@ function createWindow () {
         });
       if (choice == 1) {
         e.preventDefault();
+        return;
       }
     } else {
       choice = dialog.showMessageBox(this,
@@ -160,10 +161,13 @@ function createWindow () {
           console.log("Cancel quit");
           e.preventDefault();
           return;
-        } else {
-          console.log("just quit")
         }
       }
+      snapshots.forEach(snapshot => {
+        if (snapshot) {
+          snapshot.close();
+        }
+      });
   });
 }
 
@@ -227,22 +231,24 @@ ipcMain.on('print-to-pdf', function (event) {
   });
 });
 
+let snapshots = [];
+
 ipcMain.on('snap', function(event, data) {
   const PROTOCOL = 'file';
+  const id = snapshots.length;
   
   let snapshot = new BrowserWindow({
-    width: 1100,
-    height: 825,
+    width: 800,
+    height: 600,
     center: true,
     resizable: true,
     frame: true,
     transparent: false,
     show: false,
-    parent: mainWindow
   });
 
-  // remove the menu from snapshot
-  snapshot.setMenu(null);
+  snapshot.setMenu(null); // remove the menu from snapshot
+  snapshots[id] = snapshot;
 
   // load the snapshot file
   snapshot.loadURL(url.format({
@@ -264,6 +270,7 @@ ipcMain.on('snap', function(event, data) {
   // garbage collection handle
   snapshot.on('closed', function() {
     snapshot = null;
+    snapshots[id] = null;
   });
 });
 
