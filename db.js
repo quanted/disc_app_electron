@@ -270,6 +270,10 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   
   setScoreData(state, county, "custom_val"); // set the domain scores
   loadSkillbar(); // update the colored bars on the snapshot page
+
+  //add bullet service markers to hwbi metrics on change
+  $(ele).parent().parent().find('.accordion-metrics').addClass('bull');
+  $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
 });
 
 /**
@@ -288,6 +292,15 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   updateAllAvgValues('METRIC_GROUP', 'custom_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
   updateApexCharts("custom_val");
+
+  //add bullet markers to services when changed
+  let innerBtn = $(ele).parent().parent().find('.accordion-metrics');
+  let outerBtn = $(innerBtn).parent().parent().parent().children('button');
+
+  $(innerBtn).addClass('bull');
+  $(outerBtn).addClass('bull');
+  $(ele).closest('.service-card').children('a').find('.card-text-overlay').addClass('bull');
+  
 });
 
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
