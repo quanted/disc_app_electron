@@ -238,8 +238,8 @@ ipcMain.on('snap', function(event, data) {
   const id = snapshots.length;
   
   let snapshot = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 900,
+    height: 700,
     center: true,
     resizable: true,
     frame: true,
