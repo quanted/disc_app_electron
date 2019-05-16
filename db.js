@@ -51,19 +51,30 @@ $(document).on('click', 'a[href^="http"]', function(event) {
 });
 
 function generateReport() {
-    let chkbx = $('.resources-checkbox');
-    let a;
+  let chkbx = $('.resources-checkbox:checked');
 
-    $('.active-metric').trigger('click');
-
-    for (a = 0; a < chkbx.length; a++) {
-
-      let grandparent = $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics');
-
-      if($(chkbx[a]).is(':checked') && !$(grandparent).hasClass('active-metric')) {
-        $(grandparent).trigger('click');
-      }
+  if (!chkbx.length) {
+    const choice = dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Generate Report',
+      message: 'You have not selected any resources.\n\nDo you still want to generate a report?'
+    });
+  
+    if (choice !== 0) { 
+      return;
     }
+  }
+
+  $('.active-metric').trigger('click');
+
+  for (let a = 0; a < chkbx.length; a++) {
+    let grandparent = $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics');
+
+    if (!$(grandparent).hasClass('active-metric')) {
+      $(grandparent).trigger('click');
+    }
+  }
   ipcRenderer.send('print-to-pdf');
 }
 
