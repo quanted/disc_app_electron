@@ -245,6 +245,9 @@ ipcMain.on('snap', function(event, data) {
     frame: true,
     transparent: false,
     show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
 
   snapshot.setMenu(null); // remove the menu from snapshot
