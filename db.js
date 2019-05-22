@@ -42,6 +42,8 @@ $(function() {
   createDataStructure(dataStructure);
   getNationalDomainScores();
   nationalRes();
+
+  navigator.onLine ? onlineSearch(true) : onlineSearch(false);
 });
 
 //open links externally by default

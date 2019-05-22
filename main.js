@@ -96,6 +96,7 @@ function createWindow () {
       submenu: [
         {
           label: 'Toggle Offline Search',
+          id: 'toggle-offline',
           accelerator: process.platform === 'darwin' ? 'Command+D' : "CTRL+D",
           type: 'checkbox',
           click: () => {
@@ -168,6 +169,15 @@ function createWindow () {
           snapshot.close();
         }
       });
+  });
+
+  /**
+   * Listens for toggle-offline message from render thread and toggle the checkmark.
+   * @listens toggle-offline
+   */
+  ipcMain.on('toggle-offline', () => {
+    const item =  menu.getMenuItemById('toggle-offline');
+    item.checked = !item.checked;
   });
 }
 
@@ -464,8 +474,8 @@ ipcMain.on('quit', function(event, arg) {
 
 /**
  * Listens for json-save message from render thread. Saves the JSON data to a file.
- * @param {event} e - The storage event.
- * @param {objec6} e - The JSON object to save.
+ * @param {event} event - The storage event.
+ * @param {object} arg - The JSON object to save.
  * @listens json-save
  */
 ipcMain.on('json-save', function(event, arg) {
@@ -479,7 +489,7 @@ ipcMain.on('json-save', function(event, arg) {
 /**
  * Listens for json-save-as message from render thread. Saves the JSON data to a file.
  * @param {event} e - The storage event.
- * @param {objec6} e - The JSON object to save.
+ * @param {object} arg - The JSON object to save.
  * @listens json-save-as
  */
 ipcMain.on('json-save-as', function(event, arg) {
