@@ -104,6 +104,9 @@ copyfile('static_qed/hwbi/disc/js/draw.js', 'disc_app_electron/static_qed/hwbi/d
 copyfile('static_qed/hwbi/disc/js/donut.js', 'disc_app_electron/static_qed/hwbi/disc/js/donut.js')
 copyfile('static_qed/hwbi/disc/js/topojson.min.js', 'disc_app_electron/static_qed/hwbi/disc/js/topojson.min.js')
 copyfile('static_qed/hwbi/disc/js/hwbi-disc-compare.js', 'disc_app_electron/static_qed/hwbi/disc/js/hwbi-disc-compare.js')
+copyfile('static_qed/hwbi/disc/js/intro.js', 'disc_app_electron/static_qed/hwbi/disc/js/intro.js')
+copyfile('static_qed/hwbi/disc/css/introjs.css', 'disc_app_electron/static_qed/hwbi/disc/css/introjs.css')
+copyfile('static_qed/hwbi/disc/css/introjs-nassim.css', 'disc_app_electron/static_qed/hwbi/disc/css/introjs-nassim.css')
 
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')

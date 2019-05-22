@@ -1458,7 +1458,7 @@ fieldset.filter-wrapper {
   }
 
   .block-pane-epa-global-footer .row > .col {
-    width 100%;
+    width: 100%;
   }
 }
 
@@ -1595,7 +1595,7 @@ input[type="submit"],
   background-color: #0071bc;
   border: 0;
   color: #fff;
-  cursor: pointer;
+  /* cursor: pointer; */
   display: inline-block;
   font-weight: bold;
   line-height: 1;

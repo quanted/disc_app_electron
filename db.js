@@ -166,8 +166,16 @@ function setScoreData(state, county, valueType) {
   }
 }
 
+let isClicked = false;
+$('.tutButton').click(function(e) {
+
+  isClicked = true;
+});
+
+let searchCount = 0;
 async function getScoreData() {
   var location_data = locationValue;
+  
   if (location_data === "{}") {
       var locationCookie = getCookie("EPAHWBIDISC");
       if (locationCookie !== "") {
@@ -243,9 +251,22 @@ async function getScoreData() {
   locationValue = JSON.stringify(location);
   show('mainpage', 'homepage');
   $('#community-snapshot-tab-link').trigger("click");
+  
   $('#customize_location').html(location.county + " County, " + location.state);
   setCookie('EPAHWBIDISC', location_data, 0.5);
+
+  //if tutorial button clicked, start tutorial
+  if(isClicked) {
+    startIntro();
+    isClicked = false;
+  } else {
+    return;
+  }
+  
+
 }
+
+
 
 /**
  * Change the relative importance weight of a domain
