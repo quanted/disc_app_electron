@@ -308,6 +308,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   //add bullet service markers to hwbi metrics on change
   $(ele).parent().parent().find('.accordion-metrics').addClass('bull');
   $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
+  $(ele).prev().addClass('bull');
 });
 
 /**
@@ -334,6 +335,7 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   $(innerBtn).addClass('bull');
   $(outerBtn).addClass('bull');
   $(ele).closest('.service-card').children('a').find('.card-text-overlay').addClass('bull');
+  $(ele).prev().addClass('bull');
   
 });
 
