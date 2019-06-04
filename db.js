@@ -1,27 +1,27 @@
-const electron = nodeRequire('electron');
+const electron = require('electron');
 const { app, ipcRenderer, shell } = electron;
 const { dialog } = electron.remote
 
-const path = nodeRequire('path');
-const fs = nodeRequire('fs');
+const path = require('path');
+const fs = require('fs');
 
 try {
-	var sqlite3 = nodeRequire('sqlite3').verbose();
+	var sqlite3 = require('sqlite3').verbose();
 } catch (e) { 
   console.log(e);
   try {
-    var sqlite3 = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/sqlite3')).verbose();
+    var sqlite3 = require(path.join(process.resourcesPath, '/app.asar/node_modules/sqlite3')).verbose();
   } catch (e) { 
     console.log(e);
   }
 }
 
 try {
-  d3.tip = nodeRequire('d3-tip');
+  d3.tip = require('d3-tip');
 } catch (e) {
 
   try {
-    d3.tip = nodeRequire(path.join(process.resourcesPath, '/app.asar/node_modules/d3-tip'));
+    d3.tip = require(path.join(process.resourcesPath, '/app.asar/node_modules/d3-tip'));
   } catch (e) {
     console.log(e);
   }

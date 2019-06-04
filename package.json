@@ -14,12 +14,15 @@
   "author": "",
   "license": "",
   "devDependencies": {
+    "devtron": "^1.4.0",
     "electron": "4.0.3",
-    "electron-builder": "^20.39.0"
+    "electron-builder": "^20.39.0",
+    "spectron": "^5.0.0"
   },
   "dependencies": {
     "d3-tip": "^0.9.1",
     "intro.js": "^2.9.3",
+    "jquery": "^3.4.1",
     "jquery-slinky": "^4.1.0",
     "papaparse": "^4.6.3",
     "sqlite3": "^4.0.6",
