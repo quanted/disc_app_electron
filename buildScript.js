@@ -4,7 +4,7 @@ const builder = require("electron-builder");
 const Platform = builder.Platform;
 
 const config = {
-  "asar": false,
+  "asar": true,
   "appId": "disc.app",
   "productName": "Decision Integration for Strong Communities",
   "mac": {
@@ -23,7 +23,7 @@ builder.build({
     config: config
 })
 .then(m => {
-    console.log(`Build OK!\n${m}`);
+    console.log('Build OK!');
 })
 .catch(e => {
     console.error(e);
