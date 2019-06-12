@@ -8,7 +8,8 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "postinstall": "install-app-deps",
-    "rebuild": "electron-rebuild -f -w sqlite3"
+    "rebuild": "electron-rebuild -f -w sqlite3",
+    "dist": "node buildScript.js"
   },
   "repository": "",
   "author": "",
@@ -27,19 +28,5 @@
     "papaparse": "^4.6.3",
     "sqlite3": "^4.0.6",
     "wkhtmltopdf": "^0.3.4"
-  },
-  "build": {
-    "asar": true,
-    "appId": "disc.app",
-    "productName": "Decision Integration for Strong Communities",
-    "mac": {
-      "category": "disc.app"
-    },
-    "nsis": {
-      "oneClick": false
-    },
-    "extraResources": [
-      "hwbi_app/DISC.db"
-    ]
   }
 }
