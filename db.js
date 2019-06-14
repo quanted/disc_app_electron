@@ -1304,3 +1304,25 @@ ipcRenderer.on('load-json', (event, arg) => {
   show('mainpage', 'homepage');
   $('#community-snapshot-tab-link').trigger("click");
 });
+
+function hamburgerMenu() {
+  $('.sidenav').toggleClass('no-mobile');
+  $('.hamburger-line').toggleClass('h-active');
+  /* if(hmenu.hasClass('no-mobile')) {
+      $(hmenu).addClass('no-mobile');
+      $('.hamburger-line').removeClass('h-active');
+  } */
+  
+};
+
+function searchToggle() {
+  $('.search-icon-toggle').addClass('hide');
+  $('.search').css('right', '0');
+  $('.search input').focus();
+}
+
+$('#top-search-bar').on('focusout', function() {
+  $('.search').css('right', '-275px');
+  $('.search-icon-toggle').removeClass('hide');
+  
+});
