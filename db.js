@@ -85,7 +85,9 @@ ipcRenderer.on('toggleSearch', function() {
   $('#statecounty').toggle();
   $('.autocomplete-container').toggle();
 
+  $('#mainpage-statecounty').toggleClass('offline-active');
   $('#mainpage-statecounty').toggle();
+  
   $('.search').toggle();
 });
 
@@ -1317,12 +1319,21 @@ function hamburgerMenu() {
 
 function searchToggle() {
   $('.search-icon-toggle').addClass('hide');
-  $('.search').css('right', '0');
-  $('.search input').focus();
+  if ($('#mainpage-statecounty').hasClass('offline-active')) {
+    $('#mainpage-statecounty').css('right', '0');
+  } else {
+    $('.search').css('right', '0');
+    $('.search input').focus();
+  }
+  
 }
 
 $('#top-search-bar').on('focusout', function() {
   $('.search').css('right', '-275px');
   $('.search-icon-toggle').removeClass('hide');
-  
+});
+
+$('#mainpage-county-state-select .close').click(function() {
+  $('#mainpage-statecounty').css('right', '-500px');
+  $('.search-icon-toggle').removeClass('hide');
 });
