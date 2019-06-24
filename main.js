@@ -33,7 +33,8 @@ function createWindow () {
     height: 825,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    title: '[Concept Version] Decision Integration for Strong Communities ' + app.getVersion() + ' | BETA | US EPA'
   });
 
   // show the window once it's ready
@@ -169,6 +170,13 @@ function createWindow () {
           snapshot.close();
         }
       });
+  });
+
+  /**
+   * @listens page-title-updated
+   */
+  mainWindow.on('page-title-updated', (event) => {
+    event.preventDefault();
   });
 
   /**

@@ -1,12 +1,11 @@
 {
   "name": "disc-electron",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "An Electron version of the DISC application.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder",
     "postinstall": "install-app-deps",
     "rebuild": "electron-rebuild -f -w sqlite3",
     "dist": "node buildScript.js"
