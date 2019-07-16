@@ -198,13 +198,16 @@ async function getScoreData() {
   let rows = await getMetricsForCounty(location.county, location.state_abbr);
   
   let resilience = await getResilienceIndicators(location.county, location.state_abbr);
-  $('#basic-resilience_governance_value').html(round(+resilience[0].SCORE * 100, 1));
-  $('#basic-resilience_risk_value').html(round(+resilience[1].SCORE * 100, 1));
-  $('#basic-resilience_modal_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+  if (resilience && resilience.length > 1) {
+    $('#basic-resilience_governance_value').html(round(+resilience[0].SCORE * 100, 1));
+    $('#basic-resilience_risk_value').html(round(+resilience[1].SCORE * 100, 1));
+    $('#basic-resilience_modal_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
 
-  $('#basic-resilience_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
-  $('#basic-resilience_score_bar').attr('data-percent', round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1) + "%");
-  $('#basic-resilience_score_summary').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+    $('#basic-resilience_score').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+    $('#basic-resilience_score_bar').attr('data-percent', round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1) + "%");
+    $('#basic-resilience_score_summary').html(round((+resilience[0].SCORE * 100 + +resilience[1].SCORE * 100) / 2, 1));
+  }
+
 
   rows.forEach((row) => {
     var ele = document.querySelector('[data-var="' + row.METRIC_ID + '"]');
