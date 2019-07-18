@@ -72,9 +72,13 @@ function generateReport() {
 
   for (let a = 0; a < chkbx.length; a++) {
     let grandparent = $(chkbx[a]).parent().parent().parent().prev('.accordion-metrics');
+    let greatGrandparent = $(chkbx[a]).parent().parent().parent().parent().prev('.accordion-metrics');
 
     if (!$(grandparent).hasClass('active-metric')) {
       $(grandparent).trigger('click');
+    }
+    if (!$(greatGrandparent).hasClass('active-metric')) {
+      $(greatGrandparent).trigger('click');
     }
   }
   ipcRenderer.send('print-to-pdf');
