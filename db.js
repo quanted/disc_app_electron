@@ -239,8 +239,8 @@ async function getScoreData() {
   setAllInitialWeightedAvgValues('METRIC_GROUP', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
 
   // fix slider inital values quickly...
-  $('#reset-service-btn').click();
-  $('#reset-hwbi-domains').click();
+  resetServices();
+  resetDomains();
   resetValues(dataStructure.METRIC_GROUP[2], 'scenario_val', 'original_val');
   resetValues(dataStructure.METRIC_GROUP[3], 'scenario_val', 'original_val');
   resetValues(dataStructure.METRIC_GROUP[4], 'scenario_val', 'original_val');
