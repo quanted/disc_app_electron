@@ -377,9 +377,6 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
 $('.customize-service-metrics').on('change', function() { // customize metric listeners
   const ele = this;
   const val = +ele.value;
-  const loc = JSON.parse(locationValue);
-  const state = loc.state_abbr;
-  const county = loc.county;
   const metric = dataStructure.SERVICE_METRIC[ele.dataset.var];
   
   metric.custom_val = val;
@@ -570,36 +567,48 @@ function updateAllWeightedAvgValues(thing, value, obj) {
 }
 
 function setAllInitialAvgValues(thing, obj) {
-	for (var indicator in obj[thing]) {
-    var sum = function (items, prop) {
+	for (const indicator in obj[thing]) {
+    const sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
       }, 0);
     };
-    var avg = sum(obj[thing][indicator].children, "original_val") / obj[thing][indicator].children.length;
-    obj[thing][indicator]["original_val"] = avg;
-    obj[thing][indicator]["custom_val"] = avg;
-    obj[thing][indicator]["scenario_val"] = avg;
+
+    var number = 0; 
+
+    obj[thing][indicator].children.forEach(child => {
+      if (child.original_val !== null) {
+        number += 1;
+      }
+    });
+
+    const avg = sum(obj[thing][indicator].children, 'original_val') / number;
+    obj[thing][indicator].original_val = avg;
+    obj[thing][indicator].custom_val = avg;
+    obj[thing][indicator].scenario_val = avg;
   }
 }
 
 function setAllInitialWeightedAvgValues(thing, obj) {
-	for (var indicator in obj[thing]) {
-    if (obj[thing][indicator].children[0].hasOwnProperty("weight")) {
-      var sum = function (items, prop) {
+	for (const indicator in obj[thing]) {
+    if (obj[thing][indicator].children[0].hasOwnProperty('weight')) {
+      const sum = function (items, prop) {
         return items.reduce( function(a, b) {
           return a + b[prop];
         }, 0);
       };
-      var weightedSum = function (items, prop) {
+
+      const weightedSum = function (items, prop) {
         return items.reduce( function(a, b) {
           return a + b[prop] * b.weight;
         }, 0);
       };
-      var avg = weightedSum(obj[thing][indicator].children, "original_val") / sum(obj[thing][indicator].children, "weight");
-      obj[thing][indicator]["original_val"] = avg;
-      obj[thing][indicator]["custom_val"] = avg;
-      obj[thing][indicator]["scenario_val"] = avg;
+
+      const avg = weightedSum(obj[thing][indicator].children, 'original_val') / sum(obj[thing][indicator].children, 'weight');
+
+      obj[thing][indicator].original_val = avg;
+      obj[thing][indicator].custom_val = avg;
+      obj[thing][indicator].scenario_val = avg;
     }
   }
 }
