@@ -19,37 +19,34 @@ domains = cur.fetchall()
 cur.execute('select * from Indicators')
 indicators = cur.fetchall()
 
-cur.execute("select * from MetricGroups WHERE METRIC_GROUP != 'HWBI'")
+cur.execute("select * from MetricGroups WHERE METRIC_GRP != 'HWBI' AND METRIC_GRP != 'CRSI'")
 metricGroups = cur.fetchall()
 #print(metricGroups)
 
-cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " +
-        "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
-        "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION, " +
-        "Domains.DOMAIN_DESCRIPTION, MetricScores.METRIC_VAR_ID, Domains.ID " +
-    "FROM MetricScores " +
-    "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
-    "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP != 'HWBI' " +
-    "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
-    "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'" +
-    "ORDER BY METRIC_GROUP ASC,	DOMAIN ASC,	INDICATOR ASC")
+cur.execute("SELECT MetricVars.METRIC_VAR, MetricVars.METRIC_VAR_DESC, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups_Domains.METRIC_GRP, MetricVars.MINVAL, " +
+        "MetricVars.MAXVAL, MetricVars.POS_NEG_METRIC, MetricVars.METRIC_VAR_DESC, MetricVars.UNITS, Indicators.INDICATOR_DESC, Domains.DOMAIN_DESC, MetricVars.METRIC, MetricVars.SOURCE " +
+    "FROM MetricVars " +
+    "INNER JOIN Indicators_MetricVars ON MetricVars.METRIC_VAR == Indicators_MetricVars.METRIC_VAR " +
+    "INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
+    "INNER JOIN MetricGroups_Domains ON Domains_Indicators.DOMAIN == MetricGroups_Domains.DOMAIN " +
+    "INNER JOIN Indicators ON Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
+    "INNER JOIN Domains ON Domains_Indicators.DOMAIN == Domains.DOMAIN " +
+    "INNER JOIN MetricGroups ON MetricGroups_Domains.METRIC_GRP == MetricGroups.METRIC_GRP  " +
+    "WHERE MetricGroups.METRIC_GRP != 'HWBI' AND MetricGroups.METRIC_GRP != 'CRSI';")
 service_metrics = cur.fetchall()
 #print(service_metrics)
 
-cur.execute("SELECT MetricVariables.METRIC_VAR, MetricVariables.METRIC_DESCRIPTION, MetricScores.SCORE, MetricScores.FIPS, " + 
-        "Counties.COUNTY_NAME, Counties.STATE_CODE, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups.METRIC_GROUP, MetricScores.MINVAL, " + 
-        "MetricScores.MAXVAL, MetricScores.POS_NEG_METRIC, MetricVariables.SHORT_DESCRIPTION, MetricVariables.ORIG_UNITS, Indicators.INDICATOR_DESCRIPTION, " +
-        "Domains.DOMAIN_DESCRIPTION, MetricScores.METRIC_VAR_ID, Domains.ID " +
-    "FROM MetricScores " +
-    "INNER JOIN Counties ON MetricScores.FIPS == Counties.FIPS " +
-    "INNER JOIN MetricVariables ON MetricScores.METRIC_VAR_ID == MetricVariables.ID " +
-    "INNER JOIN MetricGroups ON MetricVariables.METRIC_GROUP_ID == MetricGroups.ID AND MetricGroups.METRIC_GROUP == 'HWBI' " +
-    "INNER JOIN Domains ON MetricVariables.DOMAIN_ID == Domains.ID " +
-    "INNER JOIN Indicators ON MetricVariables.INDICATOR_ID == Indicators.ID " +
-    "WHERE Counties.COUNTY_NAME == 'Benton' AND Counties.STATE_CODE == 'OR'" +
-    "ORDER BY METRIC_GROUP ASC,	DOMAIN ASC,	INDICATOR ASC")
+cur.execute("SELECT MetricVars.METRIC_VAR, MetricVars.METRIC_VAR_DESC, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups_Domains.METRIC_GRP, MetricVars.MINVAL, " +
+        "MetricVars.MAXVAL, MetricVars.POS_NEG_METRIC, MetricVars.METRIC_VAR_DESC, MetricVars.UNITS, Indicators.INDICATOR_DESC, Domains.DOMAIN_DESC, MetricVars.METRIC, MetricVars.SOURCE " +
+    "FROM MetricVars " +
+    "INNER JOIN Indicators_MetricVars ON MetricVars.METRIC_VAR == Indicators_MetricVars.METRIC_VAR " +
+    "INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
+    "INNER JOIN MetricGroups_Domains ON Domains_Indicators.DOMAIN == MetricGroups_Domains.DOMAIN " +
+    "INNER JOIN Indicators ON Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
+    "INNER JOIN Domains ON Domains_Indicators.DOMAIN == Domains.DOMAIN " +
+    "INNER JOIN MetricGroups ON MetricGroups_Domains.METRIC_GRP == MetricGroups.METRIC_GRP " +
+    "WHERE MetricGroups.METRIC_GRP == 'HWBI' OR MetricGroups.METRIC_GRP == 'CRSI' " +
+    "ORDER BY MetricGroups.METRIC_GRP DESC;")
 hwbi_metrics = cur.fetchall()
 
 try:
@@ -121,7 +118,7 @@ copyfile('static_qed/hwbi/disc/img/leisure-time.jpg', 'disc_app_electron/static_
 copyfile('static_qed/hwbi/disc/img/living-standards.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/living-standards.jpg')
 copyfile('static_qed/hwbi/disc/img/safety-and-security.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/safety-and-security.jpg')
 copyfile('static_qed/hwbi/disc/img/social-cohesion.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social-cohesion.jpg')
-copyfile('static_qed/hwbi/disc/img/basic-resilience.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/basic-resilience.jpg')
+copyfile('static_qed/hwbi/disc/img/resilience.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/resilience.jpg')
 copyfile('static_qed/hwbi/disc/img/economic.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/economic.jpg')
 copyfile('static_qed/hwbi/disc/img/ecosystem.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/ecosystem.jpg')
 copyfile('static_qed/hwbi/disc/img/social.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/social.jpg')
@@ -174,6 +171,6 @@ html += body
 }) """
 #print(html)
 #f = open('disc_app_electron/templates_qed/hwbi/disc/index.html', 'w')
-f = open('disc_app_electron/index.html', 'w')
+f = open('disc_app_electron/index.html', 'w', encoding="utf-8")
 f.write(html)
 f.closed

@@ -91,7 +91,7 @@
                                 characteristics common across all communities and is sensitive to changes in the
                                 economic, social and ecological environments.</p>
                         </div>
-                        <button id="print-btn">Print</button>
+                        <button id="print-btn">Save to PDF</button>
                     </div>
                 </div>
                 <div id="wellbeing-scores">
@@ -335,6 +335,33 @@
                                     
                                 </div>
                             </div>
+                            <div id="resilience-block" class="domain-score-block">
+                                    <button class="accordion domain-expand"></button>
+                                    <div id="resilience_data-title" class="domain-data-title">Resilience:</div>
+                                    <div id="resilience_score" class="domain-score">0.0</div>
+                                    <div id="resilience_location" class="domain-location">Nation: <span id="resilience_national_score"></span>, State: <span id="resilience_state_score"></span></div>
+                                    <div id="resilience_score_bar" class="domain-score-bar clearfix" data-percent="0%">
+                                        <div class="score-bar resilience-bar" id="resilience_score-bar"></div>
+                                    </div>
+                                    <div class="slider-block">
+                                        <span class="left-slider-legend">Less</span>
+                                        <div class="slider-container">
+                                            <div id="resilience-slider-bar" class="rank-slider resilience-slider"></div>
+                                        </div>
+                                        <span class="right-slider-legend">More</span>
+                                    </div>
+                                    <div id="resilience_details" class="domain-description">
+                                        <p>
+                                            The Resilience domain describes a community's core ability to withstand and recover from an adverse natural hazard event in the context of potential natural hazard exposures and local resilience governance.
+                                        </p>
+                                        <!-- <figure class="domain_image_left">
+                                            <img src="/static_qed/hwbi/disc/img/social-cohesion.jpg"
+                                                 alt="Social Cohesion">
+                                            <figcaption>Courtesy of iStockphoto.com</figcaption>
+                                        </figure> -->
+                                        
+                                    </div>
+                                </div>
                             </div> <!--end domain-blocks -->
 
                             <div class="service-blocks">
@@ -550,9 +577,16 @@
         ipcRenderer.send('did-finish-load');
         
         $('#print-btn').click(function() {
-        ipcRenderer.send('print-to-pdf');
+            document.body.style.cursor='progress';
+            ipcRenderer.send('print-to-pdf');
+            $('#print-btn').attr('disabled', true);
         });
 
+        
+        ipcRenderer.on('wrote-pdf', () => {
+            $('#print-btn').attr('disabled', false);
+            document.body.style.cursor='default';
+        });
 
     </script>
 </body>

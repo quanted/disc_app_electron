@@ -74,13 +74,14 @@ function createWindow () {
             mainWindow.webContents.send('request-json', 'save-as');
           }
         },
+        // {
+        //   label: 'Import Metric Data...',
+        //   accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
+        //   click: () => {
+        //     openFile();
+        //   }
+        //}, 
         {
-          label: 'Import Metric Data...',
-          accelerator: process.platform === 'darwin' ? 'Command+I' : "CTRL+I",
-          click: () => {
-            openFile();
-          }
-        }, {
           type: 'separator'
         }, {
           type: 'separator'
@@ -173,6 +174,7 @@ function createWindow () {
   });
 
   /**
+   * Listens for page-title-updated and prevents the loading of the html title attribute.
    * @listens page-title-updated
    */
   mainWindow.on('page-title-updated', (event) => {
@@ -219,7 +221,10 @@ ipcMain.on('print-to-pdf', function (event) {
   const pdfPath = path.join(__dirname, '/print.pdf');
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF({printBackground: true, landscape: true}, function (error, data) {
-    if (error) throw error
+    if (error) {
+      event.sender.send('wrote-pdf', fileNames);
+      throw error
+    }
     dialog.showSaveDialog(
     {
       filters: [
@@ -232,12 +237,14 @@ ipcMain.on('print-to-pdf', function (event) {
     function (fileNames) {
       if (fileNames === undefined) { // fileNames is an array that contains all the selected files
         console.log("No file selected");
+        event.sender.send('wrote-pdf', fileNames);
       } else {
-        if(!fileNames.endsWith(".pdf")) {
+        if (!fileNames.endsWith(".pdf")) {
           fileNames += ".pdf";
         }
         fs.writeFile(fileNames, data, function (error) {
           if (error) {
+            event.sender.send('wrote-pdf', fileNames);
             throw error;
           }
           console.log(fileNames);
@@ -286,6 +293,7 @@ ipcMain.on('snap', function(event, data) {
   // send data when the page is ready to accept it
   snapshot.webContents.on('did-finish-load', function() {
     snapshot.webContents.send('snapshot-data', data);
+    mainWindow.webContents.send('snapshot-opened');
   });
 
   // garbage collection handle
