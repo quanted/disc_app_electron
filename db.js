@@ -415,6 +415,7 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
   runAsterPlot();
 });
 
+// Update the slider labels when an input is triggered
 $('.thumb').on('input', function() {
   const ele = this;
   updateSliderLabel(ele);
@@ -1183,6 +1184,9 @@ ipcRenderer.on('load-json', (event, arg) => {
 
   // Load data into the UI
   setScoreData(state, county, "custom_val"); // set the domain scores
+
+  // set data for compare map
+  comp_setCompareMapData(state_abbr, county);
 
   updateApexCharts("custom_val");
   
