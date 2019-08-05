@@ -1211,6 +1211,15 @@ function hamburgerMenu() {
   
 };
 
+
+$('.sidenav li').on('click', function() {
+  if (!$('.sidenav').hasClass('no-mobile')) {
+    $('.sidenav').addClass('no-mobile')
+    $('#hamburger div').removeClass('h-active')
+  }
+});
+
+
 function searchToggle() {
   $('.search-icon-toggle').addClass('hide');
   if ($('#mainpage-statecounty').hasClass('offline-active')) {
@@ -1223,7 +1232,7 @@ function searchToggle() {
 }
 
 $('#top-search-bar').on('focusout', function() {
-  $('.search').css('right', '-275px');
+  $('.search').css('right', '-400px');
   $('.search-icon-toggle').removeClass('hide');
 });
 
