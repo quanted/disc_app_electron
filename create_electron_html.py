@@ -130,6 +130,7 @@ copyfile('static_qed/hwbi/disc/img/connected.png', 'disc_app_electron/static_qed
 copyfile('static_qed/hwbi/disc/img/question-circle-regular.svg', 'disc_app_electron/static_qed/hwbi/disc/img/question-circle-regular.svg')
 
 copyfile('hwbi_app/DISC.db', 'disc_app_electron/hwbi_app/DISC.db')
+copyfile('hwbi_app/cities.db', 'disc_app_electron/hwbi_app/cities.db')
 
 copyfile('static_qed/hwbi/disc/css/mainstyle.css', 'disc_app_electron/static_qed/hwbi/disc/css/mainstyle.css')
 copyfile('static_qed/hwbi/disc/img/epa2.gif', 'disc_app_electron/static_qed/hwbi/disc/img/epa2.gif')

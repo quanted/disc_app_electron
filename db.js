@@ -368,6 +368,29 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   $(ele).parent().parent().find('.accordion-metrics').addClass('bull');
   $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
+
+  // const twins = {
+  //   'CRS': 'CRS2',
+  //   'PCT_SHM': 'PCT_SHM2',
+  //   'DIVCONS': 'DIVCONS2',
+  //   'HOMEINS': 'HOMEINS2',
+  //   'NUMNFIP': 'NUMNFIP2',
+  //   'CRS2': 'CRS',
+  //   'PCT_SHM2': 'PCT_SHM',
+  //   'DIVCONS2': 'DIVCONS',
+  //   'HOMEINS2': 'HOMEINS',
+  //   'NUMNFIP2': 'NUMNFIP',
+  // };
+
+  // if (twins.hasOwnProperty(ele.dataset.var)) {
+  //   const ele2 = document.querySelector(`[data-var="${twins[ele.dataset.var]}"]`);
+  //   if (ele2.value !== ele.value) {
+  //     ele2.value = ele.value;
+  //     updateSliderLabel(ele2);
+  //     const event = new Event('change');
+  //     ele2.dispatchEvent(event);
+  //   }
+  // }
 });
 
 /**
@@ -398,7 +421,29 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   $(outerBtn).addClass('bull');
   $(ele).closest('.service-card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
-  
+
+  // const twins = {
+  //   'CRS': 'CRS2',
+  //   'PCT_SHM': 'PCT_SHM2',
+  //   'DIVCONS': 'DIVCONS2',
+  //   'HOMEINS': 'HOMEINS2',
+  //   'NUMNFIP': 'NUMNFIP2',
+  //   'CRS2': 'CRS',
+  //   'PCT_SHM2': 'PCT_SHM',
+  //   'DIVCONS2': 'DIVCONS',
+  //   'HOMEINS2': 'HOMEINS',
+  //   'NUMNFIP2': 'NUMNFIP',
+  // };
+
+  // if (twins.hasOwnProperty(ele.dataset.var)) {
+  //   const ele2 = document.querySelector(`[data-var="${twins[ele.dataset.var]}"]`);
+  //   if (ele2.value !== ele.value) {
+  //     ele2.value = ele.value;
+  //     updateSliderLabel(ele2);
+  //     const event = new Event('change');
+  //     ele2.dispatchEvent(event);
+  //   }
+  // }
 });
 
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
@@ -682,20 +727,35 @@ function getNationalDomainScores() {
 }
 
 function getCounty(location) {
+  let dbPath;
+
+  if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
+    dbPath = path.join(__dirname, "/hwbi_app/cities.db");
+  } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/cities.db'))) {
+    dbPath = path.join(__dirname, "/resources/app/hwbi_app/cities.db");
+  } else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/cities.db'))) {
+    dbPath = path.join(process.resourcesPath, '/hwbi_app/cities.db');
+  } else {
+    console.log("cities - Database not found.")
+  }
+
+  const citiesDb = new sqlite3.Database(dbPath);
+
   let city = location[0];
   let state = location[1];
   let sql = `SELECT COUNTY_NAME, STATE_CODE
     FROM Cities
     WHERE CITY_NAME ==? AND STATE_NAME ==?`;
 
-  return new Promise( ( resolve, reject ) => {
-    db.all(sql, [city, state], (err, rows) => {
+  return new Promise((resolve, reject) => {
+    citiesDb.all(sql, [city, state], (err, rows) => {
         if (err) {
             console.log('Error - getCounty(' + city + ', ' + state + '): ' + err);
             reject(err);
         }
         resolve(rows);
     });
+    citiesDb.close();
   });
 }
 
