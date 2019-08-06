@@ -683,15 +683,13 @@ function setAllInitialWeightedAvgValues(thing, obj) {
 }
 
 function runAsterPlot() {
-  var asterData = [];
-  for (var domain in dataStructure.HWBI_DOMAIN) {
-    if (dataStructure.HWBI_DOMAIN[domain].parent.name == "HWBI") {
-      asterData.push({
-          description: dataStructure.HWBI_DOMAIN[domain].name,
-          weight: dataStructure.HWBI_DOMAIN[domain].weight,
-          score: dataStructure.HWBI_DOMAIN[domain].scenario_val * 100
-      });
-    }
+  const asterData = [];
+  for (const domain in dataStructure.HWBI_DOMAIN) {
+    asterData.push({
+      description: dataStructure.HWBI_DOMAIN[domain].name,
+      weight: dataStructure.HWBI_DOMAIN[domain].weight,
+      score: dataStructure.HWBI_DOMAIN[domain].scenario_val * 100,
+    });
   }
 
   if (drawn === false) {
