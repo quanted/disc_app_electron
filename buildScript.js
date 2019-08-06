@@ -14,7 +14,8 @@ const config = {
     "oneClick": false
   },
   "extraResources": [
-    "hwbi_app/DISC.db"
+    "hwbi_app/DISC.db",
+    "hwbi_app/cities.db",
   ]
 };
 

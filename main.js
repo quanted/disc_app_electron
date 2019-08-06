@@ -34,7 +34,7 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     },
-    title: '[Concept Version] Decision Integration for Strong Communities ' + app.getVersion() + ' | BETA | US EPA'
+    title: 'Decision Integration for Strong Communities ' + app.getVersion() + ' | BETA | US EPA'
   });
 
   // show the window once it's ready
@@ -97,7 +97,7 @@ function createWindow () {
       label: 'Settings',
       submenu: [
         {
-          label: 'Toggle Offline Search',
+          label: 'Toggle Search Method',
           id: 'toggle-offline',
           accelerator: process.platform === 'darwin' ? 'Command+D' : "CTRL+D",
           type: 'checkbox',

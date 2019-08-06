@@ -169,6 +169,18 @@ if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
 
 const db = new sqlite3.Database(dbPath);
 
+if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
+  dbPath = path.join(__dirname, "/hwbi_app/cities.db");
+} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/cities.db'))) {
+  dbPath = path.join(__dirname, "/resources/app/hwbi_app/cities.db");
+} else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/cities.db'))) {
+  dbPath = path.join(process.resourcesPath, '/hwbi_app/cities.db');
+} else {
+  console.log("cities - Database not found.")
+}
+
+const citiesDb = new sqlite3.Database(dbPath);
+
 function setScoreData(state, county, valueType) {
   document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";
   
@@ -629,6 +641,7 @@ function setAllInitialAvgValues(thing, obj) {
     });
 
     const avg = sum(obj[thing][indicator].children, 'original_val') / number;
+
     obj[thing][indicator].original_val = avg;
     obj[thing][indicator].custom_val = avg;
     obj[thing][indicator].scenario_val = avg;
@@ -726,21 +739,19 @@ function getNationalDomainScores() {
   });
 }
 
+function getStateCode(location) {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT STATE_CODE FROM COUNTIES WHERE COUNTY_NAME=? AND STATE_NAME=?`, location, (err, row) => {
+        if (err) {
+            console.log('Error - getStateCode(' + location[0] + ', ' + location[1] + '): ' + err);
+            reject(err);
+        }
+        resolve(row);
+    });
+  });
+}
+
 function getCounty(location) {
-  let dbPath;
-
-  if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
-    dbPath = path.join(__dirname, "/hwbi_app/cities.db");
-  } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/cities.db'))) {
-    dbPath = path.join(__dirname, "/resources/app/hwbi_app/cities.db");
-  } else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/cities.db'))) {
-    dbPath = path.join(process.resourcesPath, '/hwbi_app/cities.db');
-  } else {
-    console.log("cities - Database not found.")
-  }
-
-  const citiesDb = new sqlite3.Database(dbPath);
-
   let city = location[0];
   let state = location[1];
   let sql = `SELECT COUNTY_NAME, STATE_CODE
@@ -755,7 +766,7 @@ function getCounty(location) {
         }
         resolve(rows);
     });
-    citiesDb.close();
+    //citiesDb.close();
   });
 }
 
