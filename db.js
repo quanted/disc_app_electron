@@ -1302,8 +1302,8 @@ function searchToggle() {
   
 }
 
-$('#top-search-bar').on('focusout', function() {
-  $('.search').css('right', '-400px');
+$('#top_local_search').on('focusout', function() {
+  $('.search').css('right', '-420px');
   $('.search-icon-toggle').removeClass('hide');
 });
 
