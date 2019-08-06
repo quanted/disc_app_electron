@@ -187,7 +187,15 @@ function setScoreData(state, county, valueType) {
   $('#location').html("Snapshot results for<br>" + county + ", " + state); // Set location info
   $('#reportlocation').html("Report for " + county + ", " + state);
 
-  const HWBI_score = round(((dataStructure.METRIC_GROUP['HWBI'][valueType] * dataStructure.METRIC_GROUP['HWBI'].children.length) + (dataStructure.METRIC_GROUP['CRSI'][valueType] * dataStructure.METRIC_GROUP['CRSI'].children.length)) / (dataStructure.METRIC_GROUP['HWBI'].children.length + dataStructure.METRIC_GROUP['CRSI'].children.length) * 100, 1); // Set location score
+  let num = 0;
+  let denom = 0;
+  Object.values(dataStructure.HWBI_DOMAIN).forEach((domain) => {
+    if (domain[valueType]) {
+      num += domain[valueType];
+      denom += domain.weight;
+    }
+  });
+  const HWBI_score = round(num / denom * 100, 1);
   $('#wellbeing-score').html(HWBI_score);
   $('.modal-disc-score span').html(HWBI_score);
 
