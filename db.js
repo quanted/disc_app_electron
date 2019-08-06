@@ -640,8 +640,10 @@ function setAllInitialAvgValues(thing, obj) {
       }
     });
 
-    const avg = sum(obj[thing][indicator].children, 'original_val') / number;
-
+    let avg = sum(obj[thing][indicator].children, 'original_val') / number;
+    if (Number.isNaN(avg)) {
+      avg = null;
+    }
     obj[thing][indicator].original_val = avg;
     obj[thing][indicator].custom_val = avg;
     obj[thing][indicator].scenario_val = avg;
