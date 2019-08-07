@@ -139,6 +139,7 @@ function generateSnapshot(that) {
           }
     }
   }
+  domainData.DISC.score = $('#wellbeing-score').html() / 100;
   domainData.location = $('#location').html();
   domainData.locationScores = $('#wellbeing-score-location').html();
   ipcRenderer.send('snap', domainData);
