@@ -219,7 +219,7 @@ function setScoreData(state, county, valueType) {
   }
 
   resetServiceScores(valueType);
-  
+  toggleCustomizedDataMessage();  
 }
 
 function resetServiceScores(valueType) {
@@ -244,6 +244,8 @@ function resetServiceScores(valueType) {
     const score = round(dataStructure.SERVICE_INDICATOR[indicator][valueType] * 100, 1);
     $('#' + slugifiedIndicator + "_value").html(score);
   }
+
+  toggleCustomizedDataMessage();
 }
 
 let isClicked = false;
@@ -357,6 +359,7 @@ $('.rankinglist input').on("input", function() {
   dataStructure.HWBI_DOMAIN[label].weight = +$this.val();
 
   updateRivUi();
+  toggleCustomizedDataMessage();
 });
 
 /**
@@ -389,6 +392,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   $(ele).parent().parent().parent().find('.accordion-metrics').addClass('bull');
   $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
+  toggleCustomizedDataMessage();
 
   // const twins = {
   //   'CRS': 'CRS2',
@@ -442,6 +446,7 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   $(outerBtn).addClass('bull');
   $(ele).closest('.service-card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
+  toggleCustomizedDataMessage();
 
   // const twins = {
   //   'CRS': 'CRS2',
@@ -479,12 +484,14 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
   updateAllAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   calculateServiceHWBI();
   runAsterPlot();
+  toggleCustomizedDataMessage();
 });
 
 // Update the slider labels when an input is triggered
 $('.thumb').on('input', function() {
   const ele = this;
   updateSliderLabel(ele);
+  toggleCustomizedDataMessage();
 });
 
 function getMetricsForCounty(county = "", state = "") {
