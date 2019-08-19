@@ -386,7 +386,7 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   runAsterPlot();
 
   //add bullet service markers to hwbi metrics on change
-  $(ele).parent().parent().find('.accordion-metrics').addClass('bull');
+  $(ele).parent().parent().parent().find('.accordion-metrics').addClass('bull');
   $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
 
@@ -435,7 +435,7 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   updateApexCharts("custom_val");
 
   //add bullet markers to services when changed
-  let innerBtn = $(ele).parent().parent().find('.accordion-metrics');
+  let innerBtn = $(ele).parent().parent().parent().find('.accordion-metrics');
   let outerBtn = $(innerBtn).parent().parent().parent().children('button');
 
   $(innerBtn).addClass('bull');
