@@ -1337,9 +1337,29 @@ function resetAll() {
         message: `Are you sure you want to reset all changes to the Customize pages, Scenario Builder, and Priority Rankings?`,
     });
     if (choice === 0) {
-        $("#reset-scenario-builder-btn, #reset-hwbi-domains, #reset-service-btn, #riv-reset-btn").trigger('click');
+        /* $("#reset-scenario-builder-btn, #reset-hwbi-domains, #reset-service-btn, #riv-reset-btn").trigger('click'); */
+        resetServices();
+        resetServiceScores("custom_val");
 
+        resetDomains();
+        
         resetRivs();
         updateRivUi();
+        
+        let baselineValue = 'original_val'; 
+
+        // isCustomized() ? baselineValue = 'custom_val' : baselineValue = 'original_val';
+
+        resetValues(dataStructure.METRIC_GROUP.HWBI, 'scenario_val', baselineValue);
+        resetValues(dataStructure.METRIC_GROUP.CRSI, 'scenario_val', baselineValue);
+        resetValues(dataStructure.METRIC_GROUP.Social, 'scenario_val', baselineValue);
+        resetValues(dataStructure.METRIC_GROUP.Economic, 'scenario_val', baselineValue);
+        resetValues(dataStructure.METRIC_GROUP.Ecosystem, 'scenario_val', baselineValue);
+        
+        resetSliders(dataStructure.SERVICE_METRIC, 'scenario_val', 'scenario-builder-metric');
+
+        calculateServiceHWBI();
+        runAsterPlot();
+        toggleCustomizedDataMessage();
     }
 }
