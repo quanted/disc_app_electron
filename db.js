@@ -1320,3 +1320,19 @@ $('#mainpage-county-state-select .close').click(function() {
   $('#mainpage-statecounty').css('right', '-500px');
   $('.search-icon-toggle').removeClass('hide');
 });
+
+function resetAll() {
+  const choice = dialog.showMessageBox(
+    {
+        type: 'question',
+        buttons: ['Yes', 'No'],
+        title: `Reset All Changes`,
+        message: `Are you sure you want to reset all changes to the Customize pages, Scenario Builder, and Priority Rankings?`,
+    });
+    if (choice === 0) {
+        $("#reset-scenario-builder-btn, #reset-hwbi-domains, #reset-service-btn, #riv-reset-btn").trigger('click');
+
+        resetRivs();
+        updateRivUi();
+    }
+}
