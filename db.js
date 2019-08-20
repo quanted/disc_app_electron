@@ -283,6 +283,15 @@ async function getScoreData() {
     if (elements.length) {
       elements.forEach(element => {
         element.parentElement.title = element.parentElement.dataset.title + row.VINTAGE + ').';
+
+        if (row.SCORE === null) {
+          element.value = 0;
+          element.dataset.isNull = true;
+        } else {
+          element.value = row.SCORE;
+          element.dataset.isNull = false;
+        }
+
         updateSliderLabel(element);
       });
     } else {
@@ -396,29 +405,6 @@ $('.customize-hwbi-metrics').on('change', function() { // customize metric liste
   $(ele).closest('.card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
   toggleCustomizedDataMessage();
-
-  // const twins = {
-  //   'CRS': 'CRS2',
-  //   'PCT_SHM': 'PCT_SHM2',
-  //   'DIVCONS': 'DIVCONS2',
-  //   'HOMEINS': 'HOMEINS2',
-  //   'NUMNFIP': 'NUMNFIP2',
-  //   'CRS2': 'CRS',
-  //   'PCT_SHM2': 'PCT_SHM',
-  //   'DIVCONS2': 'DIVCONS',
-  //   'HOMEINS2': 'HOMEINS',
-  //   'NUMNFIP2': 'NUMNFIP',
-  // };
-
-  // if (twins.hasOwnProperty(ele.dataset.var)) {
-  //   const ele2 = document.querySelector(`[data-var="${twins[ele.dataset.var]}"]`);
-  //   if (ele2.value !== ele.value) {
-  //     ele2.value = ele.value;
-  //     updateSliderLabel(ele2);
-  //     const event = new Event('change');
-  //     ele2.dispatchEvent(event);
-  //   }
-  // }
 });
 
 /**
@@ -450,29 +436,6 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   $(ele).closest('.service-card').children('a').find('.card-text-overlay').addClass('bull');
   $(ele).prev().addClass('bull');
   toggleCustomizedDataMessage();
-
-  // const twins = {
-  //   'CRS': 'CRS2',
-  //   'PCT_SHM': 'PCT_SHM2',
-  //   'DIVCONS': 'DIVCONS2',
-  //   'HOMEINS': 'HOMEINS2',
-  //   'NUMNFIP': 'NUMNFIP2',
-  //   'CRS2': 'CRS',
-  //   'PCT_SHM2': 'PCT_SHM',
-  //   'DIVCONS2': 'DIVCONS',
-  //   'HOMEINS2': 'HOMEINS',
-  //   'NUMNFIP2': 'NUMNFIP',
-  // };
-
-  // if (twins.hasOwnProperty(ele.dataset.var)) {
-  //   const ele2 = document.querySelector(`[data-var="${twins[ele.dataset.var]}"]`);
-  //   if (ele2.value !== ele.value) {
-  //     ele2.value = ele.value;
-  //     updateSliderLabel(ele2);
-  //     const event = new Event('change');
-  //     ele2.dispatchEvent(event);
-  //   }
-  // }
 });
 
 $('.scenario-builder-metric').on('change', function() { // customize metric listeners
@@ -492,7 +455,9 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
 
 // Update the slider labels when an input is triggered
 $('.thumb').on('input', function() {
+  console.log("thub")
   const ele = this;
+  ele.dataset.isNull = false;
   updateSliderLabel(ele);
 });
 
@@ -936,6 +901,15 @@ function setServiceScenarioValue(valueType) {
       const metric = dataStructure.SERVICE_METRIC[metricName];
       metric.scenario_val = metric[valueType];
       let ele = document.querySelector('[data-var="' + metric.id + '"].scenario-builder-metric');
+
+      if (metric[valueType] === null) {
+        ele.value = 0;
+        ele.dataset.isNull = true;
+      } else {
+        ele.value = metric[valueType];
+        ele.dataset.isNull = false;
+      }
+
       ele.value = metric[valueType];
       updateSliderLabel(ele);
   }
