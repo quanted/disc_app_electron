@@ -223,7 +223,6 @@ function setScoreData(state, county, valueType) {
   }
 
   resetServiceScores(valueType);
-  toggleCustomizedDataMessage();  
 }
 
 function resetServiceScores(valueType) {
@@ -495,7 +494,6 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
 $('.thumb').on('input', function() {
   const ele = this;
   updateSliderLabel(ele);
-  toggleCustomizedDataMessage();
 });
 
 function getMetricsForCounty(county = "", state = "") {
@@ -929,6 +927,7 @@ function loadMetricValues(valueType) {
     updateAllAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
     calculateServiceHWBI();
     runAsterPlot();
+    toggleCustomizedDataMessage();
   }
 }
 
