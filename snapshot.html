@@ -47,9 +47,6 @@
 <!-- end 01epa_drupal_header.html --><!-- Start imports for HWBI disc app page-->
 <script type="text/javascript" src="/static_qed/hwbi/disc/js/jquery-ui.min.js"></script>
 
-
-
-
 <!-- <script src="/static_qed/hwbi/disc/js/d3.v5.min.js"></script>
 <script type="text/javascript" src="/static_qed/hwbi/disc/js/donut.js"></script>
 <script type="text/javascript" src="/static_qed/hwbi/disc/js/hwbi-disc-app.js"></script>
@@ -539,7 +536,7 @@
         $(".domain-expand").hide()
         $("#rank_btn").hide()
         $("#servicedesc_btn").hide()
-
+        $('.score-change-warning').hide();
         // renderer process
         var ipcRenderer = nodeRequire('electron').ipcRenderer;
         ipcRenderer.on('snapshot-data', function (event, data) {
@@ -572,8 +569,10 @@
 
             document.getElementById('score_indicator_span').style.transform = "rotate(" + Math.round(HWBI_score * 90 / 50) + "deg) skew(45deg, -45deg)"; // set the graphic
 
-
-
+            
+            if(data.dataChanged) {
+                $('.score-change-warning').show();
+            }
         });
 
         ipcRenderer.send('did-finish-load');

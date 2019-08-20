@@ -116,7 +116,8 @@ function generateSnapshot(that) {
       State_DOMAIN: {},
     National_DISC: {},
       State_DISC: {},
-    location: ''
+    location: '',
+    dataChanged: false
   };
 
   for (var domain in dataStructure.HWBI_DOMAIN) {
@@ -138,6 +139,9 @@ function generateSnapshot(that) {
               score: dataStructure.METRIC_GROUP[domain].custom_val
           }
     }
+  }
+  if (isCustomized()) {
+    domainData.dataChanged = true
   }
   domainData.DISC.score = $('#wellbeing-score').html() / 100;
   domainData.location = $('#location').html();
