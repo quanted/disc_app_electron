@@ -455,7 +455,6 @@ $('.scenario-builder-metric').on('change', function() { // customize metric list
 
 // Update the slider labels when an input is triggered
 $('.thumb').on('input', function() {
-  console.log("thub")
   const ele = this;
   ele.dataset.isNull = false;
   updateSliderLabel(ele);
@@ -577,13 +576,22 @@ function Node(name, children, original_val, custom_val, scenario_val, parent, ty
 // a('INDICATOR', 'original_val'); // calculate the indicator scores by averaging each indicator's child metrics
 // set the 'value' to the average of the children Node's 'value' for the specified 'thing'
 function updateAllAvgValues(thing, value, obj) {
-	for (var indicator in obj[thing]) {
-    var sum = function (items, prop) {
+	for (const indicator in obj[thing]) {
+    const sum = function (items, prop) {
       return items.reduce( function(a, b) {
         return a + b[prop];
       }, 0);
     };
-    var avg = sum(obj[thing][indicator].children, value) / obj[thing][indicator].children.length;
+    let number = 0; 
+    obj[thing][indicator].children.forEach(child => {
+      if (child.original_val !== null) {
+        number += 1;
+      }
+    });
+    let avg = sum(obj[thing][indicator].children, value) / number;
+    if (Number.isNaN(avg)) {
+      avg = null;
+    }
 		obj[thing][indicator][value] = avg;
   }
 }
@@ -909,8 +917,6 @@ function setServiceScenarioValue(valueType) {
         ele.value = metric[valueType];
         ele.dataset.isNull = false;
       }
-
-      ele.value = metric[valueType];
       updateSliderLabel(ele);
   }
 }
