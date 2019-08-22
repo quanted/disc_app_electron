@@ -325,7 +325,7 @@ async function getScoreData() {
   resetValues(dataStructure.METRIC_GROUP['Economic'], 'scenario_val', 'original_val');
   resetValues(dataStructure.METRIC_GROUP['Ecosystem'], 'scenario_val', 'original_val');
   resetValues(dataStructure.METRIC_GROUP['Social'], 'scenario_val', 'original_val');
-  resetSliders(dataStructure.SERVICE_METRIC, 'scenario_val', 'scenario-builder-metric');
+  resetDomainSliders(dataStructure.SERVICE_DOMAIN, 'scenario_val', 'scenario-builder-domain');
 
   setScoreData(location.state, location.county, "original_val"); // set the domain scores
 
@@ -438,19 +438,24 @@ $('.customize-service-metrics').on('change', function() { // customize metric li
   toggleCustomizedDataMessage();
 });
 
-$('.scenario-builder-metric').on('change', function() { // customize metric listeners
+$('.scenario-builder-domain').on('change', function() { // customize metric listeners
   const ele = this;
   const val = +ele.value;
-  const metric = dataStructure.SERVICE_METRIC[ele.dataset.var];
+  const domain = dataStructure.SERVICE_DOMAIN[ele.dataset.domain];
   
-  metric.scenario_val = val;
+  domain.scenario_val = val;
 
-  updateAllAvgValues('SERVICE_INDICATOR', 'scenario_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
-  updateAllAvgValues('SERVICE_DOMAIN', 'scenario_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
+  // updateAllAvgValues('SERVICE_INDICATOR', 'scenario_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
+  // updateAllAvgValues('SERVICE_DOMAIN', 'scenario_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
   updateAllAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
   calculateServiceHWBI();
   runAsterPlot();
   toggleCustomizedDataMessage();
+});
+
+$('.scenario-builder-domain').on('input', function() { // customize metric listeners
+  const ele = this;
+  ele.previousElementSibling.innerHTML = "<span> " + round(ele.value * 100, 0) + "</span>";
 });
 
 // Update the slider labels when an input is triggered
@@ -894,30 +899,21 @@ function loadMetricValues(valueType) {
       message: 'Loading customized service metric values will replace any changes you have made below with the values you specified in the Customize Data -> Services section.\n\nDo you still want to proceed?'
     });
   if (choice === 0) {
-    setServiceScenarioValue(valueType);
+    // setServiceScenarioValue(valueType);
+    resetDomainSliders(dataStructure.SERVICE_DOMAIN, valueType, 'scenario-builder-domain');
     updateAllAvgValues('SERVICE_INDICATOR', 'scenario_val', dataStructure); // calculate the indicator scores by averaging each indicator's child metrics
     updateAllAvgValues('SERVICE_DOMAIN', 'scenario_val', dataStructure); // calculate the domain scores by averaging each domain's child indicators
     updateAllAvgValues('METRIC_GROUP', 'scenario_val', dataStructure); // calculate the metric group scores by averaging each metric group's child domains
+    setScenarioBuilderDomainValues(valueType);
     calculateServiceHWBI();
     runAsterPlot();
     toggleCustomizedDataMessage();
   }
 }
 
-function setServiceScenarioValue(valueType) {
-  for (let metricName in dataStructure.SERVICE_METRIC) {
-      const metric = dataStructure.SERVICE_METRIC[metricName];
-      metric.scenario_val = metric[valueType];
-      let ele = document.querySelector('[data-var="' + metric.id + '"].scenario-builder-metric');
-
-      if (metric[valueType] === null) {
-        ele.value = 0;
-        ele.dataset.isNull = true;
-      } else {
-        ele.value = metric[valueType];
-        ele.dataset.isNull = false;
-      }
-      updateSliderLabel(ele);
+function setScenarioBuilderDomainValues(valueType) {
+  for (const domain in dataStructure.SERVICE_DOMAIN) {
+    dataStructure.SERVICE_DOMAIN[domain].scenario_val = dataStructure.SERVICE_DOMAIN[domain][valueType];
   }
 }
 
@@ -1101,9 +1097,10 @@ ipcRenderer.on('has-been-saved', (event, arg) => {
 ipcRenderer.on('request-json', (event, arg) => {
   ipcRenderer.send('json-' + arg, JSON.stringify(
     {
-      "metrics": { ...dataStructure.SERVICE_METRIC, ...dataStructure.HWBI_METRIC },
-      "RIVs": dataStructure.HWBI_DOMAIN,
-      "location": JSON.parse(locationValue)
+      metrics: { ...dataStructure.SERVICE_METRIC, ...dataStructure.HWBI_METRIC },
+      RIVs: dataStructure.HWBI_DOMAIN,
+      location: JSON.parse(locationValue),
+      scenarioBuilderDomains: dataStructure.SERVICE_DOMAIN
     }, 
     getCircularReplacer())
   );
@@ -1261,7 +1258,15 @@ ipcRenderer.on('load-json', (event, arg) => {
   updateApexCharts("custom_val");
   
   loadSkillbar(); // update the colored bars on the snapshot page
-  calculateServiceHWBI();
+
+  for (const domain in dataStructure.SERVICE_DOMAIN) {
+    dataStructure.SERVICE_DOMAIN[domain].scenario_val = arg.scenarioBuilderDomains[domain].scenario_val;
+  }
+
+  resetDomainSliders(dataStructure.SERVICE_DOMAIN, 'scenario_val', 'scenario-builder-domain');
+  toggleCustomizedDataMessage();
+
+  calculateServiceHWBI('custom_val');
   runAsterPlot(); //draw aster plot
   $('#customize_location').html(county + ", " + state);
 
@@ -1339,7 +1344,7 @@ function resetAll() {
         resetValues(dataStructure.METRIC_GROUP.Economic, 'scenario_val', baselineValue);
         resetValues(dataStructure.METRIC_GROUP.Ecosystem, 'scenario_val', baselineValue);
         
-        resetSliders(dataStructure.SERVICE_METRIC, 'scenario_val', 'scenario-builder-metric');
+        resetDomainSliders(dataStructure.SERVICE_DOMAIN, 'scenario_val', 'scenario-builder-domain');
 
         calculateServiceHWBI();
         runAsterPlot();
