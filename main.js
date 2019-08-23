@@ -246,8 +246,8 @@ ipcMain.on("print-to-pdf", function(event) {
         function(fileNames) {
           if (fileNames === undefined) {
             // fileNames is an array that contains all the selected files
-            console.log("No file selected");
             event.sender.send("wrote-pdf", fileNames);
+            return;
           } else {
             if (!fileNames.endsWith(".pdf")) {
               fileNames += ".pdf";
@@ -265,7 +265,6 @@ ipcMain.on("print-to-pdf", function(event) {
                 event.sender.send("wrote-pdf", fileNames);
                 throw error;
               }
-              console.log(fileNames);
               shell.openExternal("file://" + fileNames);
               event.sender.send("wrote-pdf", fileNames);
             });
