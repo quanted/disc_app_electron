@@ -253,8 +253,7 @@ ipcMain.on("print-to-pdf", function(event) {
               fileNames += ".pdf";
             }
             fs.writeFile(fileNames, data, function(error) {
-              console.log(error.errno);
-              if (error.errno === -4082) {
+              if (error && error.errno === -4082) {
                 event.sender.send("wrote-pdf", fileNames);
                 dialog.showMessageBoxSync({
                   type: "error",
@@ -263,6 +262,7 @@ ipcMain.on("print-to-pdf", function(event) {
                   message: `${fileNames} is open in another program. Please close it and try again.`
                 });
               } else {
+                event.sender.send("wrote-pdf", fileNames);
                 throw error;
               }
               console.log(fileNames);
