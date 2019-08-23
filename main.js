@@ -145,7 +145,7 @@ function createWindow() {
   mainWindow.on("close", function(e) {
     let choice;
     if (saved) {
-      choice = dialog.showMessageBox(this, {
+      choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Yes", "No"],
         title: "Decision Integration for Strong Communities",
@@ -156,7 +156,7 @@ function createWindow() {
         return;
       }
     } else {
-      choice = dialog.showMessageBox(this, {
+      choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Save", "Don't Save", "Cancel"],
         title: "Decision Integration for Strong Communities",
@@ -253,8 +253,16 @@ ipcMain.on("print-to-pdf", function(event) {
               fileNames += ".pdf";
             }
             fs.writeFile(fileNames, data, function(error) {
-              if (error) {
+              console.log(error.errno);
+              if (error.errno === -4082) {
                 event.sender.send("wrote-pdf", fileNames);
+                dialog.showMessageBoxSync({
+                  type: "error",
+                  buttons: ["OK"],
+                  title: "Decision Integration for Strong Communities",
+                  message: `${fileNames} is open in another program. Please close it and try again.`
+                });
+              } else {
                 throw error;
               }
               console.log(fileNames);
@@ -322,7 +330,7 @@ let saved = true;
 function openFile() {
   console.log("open file");
   let dataType;
-  const choice = dialog.showMessageBox({
+  const choice = dialog.showMessageBoxSync({
     type: "question",
     buttons: ["Customized Metrics", "Scenario Builder Metrics", "Cancel"],
     title: "Decision Integration for Strong Communities",
@@ -347,7 +355,7 @@ function openFile() {
         if (!saved) {
           // Check if unsaved
           console.log("not saved");
-          dialog.showMessageBox(
+          dialog.showMessageBoxSync(
             mainWindow,
             {
               type: "question",
@@ -413,7 +421,7 @@ function saveFile(data) {
 
 function saveFileAs(data) {
   const nameToUse = savedFileName;
-  dialog.showSaveDialog(
+  dialog.showSaveDialogSync(
     {
       defaultPath: nameToUse,
       filters: [
@@ -444,7 +452,7 @@ function saveFileAs(data) {
 function saveFileAsAndOpen(saveName, openName) {
   var nameToUse = savedFileName;
   console.log(savedFileName);
-  dialog.showSaveDialog(
+  dialog.showSaveDialogSync(
     {
       defaultPath: nameToUse,
       filters: [
@@ -471,7 +479,7 @@ function saveFileAsAndOpen(saveName, openName) {
 function saveFileAsAndQuit() {
   const nameToUse = savedFileName;
   console.log(savedFileName);
-  dialog.showSaveDialog(
+  dialog.showSaveDialogSync(
     {
       defaultPath: nameToUse,
       filters: [
@@ -543,7 +551,7 @@ ipcMain.on("json-save-as", function(event, arg) {
  * @function
  */
 function loadState() {
-  dialog.showOpenDialog(
+  dialog.showOpenDialogSync(
     { filters: [{ name: "JSON File", extensions: ["json"] }] },
     function(fileNames) {
       if (fileNames === undefined) {

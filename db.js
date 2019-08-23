@@ -59,7 +59,7 @@ function generateReport() {
   let chkbx = $('.resources-checkbox:checked');
 
   if (!chkbx.length) {
-    const choice = dialog.showMessageBox({
+    const choice = dialog.showMessageBoxSync({
       type: 'question',
       buttons: ['Yes', 'No'],
       title: 'Generate Report',
@@ -1071,7 +1071,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 }
 
 function loadMetricValues(valueType) {
-  var choice = dialog.showMessageBox(
+  var choice = dialog.showMessageBoxSync(
     {
       type: 'question',
       buttons: ['Yes', 'No'],
@@ -1497,7 +1497,7 @@ $('#mainpage-county-state-select .close').click(function() {
 });
 
 function resetAll() {
-  const choice = dialog.showMessageBox(
+  const choice = dialog.showMessageBoxSync(
     {
         type: 'question',
         buttons: ['Yes', 'No'],
