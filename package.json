@@ -15,7 +15,7 @@
   "license": "",
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "6.0.3",
+    "electron": "6.0.5",
     "electron-builder": "^21.2.0",
     "spectron": "^5.0.0"
   },
