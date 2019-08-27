@@ -120,15 +120,15 @@ function createWindow() {
   ];
 
   // add dev tools item if not in production
-  // if (process.env.node_env !== "production") {
-  //   menuTemplate.push({
-  //     label: "Toggle DevTools",
-  //     accelerator: process.platform === "darwin" ? "Command+I" : "CTRL+I",
-  //     click(item, focusedWindow) {
-  //       focusedWindow.toggleDevTools();
-  //     }
-  //   });
-  // }
+  if (process.env.node_env && process.env.node_env.trim() === "dev") {
+    menuTemplate.push({
+      label: "Toggle DevTools",
+      accelerator: process.platform === "darwin" ? "Command+I" : "CTRL+I",
+      click(item, focusedWindow) {
+        focusedWindow.toggleDevTools();
+      }
+    });
+  }
 
   // if mac add empty object to menu
   if (process.platform === "darwin") {

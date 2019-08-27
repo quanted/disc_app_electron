@@ -4,7 +4,7 @@
   "description": "An Electron version of the DISC application.",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "set NODE_ENV=dev && electron .",
     "pack": "electron-builder --dir",
     "postinstall": "install-app-deps",
     "rebuild": "electron-rebuild -f -w sqlite3",
