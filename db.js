@@ -215,15 +215,30 @@ function setScoreData(state, county, valueType) {
   // Display HWBI scores on Customize tabs
   for (const domain in dataStructure.HWBI_DOMAIN) { // Set Domain scores
     const slugifiedDomain = slugify(dataStructure.HWBI_DOMAIN[domain].name);
-    const score = round(dataStructure.HWBI_DOMAIN[domain][valueType] * 100, 1);
-    $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score);
-    $('#' + slugifiedDomain + '_score_bar').attr('data-percent', score + "%");
-    $('#' + slugifiedDomain + '_score_summary').html(score);
+    const rawVal = dataStructure.HWBI_DOMAIN[domain][valueType];
+    if (rawVal !== null) {
+      const score = round(rawVal * 100, 1);
+      $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score).prop('title', '').css('cursor', 'pointer');
+      $('#' + slugifiedDomain + '_score_bar').attr('data-percent', score + "%");
+      $('#' + slugifiedDomain + '_score_summary').html(score);
+    } else {
+      const score = "N/A";
+      $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score).prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+      $('#' + slugifiedDomain + '_score_bar').attr('data-percent', "0%");
+      $('#' + slugifiedDomain + '_score_summary').html(score);
+    }
   }
 
   for (const indicator in dataStructure.HWBI_INDICATOR) { // Set indicator scores
     const slugifiedIndicator = slugify(dataStructure.HWBI_INDICATOR[indicator].parent.name) + "_" + slugify(dataStructure.HWBI_INDICATOR[indicator].name);
-    const score = round(dataStructure.HWBI_INDICATOR[indicator][valueType] * 100, 1);
+    const rawVal = dataStructure.HWBI_INDICATOR[indicator][valueType];
+    let score = round(rawVal * 100, 1);
+    if (rawVal === null) {
+      score = 'N/A';
+      $('#' + slugifiedIndicator + "_value").parent().prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+    } else {
+      $('#' + slugifiedIndicator + "_value").parent().prop('title', '').css('cursor', 'pointer');
+    }
     $('#' + slugifiedIndicator + "_value").html(score);
   }
 
@@ -236,20 +251,38 @@ function resetServiceScores(valueType) {
     const metricGroup = dataStructure.METRIC_GROUP[domain];
     if (metricGroup.name !== 'HWBI') {
       const slugifiedDomain = slugify(metricGroup.name);
-      const score = round(metricGroup[valueType] * 100, 1);
+      const rawVal = metricGroup[valueType];
+      let score = round(rawVal * 100, 1);
+      if (rawVal === null) {
+        score = "N/A";
+      }
       $('#' + slugifiedDomain + '_score, #' + slugifiedDomain + '_modal_score').html(score);
     }
   }
 
   for (const domain in dataStructure.SERVICE_DOMAIN) { // Set Service Domain scores
     const slugifiedDomain = slugify(dataStructure.SERVICE_DOMAIN[domain].parent.name) + "_" + slugify(dataStructure.SERVICE_DOMAIN[domain].name);
-    const score = round(dataStructure.SERVICE_DOMAIN[domain][valueType] * 100, 1);
+    const rawVal = dataStructure.SERVICE_DOMAIN[domain][valueType];
+    let score = round(rawVal * 100, 1);
+    if (rawVal === null) {
+      score = "N/A";
+      $('#' + slugifiedDomain + "_value").parent().prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+    } else {
+      $('#' + slugifiedDomain + "_value").parent().prop('title', '').css('cursor', 'pointer');
+    }
     $('#' + slugifiedDomain + "_value").html(score);
   }
 
   for (const indicator in dataStructure.SERVICE_INDICATOR) { // Set Service Indicator scores
     const slugifiedIndicator = slugify(dataStructure.SERVICE_INDICATOR[indicator].parent.name) + "_" + slugify(dataStructure.SERVICE_INDICATOR[indicator].name);
-    const score = round(dataStructure.SERVICE_INDICATOR[indicator][valueType] * 100, 1);
+    const rawVal = dataStructure.SERVICE_INDICATOR[indicator][valueType];
+    let score = round(rawVal * 100, 1);
+    if (rawVal === null) {
+      score = "N/A";
+      $('#' + slugifiedIndicator + "_value").parent().prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+    } else {
+      $('#' + slugifiedIndicator + "_value").parent().prop('title', '').css('cursor', 'pointer');
+    }
     $('#' + slugifiedIndicator + "_value").html(score);
   }
 
@@ -586,15 +619,15 @@ function Node(name, children, original_val, custom_val, scenario_val, parent, ty
 // a('INDICATOR', 'original_val'); // calculate the indicator scores by averaging each indicator's child metrics
 // set the 'value' to the average of the children Node's 'value' for the specified 'thing'
 function updateAllAvgValues(thing, value, obj) {
-	for (const indicator in obj[thing]) {
-    const sum = function (items, prop) {
-      return items.reduce( function(a, b) {
-        return a + b[prop];
-      }, 0);
-    };
+  const sum = function (items, prop) {
+    return items.reduce( function(a, b) {
+      return a + b[prop];
+    }, 0);
+  };
+  for (const indicator in obj[thing]) {
     let number = 0; 
     obj[thing][indicator].children.forEach(child => {
-      if (child.original_val !== null) {
+      if (child[value] !== null) {
         number += 1;
       }
     });
