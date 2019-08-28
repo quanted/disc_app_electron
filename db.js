@@ -2,11 +2,18 @@ const electron = require('electron');
 const { ipcRenderer, shell } = electron;
 const { app, dialog } = electron.remote
 
-const path = require('path');
 const fs = require('fs');
 
+process.resourcesPath = path.resolve('/node_modules/');
+ 
 try {
-	var sqlite3 = require('sqlite3');
+  if (process.platform === "darwin") {
+    var sqlite3 = require(path.resolve('node_modules/sqlite3'));
+  } else {
+    var sqlite3 = require('sqlite3');
+  }
+  
+  
 } catch (e) { 
   console.log(e);
   try {
@@ -17,7 +24,11 @@ try {
 }
 
 try {
-  d3.tip = require('d3-tip');
+  if (process.platform === "darwin") {
+    d3.tip = require(path.resolve('node_modules/d3-tip'));
+  } else {
+    d3.tip = require('d3-tip');
+  }
 } catch (e) {
   console.log(e);
   try {
@@ -162,29 +173,41 @@ ipcRenderer.on('snapshot-opened', () => {
 
 let dbPath;
 
-if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
-  dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
-} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/DISC.db'))) {
-  dbPath = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
-} else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/DISC.db'))) {
-  dbPath = path.join(process.resourcesPath, '/hwbi_app/DISC.db');
-} else {
-  console.log("Database not found.")
-}
+if (process.platform === "darwin") {
+  dbPath = path.join(process.resourcesPath + '/..', '/hwbi_app/DISC.db');
 
+} else {
+  if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
+    dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
+  } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/DISC.db'))) {
+    dbPath = path.join(__dirname, "/resources/app/hwbi_app/DISC.db");
+  } else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/DISC.db'))) {
+    dbPath = path.join(process.resourcesPath, '/hwbi_app/DISC.db');
+  } else {
+    console.log("Database not found.")
+  }
+
+}
 const db = new sqlite3.Database(dbPath);
 
-if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
-  dbPath = path.join(__dirname, "/hwbi_app/cities.db");
-} else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/cities.db'))) {
-  dbPath = path.join(__dirname, "/resources/app/hwbi_app/cities.db");
-} else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/cities.db'))) {
-  dbPath = path.join(process.resourcesPath, '/hwbi_app/cities.db');
-} else {
-  console.log("cities - Database not found.")
-}
+if (process.platform === "darwin") {
+  dbPath = path.join(process.resourcesPath + '/..', '/hwbi_app/cities.db');
 
+} else {
+  if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
+    dbPath = path.join(__dirname, "/hwbi_app/cities.db");
+  } else if (fs.existsSync(path.join(__dirname, '/resources/app/hwbi_app/cities.db'))) {
+    dbPath = path.join(__dirname, "/resources/app/hwbi_app/cities.db");
+  } else if (fs.existsSync(path.join(process.resourcesPath, '/hwbi_app/cities.db'))) {
+    dbPath = path.join(process.resourcesPath, '/hwbi_app/cities.db');
+  } else {
+    console.log("cities - Database not found.")
+  }
+
+}
 const citiesDb = new sqlite3.Database(dbPath);
+
+
 
 function setScoreData(state, county, valueType) {
   document.getElementById('score_indicator_span').style.transform = "rotate(0deg) skew(45deg, -45deg)";

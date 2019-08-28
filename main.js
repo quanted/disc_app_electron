@@ -6,6 +6,7 @@ const path = require("path");
 const url = require("url");
 const Papa = require("papaparse");
 
+
 // SET ENV
 //process.env.NODE_ENV = 'production';
 
@@ -87,12 +88,7 @@ function createWindow() {
         //     openFile();
         //   }
         //},
-        {
-          type: "separator"
-        },
-        {
-          type: "separator"
-        },
+        
         {
           label: "Quit",
           accelerator: process.platform === "darwin" ? "Command+Q" : "CTRL+Q",
@@ -119,24 +115,43 @@ function createWindow() {
     }
   ];
 
-  // add dev tools item if not in production
-  // if (process.env.node_env !== "production") {
-  //   menuTemplate.push({
-  //     label: "Toggle DevTools",
-  //     accelerator: process.platform === "darwin" ? "Command+I" : "CTRL+I",
-  //     click(item, focusedWindow) {
-  //       focusedWindow.toggleDevTools();
-  //     }
-  //   });
-  // }
+  /* //add dev tools item if not in production
+  if (process.env.node_env !== "production") {
+    menuTemplate.push({
+      label: "Toggle DevTools",
+      accelerator: process.platform === "darwin" ? "Command+I" : "CTRL+I",
+      click(item, focusedWindow) {
+        focusedWindow.toggleDevTools();
+      }
+    });
+  } */
 
   // if mac add empty object to menu
   if (process.platform === "darwin") {
-    menuTemplate.unshift({});
+    menuTemplate.unshift({
+      label: app.getName(),
+      submenu: [{
+        label: "devtools",
+        click(item, focusedWindow) {
+          focusedWindow.toggleDevTools();
+        }},
+        {role: 'about'},
+        {role: 'separator'},
+        {role: 'services', submenu: []},
+        {role: 'separator'},
+        {role: 'hide'},
+        {role: 'hideothers'},
+        {role: 'unhide'},
+        {role: 'separator'},
+        {role: 'quit'}
+      ]
+    });
   }
 
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
+  
+  
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
