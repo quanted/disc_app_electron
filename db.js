@@ -196,11 +196,16 @@ function setScoreData(state, county, valueType) {
   let denom = 0;
   Object.values(dataStructure.HWBI_DOMAIN).forEach((domain) => {
     if (domain[valueType]) {
-      num += domain[valueType];
+      num += domain[valueType] * domain.weight;
       denom += domain.weight;
     }
   });
-  const HWBI_score = round(num / denom * 100, 1);
+  let HWBI_score = round(num / denom * 100, 1);
+  if (HWBI_score > 100) {
+    HWBI_score = 100;
+  } else if (HWBI_score < 0) {
+    HWBI_score = 0;
+  }
   $('#wellbeing-score').html(HWBI_score);
   $('.modal-disc-score span').html(HWBI_score);
 
