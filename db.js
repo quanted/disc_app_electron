@@ -9,6 +9,7 @@ process.resourcesPath = path.resolve('/node_modules/');
 try {
   if (process.platform === "darwin") {
     var sqlite3 = require(path.resolve('node_modules/sqlite3'));
+    console.log(path.resolve('node_modules/sqlite3'))
   } else {
     var sqlite3 = require('sqlite3');
   }
@@ -174,7 +175,7 @@ ipcRenderer.on('snapshot-opened', () => {
 let dbPath;
 
 if (process.platform === "darwin") {
-  dbPath = path.join(process.resourcesPath + '/..', '/hwbi_app/DISC.db');
+  dbPath = path.resolve('hwbi_app') + '/DISC.db';
 
 } else {
   if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
@@ -189,9 +190,10 @@ if (process.platform === "darwin") {
 
 }
 const db = new sqlite3.Database(dbPath);
+console.log(dbPath)
 
 if (process.platform === "darwin") {
-  dbPath = path.join(process.resourcesPath + '/..', '/hwbi_app/cities.db');
+  dbPath = path.join('hwbi_app') + '/cities.db';
 
 } else {
   if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
@@ -206,6 +208,7 @@ if (process.platform === "darwin") {
 
 }
 const citiesDb = new sqlite3.Database(dbPath);
+console.log(dbPath)
 
 
 
