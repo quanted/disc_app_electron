@@ -550,6 +550,10 @@
                 $('#' + slugifiedDomain + '_score_summary').html(score);
 
                 $('#' + slugifiedDomain + '_location').html(data.HWBI_DOMAIN[domain].locationValues)
+
+                if (data.HWBI_DOMAIN[domain]["score"] === null) {
+                    $('#' + slugifiedDomain + '_score').html('N/A').prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+                }
             }
             loadSkillbar(); // update the colored bars on the snapshot page
 
