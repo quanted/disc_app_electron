@@ -115,7 +115,7 @@ function createWindow() {
     }
   ];
 
-  /* //add dev tools item if not in production
+  //add dev tools item if not in production
   if (process.env.node_env !== "production") {
     menuTemplate.push({
       label: "Toggle DevTools",
@@ -124,17 +124,13 @@ function createWindow() {
         focusedWindow.toggleDevTools();
       }
     });
-  } */
+  }
 
   // if mac add empty object to menu
   if (process.platform === "darwin") {
     menuTemplate.unshift({
       label: app.getName(),
-      submenu: [{
-        label: "devtools",
-        click(item, focusedWindow) {
-          focusedWindow.toggleDevTools();
-        }},
+      submenu: [
         {role: 'about'},
         {role: 'separator'},
         {role: 'services', submenu: []},
