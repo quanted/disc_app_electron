@@ -4,8 +4,8 @@ const { app, dialog } = electron.remote
 
 const fs = require('fs');
 
-process.resourcesPath = path.resolve('/node_modules/');
- 
+/* process.resourcesPath = path.resolve('/node_modules/');
+ */ 
 try {
   if (process.platform === "darwin") {
     var sqlite3 = require(path.resolve('node_modules/sqlite3'));
@@ -175,7 +175,12 @@ ipcRenderer.on('snapshot-opened', () => {
 let dbPath;
 
 if (process.platform === "darwin") {
-  dbPath = path.resolve('hwbi_app') + '/DISC.db';
+  if (fs.existsSync(path.resolve('hwbi_app') + '/DISC.db')) {
+    dbPath = path.resolve('hwbi_app') + '/DISC.db';
+  } else {
+    dbPath = process.resourcesPath + '/hwbi_app/DISC.db';
+  }
+  
 
 } else {
   if (fs.existsSync(path.join(__dirname, '/hwbi_app/DISC.db'))) {
@@ -189,11 +194,16 @@ if (process.platform === "darwin") {
   }
 
 }
-const db = new sqlite3.Database(dbPath);
 console.log(dbPath)
+const db = new sqlite3.Database(dbPath);
+
 
 if (process.platform === "darwin") {
-  dbPath = path.join('hwbi_app') + '/cities.db';
+  if (fs.existsSync(path.resolve('hwbi_app') + '/cities.db')) {
+    dbPath = path.resolve('hwbi_app') + '/cities.db';
+  } else {
+    dbPath = process.resourcesPath + '/hwbi_app/cities.db';
+  }
 
 } else {
   if (fs.existsSync(path.join(__dirname, '/hwbi_app/cities.db'))) {
@@ -207,8 +217,9 @@ if (process.platform === "darwin") {
   }
 
 }
-const citiesDb = new sqlite3.Database(dbPath);
 console.log(dbPath)
+const citiesDb = new sqlite3.Database(dbPath);
+
 
 
 

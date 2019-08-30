@@ -131,6 +131,9 @@ function createWindow() {
     menuTemplate.unshift({
       label: app.getName(),
       submenu: [
+        {label: 'dev', click(item, focusedWindow) {
+          focusedWindow.toggleDevTools();
+        }},
         {role: 'about'},
         {role: 'separator'},
         {role: 'services', submenu: []},

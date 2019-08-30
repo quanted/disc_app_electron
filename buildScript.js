@@ -20,7 +20,8 @@ const config = {
 };
 
 builder.build({
-    targets: Platform.WINDOWS.createTarget(),
+    win: ["default"],
+    mac: ["default"],
     config: config
 })
 .then(m => {
