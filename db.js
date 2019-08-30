@@ -714,7 +714,7 @@ function runAsterPlot() {
     asterData.push({
       description: dataStructure.HWBI_DOMAIN[domain].name,
       weight: dataStructure.HWBI_DOMAIN[domain].weight,
-      score: dataStructure.HWBI_DOMAIN[domain].scenario_val * 100,
+      score: (dataStructure.HWBI_DOMAIN[domain].scenario_val === null ? null : dataStructure.HWBI_DOMAIN[domain].scenario_val * 100),
     });
   }
 
