@@ -840,32 +840,28 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   let val;
 
   val = dataStructure.HWBI_DOMAIN["Connection to Nature"][valueType] +
-    (1.213482 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.491054 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.777788 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -1.119303 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.177527 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -0.060712 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.220577 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.294618 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.67973 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.879342 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -1.492273 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 1.606349 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 3.505902) -
-    (1.213482 + 
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.491054 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 0.777788 +
-      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * -1.119303 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * 0.177527 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * -0.060712 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -1.220577 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * -0.294618 +
-      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.67973 +
-      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * -0.879342 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -1.492273 +
-      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 1.606349 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 3.505902);
+    (2.125496 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 4.983393 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -4.639731 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -0.331266 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.085891 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.487747 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -9.83217 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.127427 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -13.18771 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 10.840124 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.45075) -
+    (2.125496 + 
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 4.983393 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -4.639731 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * -0.331266 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -1.085891 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 0.487747 +
+      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * -9.83217 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 0.127427 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -13.18771 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 10.840124 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.45075);
   if (val < 0) {
     val = 0;
   }
@@ -875,30 +871,34 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = val;
 
   val = dataStructure.HWBI_DOMAIN["Cultural Fulfillment"][valueType] +
-    (0.01211 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 1.142215 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 1.9025 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.21345 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.043404 +
-      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.15089 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.17638 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.561443 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -3.61945 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.740369 +
-      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.249935 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 0.86258) -
-    (0.01211 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * 1.142215 +
-      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 1.9025 +
-      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * -0.21345 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.043404 +
-      dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.15089 +
-      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 0.17638 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.561443 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * -3.61945 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * -0.740369 +
-      dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.249935 +
-      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 0.86258);
+    (1.241511 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 1.606393 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.437157 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.409964 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.42666 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.992387 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.899043 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.227824 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.197434 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -2.331611 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 2.679329 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 0.263944 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 3.115341 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * 0.12478) -
+    (1.241511 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 1.606393 +
+      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.437157 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.409964 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.42666 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * -0.992387 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -2.899043 +
+      dataStructure.SERVICE_DOMAIN[key.S02].scenario_val * 0.227824 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * -0.197434 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -2.331611 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 2.679329 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * 0.263944 +
+      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 3.115341 +
+      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * 0.12478);
   if (val < 0) {
     val = 0;
   }
@@ -908,30 +908,32 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Education"][valueType] +
-    ( 0.176691 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.704977 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.048449 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.771746 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.148282 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.517473 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 0.075597 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 0.768662 +
-      dataStructure.SERVICE_DOMAIN[key.S10][valueType] * -0.236321 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -1.000304 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S16][valueType] * -0.239199 +
-      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.182055) -
-    (0.176691 +
-      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.704977 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.048449 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.771746 +
-      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 0.148282 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.517473 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 0.075597 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 0.768662 +
-      dataStructure.SERVICE_DOMAIN[key.S10].scenario_val * -0.236321 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * -1.000304 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * -0.239199 +
-      dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * -0.182055);
+    (0.317409 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.307336 +
+      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * -0.031266 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.576819 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.087566 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.333649 +
+      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.243361 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.313181 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.743381 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.249658 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 8.38291 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -0.196975 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.708485) -
+    (0.317409 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.307336 +
+      dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * -0.031266 +
+      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 0.576819 +
+      dataStructure.SERVICE_DOMAIN[key.S02].scenario_val * 0.087566 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.333649 +
+      dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * -0.243361 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -1.313181 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.743381 +
+      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.249658 +
+      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 8.38291 +
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -0.196975 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.708485);
   if (val < 0) {
     val = 0;
   }
@@ -941,34 +943,22 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Education"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Health"][valueType] +
-    (-0.326979 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 1.967834 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.094752 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -0.032203 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 1.301502 +
-      dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.147901 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.142566 +
-      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.023314 +
-      dataStructure.SERVICE_DOMAIN[key.S10][valueType] * -0.121309 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.099826 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -3.202222 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.163262 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.153769 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.143455) -
-    (-0.326979 +
-      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 1.967834 +
-      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 0.094752 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -0.032203 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 1.301502 +
-      dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.147901 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.142566 +
-      dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * -0.023314 +
-      dataStructure.SERVICE_DOMAIN[key.S10].scenario_val * -0.121309 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 0.099826 +
-      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * -3.202222 +
-      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.163262 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 0.153769 +
-      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.143455);
+    (0.499961 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.96139 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.634687 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.494802 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.300629 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.208537 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.137244 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.269267) -
+    (0.499961 +
+      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.96139 +
+      dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.634687 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.494802 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.300629 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 0.208537 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.137244 +
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.269267);
   if (val < 0) {
     val = 0;
   }
@@ -978,28 +968,36 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Health"].scenario_val = val;
 
   val = dataStructure.HWBI_DOMAIN["Leisure Time"][valueType] +
-    (1.996256 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -3.251144 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -1.460873 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -0.241946 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.073752 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.118517 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -0.041005 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 4.298623 +
-      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.096419 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.554611 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.331479) -
-    (1.996256 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -3.251144 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * -1.460873 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * -0.241946 +
-      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 0.073752 +
-      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.118517 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * -0.041005 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 4.298623 +
-      dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * 0.096419 +
-      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * -0.554611 +
-      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.331479);
+    (-0.952029 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.938554 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.186626 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 2.728191 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 2.2115 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * -0.405724 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.342702 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.137733 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -1.135025 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S10][valueType] * 0.645049 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -4.991575 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.284225 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.068034 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -1.697729 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 5.52873) -
+    (-0.952029 +
+      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.938554 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.186626 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 2.728191 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 2.2115 +
+      dataStructure.SERVICE_DOMAIN[key.S02].scenario_val * -0.405724 +
+      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.342702 +
+      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * 0.137733 +
+      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * -1.135025 +
+      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * dataStructure.SERVICE_DOMAIN[key.S10].scenario_val * 0.645049 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * -4.991575 +
+      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.284225 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.068034 +
+      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -1.697729 +
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 5.52873);
   if (val < 0) {
     val = 0;
   }
@@ -1009,22 +1007,40 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Leisure Time"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Living Standards"][valueType] +
-    (-0.48408 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.450574 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.397857 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 1.207379 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 0.085441 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 1.622717 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -3.272453 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.244566) -
-    (-0.48408 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.450574 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.397857 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 1.207379 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 0.085441 +
-      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 1.622717 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * -3.272453 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.244566);
+    (0.789673 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 1.47984 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.278943 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 2.364789 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.348691 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.113025 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.139021 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.811555 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -3.51308 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.320548 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.000174 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 5.571766 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -4.438646 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 2.809376 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.106592 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.163612 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.289577) -
+    (0.789673 +
+      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 1.47984 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.278943 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 2.364789 +
+      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 0.348691 +
+      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.113025 +
+      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * 0.139021 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.811555 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * -3.51308 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -1.320548 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 0.000174 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 5.571766 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -4.438646 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 2.809376 +
+      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.106592 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.163612 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.289577) ;
   if (val < 0) {
     val = 0;
   }
@@ -1034,38 +1050,38 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Living Standards"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Safety and Security"][valueType] +
-    (0.34307 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -0.082456 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.510635 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.34585 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.251949 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.157794 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.252581 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 0.800242 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * -0.16703 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * dataStructure.SERVICE_DOMAIN[key.S16][valueType] * -0.304043 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -1.418773 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.802439 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.251155 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 0.597582 +
-      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.168898 +
-      dataStructure.SERVICE_DOMAIN[key.S17][valueType] * dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.346885) -
-    (0.34307 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -0.082456 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.510635 +
-      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.34585 +
-      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.251949 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.157794 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.252581 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 0.800242 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * -0.16703 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * -0.304043 +
-      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * -1.418773 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.802439 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 0.251155 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 0.597582 +
-      dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * dataStructure.SERVICE_DOMAIN[key.S13].scenario_val * -0.168898 +
-      dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * -0.346885);
+    (-0.109546 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -2.010049 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 2.210816 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -1.142788 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -2.240351 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 4.293024 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.1171 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.294652 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.210137 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 3.55136 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -2.323739 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.270444 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 5.842987 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.40061 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -4.53954 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 4.206231) -
+    (-0.109546 +
+      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * -2.010049 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 2.210816 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * -1.142788 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -2.240351 +
+      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 4.293024 +
+      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.1171 +
+      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * 0.294652 +
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 0.210137 +
+      dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * 3.55136 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -2.323739 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.270444 +
+      dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 5.842987 +
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.40061 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -4.53954 +
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 4.206231);
   if (val < 0) {
     val = 0;
   }
@@ -1075,30 +1091,32 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Safety and Security"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Social Cohesion"][valueType] +
-    (0.853125 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -0.358113 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.419327 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.582956 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * -0.303731 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.155134 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.673562 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -0.171109 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 1.043194 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * 0.677602 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 0.198729 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * -0.286008) -
-    (0.853125 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -0.358113 +
-      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * 0.419327 +
-      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.582956 +
-      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * -0.303731 +
-      dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.155134 +
-      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.673562 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * -0.171109 +
-      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 1.043194 +
-      dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * 0.677602 +
-      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 0.198729 +
-      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * -0.286008);
+    (1.559019 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.494673 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.148918 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.168704 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.067929 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.301997 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -3.215035 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 7.179508 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -0.283441 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.729157 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 5.161983 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 1.171484 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.61033) -
+    (1.559019 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -2.494673 +
+      dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.148918 +
+      dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.168704 +
+      dataStructure.SERVICE_DOMAIN[key.S02].scenario_val * 0.067929 +
+      dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * -0.301997 +
+      dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -3.215035 +
+      dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 7.179508 +
+      dataStructure.SERVICE_DOMAIN[key.S01].scenario_val * -0.283441 +
+      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * -0.729157 +
+      dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 5.161983 +
+      dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 1.171484 +
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.61033);
   if (val < 0) {
     val = 0;
   }
