@@ -291,7 +291,11 @@ ipcMain.on("snap", function(event, data) {
     show: false,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    title:
+      "Decision Integration for Strong Communities " +
+      app.getVersion() +
+      " | BETA | US EPA"
   });
 
   snapshot.setMenu(null); // remove the menu from snapshot
