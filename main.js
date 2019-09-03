@@ -261,7 +261,7 @@ ipcMain.on("print-to-pdf", function(event) {
                   title: "Decision Integration for Strong Communities",
                   message: `${fileNames} is open in another program. Please close it and try again.`
                 });
-              } else {
+              } else if (error) {
                 event.sender.send("wrote-pdf", fileNames);
                 throw error;
               }
