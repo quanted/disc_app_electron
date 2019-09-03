@@ -414,7 +414,7 @@ function parseCSVFile(fileName) {
 function saveFile(data) {
   console.log(savedFileName);
   if (savedFileName) {
-    fs.writeFile(savedFileName, data, () => {
+    fs.writeFile(savedFileName, data, error => {
       mainWindow.webContents.send("has-been-saved", savedFileName);
     });
   } else {
@@ -424,7 +424,7 @@ function saveFile(data) {
 
 function saveFileAs(data) {
   const nameToUse = savedFileName;
-  dialog.showSaveDialogSync(
+  dialog.showSaveDialog(
     {
       defaultPath: nameToUse,
       filters: [
@@ -435,7 +435,7 @@ function saveFileAs(data) {
       ]
     },
     function(fileNames) {
-      if (fileNames === undefined) {
+      if (fileNames === undefined || fileNames === "") {
         // fileNames is an array that contains all the selected files
         console.log("No file selected");
       } else {
@@ -443,7 +443,7 @@ function saveFileAs(data) {
         if (fileExtension.toLowerCase() !== ".json") {
           fileNames += ".json";
         }
-        fs.writeFile(fileNames, data, () => {
+        fs.writeFile(fileNames, data, error => {
           mainWindow.webContents.send("has-been-saved", fileNames);
           savedFileName = fileNames;
         });
@@ -452,6 +452,7 @@ function saveFileAs(data) {
   );
 }
 
+// Not used
 function saveFileAsAndOpen(saveName, openName) {
   var nameToUse = savedFileName;
   console.log(savedFileName);
@@ -554,10 +555,10 @@ ipcMain.on("json-save-as", function(event, arg) {
  * @function
  */
 function loadState() {
-  dialog.showOpenDialogSync(
+  dialog.showOpenDialog(
     { filters: [{ name: "JSON File", extensions: ["json"] }] },
     function(fileNames) {
-      if (fileNames === undefined) {
+      if (fileNames === undefined || !fileNames.length) {
         // fileNames is an array that contains all the selected files
         console.log("No file selected");
       } else {
