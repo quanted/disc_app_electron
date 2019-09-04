@@ -115,8 +115,8 @@ function createWindow() {
     }
   ];
 
-  //add dev tools item if not in production
-  if (process.env.node_env !== "production") {
+  // add dev tools item if not in production
+  if (process.env.node_env && process.env.node_env.trim() === "dev") {
     menuTemplate.push({
       label: "Toggle DevTools",
       accelerator: process.platform === "darwin" ? "Command+I" : "CTRL+I",
@@ -275,7 +275,7 @@ ipcMain.on("print-to-pdf", function(event) {
                   title: "Decision Integration for Strong Communities",
                   message: `${fileNames} is open in another program. Please close it and try again.`
                 });
-              } else {
+              } else if (error) {
                 event.sender.send("wrote-pdf", fileNames);
                 throw error;
               }
@@ -305,7 +305,11 @@ ipcMain.on("snap", function(event, data) {
     show: false,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    title:
+      "Decision Integration for Strong Communities " +
+      app.getVersion() +
+      " | BETA | US EPA"
   });
 
   snapshot.setMenu(null); // remove the menu from snapshot
@@ -424,7 +428,7 @@ function parseCSVFile(fileName) {
 function saveFile(data) {
   console.log(savedFileName);
   if (savedFileName) {
-    fs.writeFile(savedFileName, data, () => {
+    fs.writeFile(savedFileName, data, error => {
       mainWindow.webContents.send("has-been-saved", savedFileName);
     });
   } else {
@@ -434,7 +438,7 @@ function saveFile(data) {
 
 function saveFileAs(data) {
   const nameToUse = savedFileName;
-  dialog.showSaveDialogSync(
+  dialog.showSaveDialog(
     {
       defaultPath: nameToUse,
       filters: [
@@ -445,7 +449,7 @@ function saveFileAs(data) {
       ]
     },
     function(fileNames) {
-      if (fileNames === undefined) {
+      if (fileNames === undefined || fileNames === "") {
         // fileNames is an array that contains all the selected files
         console.log("No file selected");
       } else {
@@ -453,7 +457,7 @@ function saveFileAs(data) {
         if (fileExtension.toLowerCase() !== ".json") {
           fileNames += ".json";
         }
-        fs.writeFile(fileNames, data, () => {
+        fs.writeFile(fileNames, data, error => {
           mainWindow.webContents.send("has-been-saved", fileNames);
           savedFileName = fileNames;
         });
@@ -462,6 +466,7 @@ function saveFileAs(data) {
   );
 }
 
+// Not used
 function saveFileAsAndOpen(saveName, openName) {
   var nameToUse = savedFileName;
   console.log(savedFileName);
@@ -564,10 +569,10 @@ ipcMain.on("json-save-as", function(event, arg) {
  * @function
  */
 function loadState() {
-  dialog.showOpenDialogSync(
+  dialog.showOpenDialog(
     { filters: [{ name: "JSON File", extensions: ["json"] }] },
     function(fileNames) {
-      if (fileNames === undefined) {
+      if (fileNames === undefined || !fileNames.length) {
         // fileNames is an array that contains all the selected files
         console.log("No file selected");
       } else {

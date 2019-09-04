@@ -19,7 +19,7 @@
 <!--googleon: all-->
   <meta name="DC.description" content="" />
   <meta name="DC.title" content="" />
-  <title>Conceptual Decision Integration for Strong Communities | Q.E.D. | US EPA</title>
+  <title></title>
 <!--googleoff: snippet-->
   <meta name="keywords" content="" />
   <link rel="shortlink" href="" />
@@ -89,7 +89,7 @@
                                 economic, social and ecological environments.</p>
                         </div>
                         <button id="print-btn">Save to PDF</button>
-                        <p class="score-change-warning">The outputs on this page include data inputs customized by the user and not provided by EPA.</p>
+                        <p class="score-change-warning">The outputs on this page include modeled data and data inputs customized by the user and not provided by EPA.</p>
                     </div>
                 </div>
                 <div id="wellbeing-scores">
@@ -550,6 +550,10 @@
                 $('#' + slugifiedDomain + '_score_summary').html(score);
 
                 $('#' + slugifiedDomain + '_location').html(data.HWBI_DOMAIN[domain].locationValues)
+
+                if (data.HWBI_DOMAIN[domain]["score"] === null) {
+                    $('#' + slugifiedDomain + '_score').html('N/A').prop('title', 'Score could not be calculated due to lack of available data.').css('cursor', 'help');
+                }
             }
             loadSkillbar(); // update the colored bars on the snapshot page
 

@@ -1,6 +1,6 @@
 {
   "name": "disc-electron",
-  "version": "1.0.0",
+  "version": "1.0.6",
   "description": "An Electron version of the DISC application.",
   "main": "main.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "license": "",
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "6.0.3",
+    "electron": "6.0.7",
     "electron-builder": "^21.2.0",
     "spectron": "^5.0.0"
   },
