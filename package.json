@@ -25,7 +25,6 @@
     "jquery": "^3.4.1",
     "jquery-slinky": "^4.2.1",
     "papaparse": "^5.0.2",
-    "sqlite3": "4.1.0",
-    "wkhtmltopdf": "^0.3.4"
+    "sqlite3": "4.1.0"
   }
 }
