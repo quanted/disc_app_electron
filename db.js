@@ -840,17 +840,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   let val;
 
   val = dataStructure.HWBI_DOMAIN["Connection to Nature"][valueType] +
-    (2.125496 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 4.983393 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -4.639731 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -0.331266 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.085891 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.487747 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -9.83217 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.127427 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -13.18771 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 10.840124 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.45075) -
     (2.125496 + 
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 4.983393 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -4.639731 +
@@ -861,7 +850,18 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 0.127427 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -13.18771 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 10.840124 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.45075);
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.45075) -
+    (2.125496 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 4.983393 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -4.639731 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -0.331266 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.085891 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.487747 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -9.83217 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.127427 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -13.18771 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 10.840124 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.45075);
   if (val < 0) {
     val = 0;
   }
@@ -871,20 +871,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = val;
 
   val = dataStructure.HWBI_DOMAIN["Cultural Fulfillment"][valueType] +
-    (1.241511 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 1.606393 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.437157 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.409964 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.42666 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.992387 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.899043 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.227824 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.197434 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -2.331611 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 2.679329 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 0.263944 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 3.115341 +
-      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * 0.12478) -
     (1.241511 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 1.606393 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.437157 +
@@ -898,7 +884,21 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 2.679329 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * 0.263944 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 3.115341 +
-      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * 0.12478);
+      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * 0.12478) -
+    (1.241511 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 1.606393 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.437157 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.409964 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.42666 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.992387 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.899043 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.227824 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.197434 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -2.331611 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 2.679329 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 0.263944 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 3.115341 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * 0.12478);
   if (val < 0) {
     val = 0;
   }
@@ -908,19 +908,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Education"][valueType] +
-    (0.317409 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.307336 +
-      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * -0.031266 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.576819 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.087566 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.333649 +
-      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.243361 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.313181 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.743381 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.249658 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 8.38291 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -0.196975 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.708485) -
     (0.317409 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.307336 +
       dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * -0.031266 +
@@ -933,7 +920,20 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.249658 +
       dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 8.38291 +
       dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -0.196975 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.708485);
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.708485) -
+    (0.317409 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.307336 +
+      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * -0.031266 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.576819 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.087566 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.333649 +
+      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.243361 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.313181 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.743381 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.249658 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 8.38291 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -0.196975 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.708485);
   if (val < 0) {
     val = 0;
   }
@@ -944,21 +944,21 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 
   val = dataStructure.HWBI_DOMAIN["Health"][valueType] +
     (0.499961 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.96139 +
-      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.634687 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.494802 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.300629 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.208537 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.137244 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.269267) -
-    (0.499961 +
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.96139 +
       dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.634687 +
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.494802 +
       dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.300629 +
       dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 0.208537 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.137244 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.269267);
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.269267) -
+    (0.499961 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.96139 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.634687 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.494802 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.300629 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.208537 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.137244 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.269267);
   if (val < 0) {
     val = 0;
   }
@@ -968,21 +968,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Health"].scenario_val = val;
 
   val = dataStructure.HWBI_DOMAIN["Leisure Time"][valueType] +
-    (-0.952029 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.938554 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.186626 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 2.728191 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 2.2115 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * -0.405724 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.342702 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.137733 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -1.135025 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S10][valueType] * 0.645049 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -4.991575 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.284225 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.068034 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -1.697729 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 5.52873) -
     (-0.952029 +
       dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.938554 +
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.186626 +
@@ -997,7 +982,22 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.284225 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.068034 +
       dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -1.697729 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 5.52873);
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 5.52873) -
+    (-0.952029 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.938554 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.186626 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 2.728191 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 2.2115 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * -0.405724 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.342702 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.137733 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -1.135025 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S10][valueType] * 0.645049 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -4.991575 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.284225 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.068034 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -1.697729 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 5.52873);
   if (val < 0) {
     val = 0;
   }
@@ -1007,23 +1007,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Leisure Time"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Living Standards"][valueType] +
-    (0.789673 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 1.47984 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.278943 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 2.364789 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.348691 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.113025 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.139021 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.811555 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -3.51308 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.320548 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.000174 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 5.571766 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -4.438646 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 2.809376 +
-      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.106592 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.163612 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.289577) -
     (0.789673 +
       dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 1.47984 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.278943 +
@@ -1040,7 +1023,24 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 2.809376 +
       dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.106592 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.163612 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.289577) ;
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.289577) -
+    (0.789673 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 1.47984 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.278943 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 2.364789 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.348691 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.113025 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.139021 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.811555 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -3.51308 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.320548 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.000174 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 5.571766 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -4.438646 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 2.809376 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.106592 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.163612 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.289577);
   if (val < 0) {
     val = 0;
   }
@@ -1050,22 +1050,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Living Standards"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Safety and Security"][valueType] +
-    (-0.109546 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -2.010049 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 2.210816 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -1.142788 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -2.240351 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 4.293024 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.1171 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.294652 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.210137 +
-      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 3.55136 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -2.323739 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.270444 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 5.842987 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.40061 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -4.53954 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 4.206231) -
     (-0.109546 +
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * -2.010049 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 2.210816 +
@@ -1081,7 +1065,23 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 5.842987 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.40061 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -4.53954 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 4.206231);
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 4.206231) -
+    (-0.109546 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -2.010049 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 2.210816 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -1.142788 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -2.240351 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 4.293024 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.1171 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.294652 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.210137 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 3.55136 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -2.323739 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.270444 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 5.842987 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.40061 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -4.53954 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 4.206231);
   if (val < 0) {
     val = 0;
   }
@@ -1091,19 +1091,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Safety and Security"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Social Cohesion"][valueType] +
-    (1.559019 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.494673 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.148918 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.168704 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.067929 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.301997 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -3.215035 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 7.179508 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -0.283441 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.729157 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 5.161983 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 1.171484 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.61033) -
     (1.559019 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -2.494673 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.148918 +
@@ -1116,7 +1103,20 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * -0.729157 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 5.161983 +
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 1.171484 +
-      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.61033);
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.61033) -
+    (1.559019 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.494673 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.148918 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.168704 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.067929 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.301997 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -3.215035 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 7.179508 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -0.283441 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.729157 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 5.161983 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 1.171484 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.61033);
   if (val < 0) {
     val = 0;
   }
