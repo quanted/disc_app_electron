@@ -89,7 +89,9 @@
                                 economic, social and ecological environments.</p>
                         </div>
                         <button id="print-btn">Save to PDF</button>
+                        <button id="screenshot-btn">Take Screenshot</button>
                         <p class="score-change-warning">The outputs on this page include modeled data and data inputs customized by the user and not provided by EPA.</p>
+
                     </div>
                 </div>
                 <div id="wellbeing-scores">
@@ -373,6 +375,8 @@
                                     <div id="chart3" class="radialbar"></div>
                                 </div>
 
+                                <img id="imgscreenshot" />
+
                                 <!-- <div class="chartdesc-container">
                                     <div class="chartdesc" id="desc1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos saepe harum, architecto cumque itaque corporis aliquid, error totam et animi quibusdam, fugiat dolor ea molestias quas modi iusto sapiente odio.</div>
                                     <div class="chartdesc" id="desc2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio perspiciatis laboriosam similique quaerat numquam voluptate assumenda asperiores! Quae vel corrupti aliquid culpa sunt, unde quisquam! Itaque voluptates quos eos nemo.</div>
@@ -592,6 +596,36 @@
             $('#print-btn').attr('disabled', false);
             document.body.style.cursor='default';
         });
+
+        const remote = nodeRequire('electron').remote
+        const BrowserWindow = remote.BrowserWindow
+        const dialog = remote.dialog
+        const fs = nodeRequire('fs')
+        const path = nodeRequire('path')
+        let win =  remote.getCurrentWindow()
+        
+        //create screenshot
+        $('#screenshot-btn').click(function() {
+            const win_size = win.getSize()
+            const win_height = win_size[1]
+            const win_width = win_size[0]
+            win.setSize(1000, 1000)
+            win.capturePage((img) => {
+                var capturedImg = img.toPNG()
+                win.setSize(win_width, win_height)
+                dialog.showSaveDialog({
+                    filters: [{
+                        name: "PNG",
+                        extensions: ["png"]
+                    }]
+                }, function(fileNames) {
+                    if (!fileNames.endsWith(".png")) {
+                        fileNames += ".png";
+                    }
+                    fs.writeFileSync(fileNames, capturedImg)
+                })
+            })
+        })
 
     </script>
 </body>
