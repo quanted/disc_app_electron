@@ -606,6 +606,7 @@
         
         //create screenshot
         $('#screenshot-btn').click(function() {
+            $('#screenshot-btn').attr('disabled', true);
             const win_size = win.getSize()
             const win_height = win_size[1]
             const win_width = win_size[0]
@@ -623,6 +624,7 @@
                         fileNames += ".png";
                     }
                     fs.writeFileSync(fileNames, capturedImg)
+                    $('#screenshot-btn').attr('disabled', false);
                 })
             })
         })
