@@ -15,7 +15,7 @@
   "license": "",
   "devDependencies": {
     "devtron": "^1.4.0",
-    "electron": "6.0.7",
+    "electron": "6.0.9",
     "electron-builder": "^21.2.0",
     "spectron": "^5.0.0"
   },
@@ -24,7 +24,7 @@
     "intro.js": "^2.9.3",
     "jquery": "^3.4.1",
     "jquery-slinky": "^4.2.1",
-    "papaparse": "^5.0.2",
+    "papaparse": "^5.1.0",
     "sqlite3": "4.1.0"
   }
 }
