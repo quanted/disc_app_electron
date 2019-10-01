@@ -721,7 +721,7 @@ function runAsterPlot() {
   }
   
   console.log (asterData);
-  if (drawn === false) {
+  if (!drawn) {
     drawAsterPlot(asterData);
   } else {
     updateAsterPlot(asterData);
@@ -1589,4 +1589,90 @@ function resetAll() {
         runAsterPlot();
         toggleCustomizedDataMessage();
     }
+}
+
+let drawn = false;
+  // set the dimensions and margins of the graph
+  const margin = { top: 30, right: 30, bottom: 30, left: 120 };
+  const width = 450 - margin.left - margin.right;
+  const height = 450 - margin.top - margin.bottom;
+
+  // append the svg object to the body of the page
+  const svg = d3
+    .select("#heat-chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Labels of row and columns
+  const myGroups = ["Domain"];
+  const myconsts = [
+    "Resilience",
+    "Social Cohesion",
+    "Safety & Security",
+    "Living Standards",
+    "Leisure Time",
+    "Health",
+    "Education",
+    "Cultural Fulfillment",
+    "Connection to Nature"
+  ];
+
+    // Build X scales and axis:
+    const x = d3
+    .scaleBand()
+    .range([0, width])
+    .domain(myGroups)
+    .padding(0.01);
+
+  // Build X scales and axis:
+  const y = d3
+    .scaleBand()
+    .range([height, 0])
+    .domain(myconsts)
+    .padding(0.01);
+  svg.append("g").call(d3.axisLeft(y));
+
+  // Build color scale
+  const myColor = d3
+    .scaleLinear()
+    .range(["white", "#69b3a2"])
+    .domain([1, 100]);
+
+function drawAsterPlot(data) {
+  svg
+    .selectAll()
+    .data(data, function(d) {
+      return d.description;
+    })
+    .enter()
+    .append("rect")
+    .attr("x", function(d) {
+      return 3;
+    })
+    .attr("y", function(d) {
+      return y(d.description);
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", y.bandwidth())
+    .style("fill", function(d) {
+      return myColor(d.score);
+    });
+
+    drawn = true;
+}
+
+function updateAsterPlot(data) { 
+  svg
+    .selectAll('rect')
+    .data(data, function(d) {
+      return d.description;
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", y.bandwidth())
+    .style("fill", function(d) {
+      return myColor(d.score);
+    });
 }
