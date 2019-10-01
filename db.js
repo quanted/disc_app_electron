@@ -711,13 +711,16 @@ function setAllInitialWeightedAvgValues(thing, obj) {
 function runAsterPlot() {
   const asterData = [];
   for (const domain in dataStructure.HWBI_DOMAIN) {
+    var val = (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100;
+    console.log(domain + ': ' +  val);
     asterData.push({
       description: dataStructure.HWBI_DOMAIN[domain].name,
       weight: dataStructure.HWBI_DOMAIN[domain].weight,
-      score: (dataStructure.HWBI_DOMAIN[domain].scenario_val === null ? null : dataStructure.HWBI_DOMAIN[domain].scenario_val * 100),
+      score: ((dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 > 0 ? (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 : 0),
     });
   }
-
+  
+  console.log (asterData);
   if (drawn === false) {
     drawAsterPlot(asterData);
   } else {
