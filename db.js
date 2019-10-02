@@ -1611,7 +1611,7 @@ let drawn = false;
   const myconsts = [
     "Resilience",
     "Social Cohesion",
-    "Safety & Security",
+    "Safety and Security",
     "Living Standards",
     "Leisure Time",
     "Health",
@@ -1639,7 +1639,7 @@ let drawn = false;
   const myColor = d3
     .scaleLinear()
     .range(["white", "#69b3a2"])
-    .domain([1, 100]);
+    .domain([1, 50]);
 
 function drawAsterPlot(data) {
   svg
