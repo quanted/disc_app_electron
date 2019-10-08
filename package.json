@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "d3-tip": "^0.9.1",
+    "electron-pdf-window": "^1.0.12",
     "intro.js": "^2.9.3",
     "jquery": "^3.4.1",
     "jquery-slinky": "^4.2.1",

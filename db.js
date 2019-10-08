@@ -1,9 +1,10 @@
 const electron = require('electron');
 const { ipcRenderer, shell } = electron;
-const { app, dialog } = electron.remote
+const { app, dialog, BrowserWindow } = electron.remote
 
 const path = require('path');
 const fs = require('fs');
+const PDFWindow = require('electron-pdf-window');
 
 try {
 	var sqlite3 = require('sqlite3');
@@ -1587,3 +1588,28 @@ function resetAll() {
         toggleCustomizedDataMessage();
     }
 }
+
+const url = require("url");
+/**
+ * Opens a new PDF window when clicking on "more..." on the snapshot page
+ * @function
+ */
+function openMorePDF(block) {
+  const win = new BrowserWindow({
+    width: 800,
+    height: 600
+  })
+
+  PDFWindow.addSupport(win)
+
+  let appPath = app.getAppPath()
+
+  win.loadURL(
+    url.format({
+      pathname: block + '.pdf',
+      protocol: 'file:',
+      slashes: true
+    })
+  );
+}
+/*   win.loadURL('file:///' + path.join(__dirname, '/' + block + '.pdf')) */
