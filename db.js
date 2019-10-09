@@ -4,7 +4,6 @@ const { app, dialog, BrowserWindow } = electron.remote
 
 const path = require('path');
 const fs = require('fs');
-const PDFWindow = require('electron-pdf-window');
 
 try {
 	var sqlite3 = require('sqlite3');
