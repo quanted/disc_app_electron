@@ -229,7 +229,7 @@ ipcMain.on("print-to-pdf", function(event) {
   const pdfPath = path.join(__dirname, "/print.pdf");
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF(
-    { printBackground: true, landscape: true },
+    { printBackground: true, landscape: false },
     function(error, data) {
       if (error) {
         event.sender.send("wrote-pdf", fileNames);
