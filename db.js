@@ -711,16 +711,15 @@ function setAllInitialWeightedAvgValues(thing, obj) {
 function runAsterPlot() {
   const asterData = [];
   for (const domain in dataStructure.HWBI_DOMAIN) {
-    var val = (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100;
-    console.log(domain + ': ' +  val);
-    asterData.push({
-      description: dataStructure.HWBI_DOMAIN[domain].name,
-      weight: dataStructure.HWBI_DOMAIN[domain].weight,
-      score: ((dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 > 0 ? (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 : 0),
-    });
+    if (domain !== "Resilience") {
+      var val = (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100;
+      asterData.push({
+        description: dataStructure.HWBI_DOMAIN[domain].name,
+        weight: dataStructure.HWBI_DOMAIN[domain].weight,
+        score: ((dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 > 0 ? (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 : 0),
+      });
+    }
   }
-  
-  console.log (asterData);
   if (!drawn) {
     drawAsterPlot(asterData);
   } else {
@@ -1593,7 +1592,7 @@ function resetAll() {
 
 let drawn = false;
   // set the dimensions and margins of the graph
-  const margin = { top: 30, right: 30, bottom: 30, left: 120 };
+  const margin = { top: 30, right: 30, bottom: 30, left: 200 };
   const width = 450 - margin.left - margin.right;
   const height = 450 - margin.top - margin.bottom;
 
@@ -1609,7 +1608,6 @@ let drawn = false;
   // Labels of row and columns
   const myGroups = ["Domain"];
   const myconsts = [
-    "Resilience",
     "Social Cohesion",
     "Safety and Security",
     "Living Standards",
@@ -1633,13 +1631,13 @@ let drawn = false;
     .range([height, 0])
     .domain(myconsts)
     .padding(0.01);
-  svg.append("g").call(d3.axisLeft(y));
+  svg.append("g").style("font-size", "17px").call(d3.axisLeft(y));
 
   // Build color scale
   const myColor = d3
     .scaleLinear()
-    .range(["white", "#69b3a2"])
-    .domain([1, 50]);
+    .range(["#c7e2dc", "#254d44"])
+    .domain([0, 10]);
 
 function drawAsterPlot(data) {
   svg
@@ -1658,7 +1656,7 @@ function drawAsterPlot(data) {
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
     .style("fill", function(d) {
-      return myColor(d.score);
+      return myColor((d.score > 10 ? 10 : d.score));
     });
 
     drawn = true;
@@ -1673,7 +1671,7 @@ function updateAsterPlot(data) {
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
     .style("fill", function(d) {
-      return myColor(d.score);
+      return myColor((d.score > 10 ? 10 : d.score));
     });
 }
 const url = require("url");
