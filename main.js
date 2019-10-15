@@ -228,7 +228,7 @@ ipcMain.on("print-to-pdf", function(event) {
   const pdfPath = path.join(__dirname, "/print.pdf");
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF(
-    { printBackground: true, landscape: true },
+    { printBackground: true, landscape: false },
     function(error, data) {
       if (error) {
         event.sender.send("wrote-pdf", fileNames);
@@ -572,3 +572,28 @@ function loadState() {
     }
   );
 }
+
+ipcMain.on("open-pdf", function(event, arg) {
+  console.log(path.join(process.resourcesPath, "/pdf/" + arg + ".pdf"));
+
+  if (fs.existsSync(path.join(__dirname, "/pdf/" + arg + ".pdf"))) {
+    pdfPath = path.join(__dirname, "/pdf/" + arg + ".pdf");
+  } else if (
+    fs.existsSync(path.join(process.resourcesPath, "/pdf/" + arg + ".pdf"))
+  ) {
+    pdfPath = path.join(process.resourcesPath, "/pdf/" + arg + ".pdf");
+  }
+
+  if (!fs.existsSync(path.join(app.getPath("temp"), "/DISC"))) {
+    fs.mkdirSync(path.join(app.getPath("temp"), "/DISC"));
+  }
+
+  fs.copyFileSync(
+    pdfPath,
+    path.join(app.getPath("temp"), "/DISC/" + arg + ".pdf")
+  );
+
+  shell.openExternal(
+    "file://" + path.join(app.getPath("temp"), "/DISC/" + arg + ".pdf")
+  );
+});

@@ -563,7 +563,7 @@ object {
 /** Print Typography **********************************************************/
 @media print {
   * {
-    background: transparent !important;
+    /* background: transparent !important; */
     /* color: #000 !important;
     -ms-filter: none !important;
     filter: none !important;

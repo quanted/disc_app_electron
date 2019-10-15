@@ -4,28 +4,37 @@ const builder = require("electron-builder");
 const Platform = builder.Platform;
 
 const config = {
-  "asar": true,
-  "appId": "disc.app",
-  "productName": "Decision Integration for Strong Communities",
-  "mac": {
-    "category": "disc.app"
+  asar: true,
+  appId: "disc.app",
+  productName: "Decision Integration for Strong Communities",
+  mac: {
+    category: "disc.app"
   },
-  "nsis": {
-    "oneClick": false
+  nsis: {
+    oneClick: false
   },
-  "extraResources": [
+  extraResources: [
     "hwbi_app/DISC.db",
     "hwbi_app/cities.db",
+    "pdf/Connection.pdf",
+    "pdf/Culture.pdf",
+    "pdf/Education.pdf",
+    "pdf/Health.pdf",
+    "pdf/Leisure.pdf",
+    "pdf/Living.pdf",
+    "pdf/Safety.pdf",
+    "pdf/Social.pdf"
   ]
 };
 
-builder.build({
+builder
+  .build({
     targets: Platform.WINDOWS.createTarget(),
     config: config
-})
-.then(m => {
-    console.log('Build OK!');
-})
-.catch(e => {
+  })
+  .then(m => {
+    console.log("Build OK!");
+  })
+  .catch(e => {
     console.error(e);
-});
+  });
