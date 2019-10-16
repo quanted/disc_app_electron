@@ -1591,53 +1591,53 @@ function resetAll() {
 }
 
 let drawn = false;
-  // set the dimensions and margins of the graph
-  const margin = { top: 30, right: 30, bottom: 30, left: 200 };
-  const width = 450 - margin.left - margin.right;
-  const height = 450 - margin.top - margin.bottom;
+// set the dimensions and margins of the graph
+const margin = { top: 30, right: 30, bottom: 30, left: 200 };
+const width = 450 - margin.left - margin.right;
+const height = 450 - margin.top - margin.bottom;
 
-  // append the svg object to the body of the page
-  const svg = d3
-    .select("#heat-chart")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// append the svg object to the body of the page
+const svg = d3
+  .select("#heat-chart")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // Labels of row and columns
-  const myGroups = ["Domain"];
-  const myconsts = [
-    "Social Cohesion",
-    "Safety and Security",
-    "Living Standards",
-    "Leisure Time",
-    "Health",
-    "Education",
-    "Cultural Fulfillment",
-    "Connection to Nature"
-  ];
-
-    // Build X scales and axis:
-    const x = d3
-    .scaleBand()
-    .range([0, width])
-    .domain(myGroups)
-    .padding(0.01);
+// Labels of row and columns
+const myGroups = ["Domain"];
+const myconsts = [
+  "Social Cohesion",
+  "Safety and Security",
+  "Living Standards",
+  "Leisure Time",
+  "Health",
+  "Education",
+  "Cultural Fulfillment",
+  "Connection to Nature"
+];
 
   // Build X scales and axis:
-  const y = d3
-    .scaleBand()
-    .range([height, 0])
-    .domain(myconsts)
-    .padding(0.01);
-  svg.append("g").style("font-size", "17px").call(d3.axisLeft(y));
+  const x = d3
+  .scaleBand()
+  .range([0, width])
+  .domain(myGroups)
+  .padding(0.01);
 
-  // Build color scale
-  const myColor = d3
-    .scaleLinear()
-    .range(["#c7e2dc", "#254d44"])
-    .domain([0, 10]);
+// Build X scales and axis:
+const y = d3
+  .scaleBand()
+  .range([height, 0])
+  .domain(myconsts)
+  .padding(0.01);
+svg.append("g").style("font-size", "17px").call(d3.axisLeft(y));
+
+// Build color scale
+const myColor = d3
+  .scaleLinear()
+  .range(["#e9f5f2", "#254d44"])
+  .domain([0, 10]);
 
 function drawAsterPlot(data) {
   svg
@@ -1659,7 +1659,68 @@ function drawAsterPlot(data) {
       return myColor((d.score > 10 ? 10 : d.score));
     });
 
-    drawn = true;
+
+  var h = 50;
+
+  var key = d3
+    .select("#legend1")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", h);
+
+  var legend = key
+    .append("defs")
+    .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "100%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+  legend
+    .append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#e9f5f2")
+    .attr("stop-opacity", 1);
+
+  legend
+    .append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#254d44")
+    .attr("stop-opacity", 1);
+
+  key
+    .append("rect")
+    .attr("width", width)
+    .attr("height", h - 30)
+    .style("fill", "url(#gradient)")
+    .attr("transform", "translate(" + margin.left + ",10)");
+
+  var y2 = d3
+    .scaleLinear()
+    .range([220, 0])
+    .domain([10, 0]);
+
+  var yAxis = d3
+    .axisBottom()
+    .scale(y2)
+    .ticks(1);
+
+  key
+    .append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + margin.left + ",30)")
+    .style("font-size", "14px")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("axis title");
+
+  drawn = true;
 }
 
 function updateAsterPlot(data) { 
