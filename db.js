@@ -40,7 +40,6 @@ $(function() {
     SERVICE_METRIC: {}
   };
   createDataStructure(dataStructure);
-  getNationalDomainScores();
 
   navigator.onLine ? onlineSearch(true) : onlineSearch(false);
 
@@ -751,29 +750,14 @@ function getStateDomainScores(state) {
   });
 }
 
-function getNationalDomainScores() {
-  var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
-    SELECT Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR, avg(MetricVarScores.SCORE) as SCORE
-      FROM MetricVarScores
-      INNER JOIN Counties ON MetricVarScores.FIPS == Counties.FIPS
-      INNER JOIN MetricVars ON MetricVarScores.METRIC_VAR == MetricVars.METRIC_VAR
-      INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR
-      INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR
-      INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN
-      WHERE MetricGroups_Domains.METRIC_GRP='HWBI' OR MetricGroups_Domains.METRIC_GRP='CRSI'
-      Group By Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR) Group By DOMAIN`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    let avg = 0;
-    rows.forEach((row) => {
-      $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
-      avg += row.SCORE;
-    });
-    $("#disc_national_score").html(round(avg / rows.length * 100, 1));
+ipcRenderer.on('national-disc', (event, rows) => {
+  let avg = 0;
+  rows.forEach((row) => {
+    $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
+    avg += row.SCORE;
   });
-}
+  $("#disc_national_score").html(round(avg / rows.length * 100, 1));
+});
 
 function getStateCode(location) {
   return new Promise((resolve, reject) => {
