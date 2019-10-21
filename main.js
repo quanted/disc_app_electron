@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const url = require("url");
 const Papa = require("papaparse");
+const sqlite3 = require("sqlite3");
 
 // SET ENV
 //process.env.NODE_ENV = 'production';
@@ -137,6 +138,42 @@ function createWindow() {
 
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
+
+  let dbPath;
+
+  if (fs.existsSync(path.join(__dirname, "/hwbi_app/DISC.db"))) {
+    dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
+  } else if (
+    fs.existsSync(path.join(process.resourcesPath, "/hwbi_app/DISC.db"))
+  ) {
+    dbPath = path.join(process.resourcesPath, "/hwbi_app/DISC.db");
+  }
+
+  const db = new sqlite3.Database(dbPath);
+
+  function getNationalDomainScores() {
+    console.log(`getNationalDomainScores`);
+    var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR, avg(MetricVarScores.SCORE) as SCORE
+      FROM MetricVarScores
+      INNER JOIN Counties ON MetricVarScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVars ON MetricVarScores.METRIC_VAR == MetricVars.METRIC_VAR
+      INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR
+      INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR
+      INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN
+      WHERE MetricGroups_Domains.METRIC_GRP='HWBI' OR MetricGroups_Domains.METRIC_GRP='CRSI'
+      Group By Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR) Group By DOMAIN`;
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      mainWindow.webContents.send("national-disc", rows);
+    });
+
+    db.close();
+  }
+
+  getNationalDomainScores();
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
