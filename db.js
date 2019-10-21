@@ -1577,7 +1577,7 @@ function resetAll() {
 let drawn = false;
 // set the dimensions and margins of the graph
 const margin = { top: 30, right: 30, bottom: 30, left: 200 };
-const width = 450 - margin.left - margin.right;
+const width = 425 - margin.left - margin.right;
 const height = 450 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
@@ -1683,7 +1683,7 @@ function drawAsterPlot(data) {
 
   var y2 = d3
     .scaleLinear()
-    .range([220, 0])
+    .range([195, 0])
     .domain([10, 0]);
 
   var yAxis = d3
