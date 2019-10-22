@@ -5,6 +5,9 @@ const { app, dialog, BrowserWindow } = electron.remote
 const path = require('path');
 const fs = require('fs');
 
+const Store = require('electron-store');
+const store = new Store();
+
 try {
 	var sqlite3 = require('sqlite3');
 } catch (e) { 
@@ -1743,3 +1746,27 @@ function openMorePDF(block) {
   );
 }
 /*   win.loadURL('file:///' + path.join(__dirname, '/' + block + '.pdf')) */
+
+
+/* save state of 'dont show this message again' checkbox */
+function saveOption() {
+  var cb = $('#checkbox-modal-hide');
+  var cbcheck = false
+  if (cb.is(':checked')) {
+    cbcheck = true
+    store.set('checkbox1', cbcheck);
+  }
+}
+
+/* check state of 'dont show this message again' checkbox on page load */
+$(function() {
+  var checked = store.get('checkbox1');
+  if(checked == true) {
+    $('#popup1').hide();
+  }
+})
+
+ipcRenderer.on('toggleAbout', function() {
+  $('#checkbox-modal-hide').removeAttr('checked')
+  store.delete('checkbox1')
+});

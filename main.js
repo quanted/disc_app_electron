@@ -115,6 +115,14 @@ function createWindow() {
             let focusedWin = BrowserWindow.getFocusedWindow();
             focusedWin.webContents.send("toggleSearch");
           }
+        },
+        {
+          label: "Show DISC Description (requires restart)",
+          id: "toggle-about",
+          accelerator: process.platform === "darwin" ? "Command+D" : "CTRL+D",
+          click: () => {
+            mainWindow.webContents.send("toggleAbout");
+          }
         }
       ]
     }
