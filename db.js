@@ -5,7 +5,19 @@ const { app, dialog, BrowserWindow } = electron.remote
 const path = require('path');
 const fs = require('fs');
 
-const Store = require('electron-store');
+let Store;
+
+try {
+  Store = require('electron-store');
+} catch (e) { 
+  console.log(e);
+  try {
+    Store = require(path.join(process.resourcesPath, '/app.asar/node_modules/electron-store'));
+  } catch (e) { 
+    console.log(e);
+  }
+}
+
 const store = new Store();
 
 try {

@@ -160,7 +160,6 @@ function createWindow() {
   const db = new sqlite3.Database(dbPath);
 
   function getNationalDomainScores() {
-    console.log(`getNationalDomainScores`);
     var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
     SELECT Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR, avg(MetricVarScores.SCORE) as SCORE
       FROM MetricVarScores

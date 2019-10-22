@@ -1,6 +1,6 @@
 {
   "name": "disc-electron",
-  "version": "1.1.0a",
+  "version": "1.2.0",
   "description": "An Electron version of the DISC application.",
   "main": "main.js",
   "scripts": {
