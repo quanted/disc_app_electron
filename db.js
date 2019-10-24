@@ -1633,10 +1633,40 @@ const y = d3
 svg.append("g").style("font-size", "17px").call(d3.axisLeft(y));
 
 // Build color scale
-const myColor = d3
-  .scaleLinear()
-  .range(["#e9f5f2", "#254d44"])
-  .domain([0, 10]);
+const myColor = {
+  "Connection to Nature" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#82AC45"])
+    .domain([0, 10]),
+  "Cultural Fulfillment" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#998FE4"])
+    .domain([0, 10]),
+  "Education" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#D59B2D"])
+    .domain([0, 10]),
+  "Health" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#5598C3"])
+    .domain([0, 10]),
+  "Leisure Time" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#DC4B60"])
+    .domain([0, 10]),
+  "Living Standards" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#269683"])
+    .domain([0, 10]),
+  "Safety and Security" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#606060"])
+    .domain([0, 10]),
+  "Social Cohesion" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#fdfd65"])
+    .domain([0, 10])
+} 
 
 function drawAsterPlot(data) {
   svg
@@ -1655,19 +1685,19 @@ function drawAsterPlot(data) {
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
     .style("fill", function(d) {
-      return myColor((d.score > 10 ? 10 : d.score));
+      return myColor[d.description]((d.score > 10 ? 10 : d.score));
     });
 
 
-  var h = 50;
+  const h = 50;
 
-  var key = d3
+  const key = d3
     .select("#legend1")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", h);
 
-  var legend = key
+  const legend = key
     .append("defs")
     .append("svg:linearGradient")
     .attr("id", "gradient")
@@ -1680,13 +1710,13 @@ function drawAsterPlot(data) {
   legend
     .append("stop")
     .attr("offset", "0%")
-    .attr("stop-color", "#e9f5f2")
+    .attr("stop-color", "#e8e8e8")
     .attr("stop-opacity", 1);
 
   legend
     .append("stop")
     .attr("offset", "100%")
-    .attr("stop-color", "#254d44")
+    .attr("stop-color", "#000000")
     .attr("stop-opacity", 1);
 
   key
@@ -1696,15 +1726,21 @@ function drawAsterPlot(data) {
     .style("fill", "url(#gradient)")
     .attr("transform", "translate(" + margin.left + ",10)");
 
-  var y2 = d3
+  const y2 = d3
     .scaleLinear()
     .range([195, 0])
     .domain([10, 0]);
 
-  var yAxis = d3
+    const ticks = [0, 5, 10];
+    const tickLabels = ['Base','→','Max']
+
+  const yAxis = d3
     .axisBottom()
     .scale(y2)
-    .ticks(1);
+    .tickValues(ticks)
+    .tickFormat(function(d, i) {
+      return tickLabels[i]
+  });
 
   key
     .append("g")
@@ -1720,6 +1756,7 @@ function drawAsterPlot(data) {
     .text("axis title");
 
   drawn = true;
+  $('#legend1 .tick > line').eq(1).attr('y2', 0);
 }
 
 function updateAsterPlot(data) { 
@@ -1731,7 +1768,7 @@ function updateAsterPlot(data) {
     .attr("width", x.bandwidth())
     .attr("height", y.bandwidth())
     .style("fill", function(d) {
-      return myColor((d.score > 10 ? 10 : d.score));
+      return myColor[d.description]((d.score > 10 ? 10 : d.score));
     });
 }
 const url = require("url");
