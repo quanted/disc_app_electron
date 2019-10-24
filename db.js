@@ -1630,7 +1630,7 @@ const y = d3
   .range([height, 0])
   .domain(myconsts)
   .padding(0.01);
-svg.append("g").style("font-size", "17px").call(d3.axisLeft(y));
+svg.append("g").style("font-size", "16px").call(d3.axisLeft(y));
 
 // Build color scale
 const myColor = {
@@ -1731,8 +1731,8 @@ function drawAsterPlot(data) {
     .range([195, 0])
     .domain([10, 0]);
 
-    const ticks = [0, 5, 10];
-    const tickLabels = ['Base','→','Max']
+    const ticks = [2, 5, 8];
+    const tickLabels = ['Current Score','→','Higher Score']
 
   const yAxis = d3
     .axisBottom()
@@ -1746,7 +1746,7 @@ function drawAsterPlot(data) {
     .append("g")
     .attr("class", "y axis")
     .attr("transform", "translate(" + margin.left + ",30)")
-    .style("font-size", "14px")
+    .style("font-size", "12px")
     .call(yAxis)
     .append("text")
     .attr("transform", "rotate(-90)")
@@ -1756,7 +1756,7 @@ function drawAsterPlot(data) {
     .text("axis title");
 
   drawn = true;
-  $('#legend1 .tick > line').eq(1).attr('y2', 0);
+  $('#legend1 .tick > line').attr('y2', 0);
 }
 
 function updateAsterPlot(data) { 
