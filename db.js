@@ -1660,7 +1660,7 @@ const myColor = {
     .domain([0, 10]),
   "Safety and Security" : d3
     .scaleLinear()
-    .range(["#e8e8e8", "#606060"])
+    .range(["#e8e8e8", "#434c86"])
     .domain([0, 10]),
   "Social Cohesion" : d3
     .scaleLinear()
