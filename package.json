@@ -16,7 +16,7 @@
   "devDependencies": {
     "devtron": "^1.4.0",
     "electron": "6.0.12",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.1.0",
     "spectron": "^5.0.0"
   },
   "dependencies": {
