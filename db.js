@@ -732,6 +732,12 @@ function runAsterPlot() {
         weight: dataStructure.HWBI_DOMAIN[domain].weight,
         score: ((dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 > 0 ? (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 : 0),
       });
+    } else if (domain === "Resilience") {
+      asterData.push({
+        description: dataStructure.HWBI_DOMAIN[domain].name,
+        weight: dataStructure.HWBI_DOMAIN[domain].weight,
+        score: (((dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].scenario_val - dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].original_val) / 2) + ((dataStructure.SERVICE_DOMAIN["Greenspace"].scenario_val - dataStructure.SERVICE_DOMAIN["Greenspace"].original_val) / 2)) * 100,
+      });
     }
   }
   if (!drawn) {
@@ -1607,6 +1613,7 @@ const svg = d3
 // Labels of row and columns
 const myGroups = ["Domain"];
 const myconsts = [
+  "Resilience",
   "Social Cohesion",
   "Safety and Security",
   "Living Standards",
@@ -1663,6 +1670,10 @@ const myColor = {
     .range(["#e8e8e8", "#434c86"])
     .domain([0, 10]),
   "Social Cohesion" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#e5632e"])
+    .domain([0, 10]),
+    "Resilience" : d3
     .scaleLinear()
     .range(["#e8e8e8", "#fdfd65"])
     .domain([0, 10])
@@ -1731,8 +1742,8 @@ function drawAsterPlot(data) {
     .range([195, 0])
     .domain([10, 0]);
 
-    const ticks = [2, 5, 8];
-    const tickLabels = ['Current Score','→','Higher Score']
+    const ticks = [5];
+    const tickLabels = ['Positive Influence →']
 
   const yAxis = d3
     .axisBottom()
