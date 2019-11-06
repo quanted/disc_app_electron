@@ -14,6 +14,7 @@ const sqlite3 = require("sqlite3");
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let savedFileName = "";
+const appTitle = `Decision Integration for Strong Communities ${app.getVersion()} | BETA | US EPA`;
 
 function createWindow() {
   const WEB_FOLDER = "";
@@ -35,10 +36,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true
     },
-    title:
-      "Decision Integration for Strong Communities " +
-      app.getVersion() +
-      " | BETA | US EPA"
+    title: appTitle
   });
 
   // show the window once it's ready
@@ -125,6 +123,36 @@ function createWindow() {
           }
         }
       ]
+    },
+    {
+      label: "Good to Know",
+      click: () => {
+        const id = snapshots.length;
+        let win = new BrowserWindow({
+          width: 800,
+          height: 600,
+          frame: true,
+          title: `Good to Know - ${appTitle}`
+        });
+        //win.setMenu(null);
+        snapshots[id] = win;
+        win.show();
+        // and load the index.html of the app.
+        win.loadURL(
+          url.format({
+            pathname: "goodtoknow.html",
+            protocol: PROTOCOL + ":",
+            slashes: true,
+            autoHideMenuBar: false
+          })
+        );
+
+        // garbage collection handle
+        win.on("closed", () => {
+          win = null;
+          snapshots[id] = null;
+        });
+      }
     }
   ];
 
@@ -192,7 +220,7 @@ function createWindow() {
       choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Yes", "No"],
-        title: "Decision Integration for Strong Communities",
+        title: appTitle,
         message: "Are you sure you want to quit?"
       });
       if (choice == 1) {
@@ -203,7 +231,7 @@ function createWindow() {
       choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Save", "Don't Save", "Cancel"],
-        title: "Decision Integration for Strong Communities",
+        title: appTitle,
         message: "Do you want to save your changes to " + savedFileName + "?"
       });
       console.log(choice);
@@ -302,7 +330,7 @@ ipcMain.on("print-to-pdf", function(event) {
                 dialog.showMessageBoxSync({
                   type: "error",
                   buttons: ["OK"],
-                  title: "Decision Integration for Strong Communities",
+                  title: appTitle,
                   message: `${fileNames} is open in another program. Please close it and try again.`
                 });
               } else if (error) {
@@ -380,7 +408,7 @@ function openFile() {
   const choice = dialog.showMessageBoxSync({
     type: "question",
     buttons: ["Customized Metrics", "Scenario Builder Metrics", "Cancel"],
-    title: "Decision Integration for Strong Communities",
+    title: appTitle,
     message: "Which Metric data do you want to load?"
   });
 
@@ -407,7 +435,7 @@ function openFile() {
             {
               type: "question",
               buttons: ["Save", "Don't Save", "Cancel"],
-              title: "Decision Integration for Strong Communities",
+              title: appTitle,
               message:
                 "Do you want to save your changes to " + savedFileName + "?"
             },
