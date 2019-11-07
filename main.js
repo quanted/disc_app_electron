@@ -134,7 +134,7 @@ function createWindow() {
           frame: true,
           title: `Good to Know - ${appTitle}`
         });
-        //win.setMenu(null);
+        win.setMenu(null);
         snapshots[id] = win;
         win.show();
         // and load the index.html of the app.
