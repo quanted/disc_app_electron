@@ -554,7 +554,8 @@ function createDataStructure(obj) {
   "FROM MetricVars " +
   "INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR " +
   "INNER JOIN Domains_Indicators ON Indicators_MetricVars.INDICATOR == Domains_Indicators.INDICATOR " + 
-  "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN;";
+  "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN " + 
+  "ORDER BY DOMAIN ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
 
   db.all(sql, [], (err, rows) => {
     if (err) {
