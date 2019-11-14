@@ -46,7 +46,7 @@ cur.execute("SELECT MetricVars.METRIC_VAR, MetricVars.METRIC_VAR_DESC, Domains.D
     "INNER JOIN Domains ON Domains_Indicators.DOMAIN == Domains.DOMAIN " +
     "INNER JOIN MetricGroups ON MetricGroups_Domains.METRIC_GRP == MetricGroups.METRIC_GRP " +
     "WHERE MetricGroups.METRIC_GRP == 'HWBI' OR MetricGroups.METRIC_GRP == 'CRSI' " +
-    "ORDER BY MetricGroups.METRIC_GRP DESC;")
+    "ORDER BY Domains.DOMAIN ASC;")
 hwbi_metrics = cur.fetchall()
 
 try:
@@ -108,8 +108,8 @@ copyfile('static_qed/hwbi/disc/css/introjs-nassim.css', 'disc_app_electron/stati
 copyfile('static_qed/hwbi/disc/js/statecounty.json', 'disc_app_electron/static_qed/hwbi/disc/js/statecounty.json')
 copyfile('static_qed/hwbi/disc/js/statestateabbr.json', 'disc_app_electron/static_qed/hwbi/disc/js/statestateabbr.json')
 
-copyfile('static_qed/hwbi/disc/img/connection-to-nature.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/connection-to-nature.jpg')
-copyfile('static_qed/hwbi/disc/img/cultural-fulfillment.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/cultural-fulfillment.jpg')
+copyfile('static_qed/hwbi/disc/img/nature-connection.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/nature-connection.jpg')
+copyfile('static_qed/hwbi/disc/img/fulfillment-through-culture.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/fulfillment-through-culture.jpg')
 copyfile('static_qed/hwbi/disc/img/domain_arrow.png', 'disc_app_electron/static_qed/hwbi/disc/img/domain_arrow.png')
 copyfile('static_qed/hwbi/disc/img/domain_bar.png', 'disc_app_electron/static_qed/hwbi/disc/img/domain_bar.png')
 copyfile('static_qed/hwbi/disc/img/education.jpg', 'disc_app_electron/static_qed/hwbi/disc/img/education.jpg')

@@ -1,11 +1,24 @@
 const electron = require('electron');
 const { ipcRenderer, shell } = electron;
-const { app, dialog } = electron.remote
+const { app, dialog, BrowserWindow } = electron.remote
 
 const fs = require('fs');
 
-/* process.resourcesPath = path.resolve('/node_modules/');
- */ 
+let Store;
+
+try {
+  Store = require('electron-store');
+} catch (e) { 
+  console.log(e);
+  try {
+    Store = require(path.join(process.resourcesPath, '/app.asar/node_modules/electron-store'));
+  } catch (e) { 
+    console.log(e);
+  }
+}
+
+const store = new Store();
+
 try {
   if (process.platform === "darwin") {
     var sqlite3 = require(path.resolve('node_modules/sqlite3'));
@@ -52,7 +65,6 @@ $(function() {
     SERVICE_METRIC: {}
   };
   createDataStructure(dataStructure);
-  getNationalDomainScores();
 
   navigator.onLine ? onlineSearch(true) : onlineSearch(false);
 
@@ -577,7 +589,8 @@ function createDataStructure(obj) {
   "FROM MetricVars " +
   "INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR " +
   "INNER JOIN Domains_Indicators ON Indicators_MetricVars.INDICATOR == Domains_Indicators.INDICATOR " + 
-  "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN;";
+  "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN " + 
+  "ORDER BY DOMAIN ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -748,14 +761,22 @@ function setAllInitialWeightedAvgValues(thing, obj) {
 function runAsterPlot() {
   const asterData = [];
   for (const domain in dataStructure.HWBI_DOMAIN) {
-    asterData.push({
-      description: dataStructure.HWBI_DOMAIN[domain].name,
-      weight: dataStructure.HWBI_DOMAIN[domain].weight,
-      score: (dataStructure.HWBI_DOMAIN[domain].scenario_val === null ? null : dataStructure.HWBI_DOMAIN[domain].scenario_val * 100),
-    });
+    if (domain !== "Resilience") {
+      var val = (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100;
+      asterData.push({
+        description: dataStructure.HWBI_DOMAIN[domain].name,
+        weight: dataStructure.HWBI_DOMAIN[domain].weight,
+        score: ((dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 > 0 ? (dataStructure.HWBI_DOMAIN[domain].scenario_val - dataStructure.HWBI_DOMAIN[domain].original_val) * 100 : 0),
+      });
+    } else if (domain === "Resilience") {
+      asterData.push({
+        description: dataStructure.HWBI_DOMAIN[domain].name,
+        weight: dataStructure.HWBI_DOMAIN[domain].weight,
+        score: (((dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].scenario_val - dataStructure.SERVICE_DOMAIN["Emergency Preparedness"].original_val) / 2) + ((dataStructure.SERVICE_DOMAIN["Greenspace"].scenario_val - dataStructure.SERVICE_DOMAIN["Greenspace"].original_val) / 2)) * 100,
+      });
+    }
   }
-
-  if (drawn === false) {
+  if (!drawn) {
     drawAsterPlot(asterData);
   } else {
     updateAsterPlot(asterData);
@@ -786,29 +807,14 @@ function getStateDomainScores(state) {
   });
 }
 
-function getNationalDomainScores() {
-  var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
-    SELECT Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR, avg(MetricVarScores.SCORE) as SCORE
-      FROM MetricVarScores
-      INNER JOIN Counties ON MetricVarScores.FIPS == Counties.FIPS
-      INNER JOIN MetricVars ON MetricVarScores.METRIC_VAR == MetricVars.METRIC_VAR
-      INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR
-      INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR
-      INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN
-      WHERE MetricGroups_Domains.METRIC_GRP='HWBI' OR MetricGroups_Domains.METRIC_GRP='CRSI'
-      Group By Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR) Group By DOMAIN`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      throw err;
-    }
-    let avg = 0;
-    rows.forEach((row) => {
-      $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
-      avg += row.SCORE;
-    });
-    $("#disc_national_score").html(round(avg / rows.length * 100, 1));
+ipcRenderer.on('national-disc', (event, rows) => {
+  let avg = 0;
+  rows.forEach((row) => {
+    $("#" + slugify(row.DOMAIN) + "_national_score").html(round(row.SCORE * 100, 1));
+    avg += row.SCORE;
   });
-}
+  $("#disc_national_score").html(round(avg / rows.length * 100, 1));
+});
 
 function getStateCode(location) {
   return new Promise((resolve, reject) => {
@@ -876,18 +882,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 
   let val;
 
-  val = dataStructure.HWBI_DOMAIN["Connection to Nature"][valueType] +
-    (2.125496 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 4.983393 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -4.639731 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -0.331266 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.085891 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.487747 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -9.83217 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.127427 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -13.18771 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 10.840124 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.45075) -
+  val = dataStructure.HWBI_DOMAIN["Nature Connection"][valueType] +
     (2.125496 + 
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 4.983393 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -4.639731 +
@@ -898,30 +893,27 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 0.127427 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -13.18771 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 10.840124 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.45075);
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.45075) -
+    (2.125496 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 4.983393 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * -4.639731 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -0.331266 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.085891 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 0.487747 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * -9.83217 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 0.127427 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -13.18771 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 10.840124 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.45075);
   if (val < 0) {
     val = 0;
   }
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = val;
+  dataStructure.HWBI_DOMAIN["Nature Connection"].scenario_val = val;
 
-  val = dataStructure.HWBI_DOMAIN["Cultural Fulfillment"][valueType] +
-    (1.241511 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 1.606393 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.437157 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.409964 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.42666 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.992387 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.899043 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.227824 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.197434 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -2.331611 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 2.679329 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 0.263944 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 3.115341 +
-      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * 0.12478) -
+  val = dataStructure.HWBI_DOMAIN["Fulfillment through Culture"][valueType] +
     (1.241511 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 1.606393 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.437157 +
@@ -935,29 +927,30 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 2.679329 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * 0.263944 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * 3.115341 +
-      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * 0.12478);
+      dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S17].scenario_val * 0.12478) -
+    (1.241511 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 1.606393 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -0.437157 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.409964 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.42666 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -0.992387 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.899043 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.227824 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * -0.197434 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S12][valueType] * -2.331611 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 2.679329 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 0.263944 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * 3.115341 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S17][valueType] * 0.12478);
   if (val < 0) {
     val = 0;
   }
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = val; 
+  dataStructure.HWBI_DOMAIN["Fulfillment through Culture"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Education"][valueType] +
-    (0.317409 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.307336 +
-      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * -0.031266 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.576819 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.087566 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.333649 +
-      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.243361 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.313181 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.743381 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.249658 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 8.38291 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -0.196975 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.708485) -
     (0.317409 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.307336 +
       dataStructure.SERVICE_DOMAIN[key.S09].scenario_val * -0.031266 +
@@ -970,7 +963,20 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * 0.249658 +
       dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 8.38291 +
       dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -0.196975 +
-      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.708485);
+      dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.708485) -
+    (0.317409 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.307336 +
+      dataStructure.SERVICE_DOMAIN[key.S09][valueType] * -0.031266 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.576819 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.087566 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.333649 +
+      dataStructure.SERVICE_DOMAIN[key.S13][valueType] * -0.243361 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.313181 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.743381 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.249658 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 8.38291 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -0.196975 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.708485);
   if (val < 0) {
     val = 0;
   }
@@ -981,21 +987,21 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 
   val = dataStructure.HWBI_DOMAIN["Health"][valueType] +
     (0.499961 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.96139 +
-      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.634687 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.494802 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.300629 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.208537 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.137244 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.269267) -
-    (0.499961 +
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * 0.96139 +
       dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -0.634687 +
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.494802 +
       dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * -0.300629 +
       dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * 0.208537 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.137244 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.269267);
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.269267) -
+    (0.499961 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * 0.96139 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -0.634687 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.494802 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -0.300629 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.208537 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.137244 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.269267);
   if (val < 0) {
     val = 0;
   }
@@ -1005,21 +1011,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Health"].scenario_val = val;
 
   val = dataStructure.HWBI_DOMAIN["Leisure Time"][valueType] +
-    (-0.952029 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.938554 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.186626 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 2.728191 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 2.2115 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * -0.405724 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.342702 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.137733 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -1.135025 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S10][valueType] * 0.645049 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -4.991575 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.284225 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.068034 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -1.697729 +
-      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 5.52873) -
     (-0.952029 +
       dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * 0.938554 +
       dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * 0.186626 +
@@ -1034,7 +1025,22 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -0.284225 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.068034 +
       dataStructure.SERVICE_DOMAIN[key.S16].scenario_val * dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * -1.697729 +
-      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 5.52873);
+      dataStructure.SERVICE_DOMAIN[key.S06].scenario_val * dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 5.52873) -
+    (-0.952029 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.938554 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 0.186626 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 2.728191 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 2.2115 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * -0.405724 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * 0.342702 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.137733 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -1.135025 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S10][valueType] * 0.645049 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S03][valueType] * -4.991575 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.284225 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.068034 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * dataStructure.SERVICE_DOMAIN[key.S06][valueType] * -1.697729 +
+      dataStructure.SERVICE_DOMAIN[key.S06][valueType] * dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 5.52873);
   if (val < 0) {
     val = 0;
   }
@@ -1044,23 +1050,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Leisure Time"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Living Standards"][valueType] +
-    (0.789673 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 1.47984 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.278943 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 2.364789 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.348691 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.113025 +
-      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.139021 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.811555 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -3.51308 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.320548 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.000174 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 5.571766 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -4.438646 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 2.809376 +
-      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.106592 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.163612 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.289577) -
     (0.789673 +
       dataStructure.SERVICE_DOMAIN[key.S14].scenario_val * 1.47984 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 0.278943 +
@@ -1077,7 +1066,24 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 2.809376 +
       dataStructure.SERVICE_DOMAIN[key.S11].scenario_val * dataStructure.SERVICE_DOMAIN[key.S23].scenario_val * 0.106592 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S22].scenario_val * -0.163612 +
-      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.289577) ;
+      dataStructure.SERVICE_DOMAIN[key.S04].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.289577) -
+    (0.789673 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 1.47984 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * 0.278943 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * 2.364789 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * 0.348691 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.113025 +
+      dataStructure.SERVICE_DOMAIN[key.S12][valueType] * 0.139021 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.811555 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * -3.51308 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -1.320548 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.000174 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 5.571766 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -4.438646 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 2.809376 +
+      dataStructure.SERVICE_DOMAIN[key.S11][valueType] * dataStructure.SERVICE_DOMAIN[key.S23][valueType] * 0.106592 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.163612 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.289577);
   if (val < 0) {
     val = 0;
   }
@@ -1087,22 +1093,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Living Standards"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Safety and Security"][valueType] +
-    (-0.109546 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -2.010049 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 2.210816 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -1.142788 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -2.240351 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 4.293024 +
-      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.1171 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.294652 +
-      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.210137 +
-      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 3.55136 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -2.323739 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.270444 +
-      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 5.842987 +
-      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.40061 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -4.53954 +
-      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 4.206231) -
     (-0.109546 +
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * -2.010049 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 2.210816 +
@@ -1118,7 +1108,23 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S19].scenario_val * dataStructure.SERVICE_DOMAIN[key.S21].scenario_val * 5.842987 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.40061 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * dataStructure.SERVICE_DOMAIN[key.S24].scenario_val * -4.53954 +
-      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 4.206231);
+      dataStructure.SERVICE_DOMAIN[key.S20].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 4.206231) -
+    (-0.109546 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * -2.010049 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 2.210816 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * -1.142788 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -2.240351 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 4.293024 +
+      dataStructure.SERVICE_DOMAIN[key.S16][valueType] * 0.1171 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * 0.294652 +
+      dataStructure.SERVICE_DOMAIN[key.S04][valueType] * 0.210137 +
+      dataStructure.SERVICE_DOMAIN[key.S24][valueType] * 3.55136 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -2.323739 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -0.270444 +
+      dataStructure.SERVICE_DOMAIN[key.S19][valueType] * dataStructure.SERVICE_DOMAIN[key.S21][valueType] * 5.842987 +
+      dataStructure.SERVICE_DOMAIN[key.S03][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.40061 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * dataStructure.SERVICE_DOMAIN[key.S24][valueType] * -4.53954 +
+      dataStructure.SERVICE_DOMAIN[key.S20][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 4.206231);
   if (val < 0) {
     val = 0;
   }
@@ -1128,19 +1134,6 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   dataStructure.HWBI_DOMAIN["Safety and Security"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Social Cohesion"][valueType] +
-    (1.559019 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.494673 +
-      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.148918 +
-      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.168704 +
-      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.067929 +
-      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.301997 +
-      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -3.215035 +
-      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 7.179508 +
-      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -0.283441 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.729157 +
-      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 5.161983 +
-      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 1.171484 +
-      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.61033) -
     (1.559019 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * -2.494673 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * 0.148918 +
@@ -1153,7 +1146,20 @@ function calculateServiceHWBI(valueType = 'custom_val') {
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * -0.729157 +
       dataStructure.SERVICE_DOMAIN[key.S07].scenario_val * dataStructure.SERVICE_DOMAIN[key.S18].scenario_val * 5.161983 +
       dataStructure.SERVICE_DOMAIN[key.S05].scenario_val * dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * 1.171484 +
-      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.61033);
+      dataStructure.SERVICE_DOMAIN[key.S15].scenario_val * dataStructure.SERVICE_DOMAIN[key.S25].scenario_val * -0.61033) -
+    (1.559019 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * -2.494673 +
+      dataStructure.SERVICE_DOMAIN[key.S08][valueType] * 0.148918 +
+      dataStructure.SERVICE_DOMAIN[key.S22][valueType] * -0.168704 +
+      dataStructure.SERVICE_DOMAIN[key.S02][valueType] * 0.067929 +
+      dataStructure.SERVICE_DOMAIN[key.S21][valueType] * -0.301997 +
+      dataStructure.SERVICE_DOMAIN[key.S18][valueType] * -3.215035 +
+      dataStructure.SERVICE_DOMAIN[key.S14][valueType] * 7.179508 +
+      dataStructure.SERVICE_DOMAIN[key.S01][valueType] * -0.283441 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * -0.729157 +
+      dataStructure.SERVICE_DOMAIN[key.S07][valueType] * dataStructure.SERVICE_DOMAIN[key.S18][valueType] * 5.161983 +
+      dataStructure.SERVICE_DOMAIN[key.S05][valueType] * dataStructure.SERVICE_DOMAIN[key.S15][valueType] * 1.171484 +
+      dataStructure.SERVICE_DOMAIN[key.S15][valueType] * dataStructure.SERVICE_DOMAIN[key.S25][valueType] * -0.61033);
   if (val < 0) {
     val = 0;
   }
@@ -1327,7 +1333,7 @@ ipcRenderer.on('save', (event, arg) => {
   csv += 'county,"' + location.county + '"\n';
   csv += 'state_abbr,' + location.state_abbr + '\n';
   csv += 'state,' + location.state + '\n';
-  csv += '"Connection to Nature",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
+  csv += '"Nature Connection",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
   csv += '"Cultural Fullfillment",' + dataStructure.HWBI_DOMAIN[2].weight + '\n';
   csv += '"Education",' + dataStructure.HWBI_DOMAIN[15].weight + '\n';
   csv += '"Health",' + dataStructure.HWBI_DOMAIN[4].weight + '\n';
@@ -1624,3 +1630,239 @@ function resetAll() {
         toggleCustomizedDataMessage();
     }
 }
+
+let drawn = false;
+// set the dimensions and margins of the graph
+const margin = { top: 30, right: 30, bottom: 30, left: 200 };
+const width = 425 - margin.left - margin.right;
+const height = 450 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+const svg = d3
+  .select("#heat-chart")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// Labels of row and columns
+const myGroups = ["Domain"];
+const myconsts = [
+  "Social Cohesion",
+  "Safety and Security",
+  "Resilience",
+  "Nature Connection",
+  "Living Standards",
+  "Leisure Time",
+  "Health",
+  "Fulfillment through Culture",
+  "Education"
+];
+
+  // Build X scales and axis:
+  const x = d3
+  .scaleBand()
+  .range([0, width])
+  .domain(myGroups)
+  .padding(0.01);
+
+// Build X scales and axis:
+const y = d3
+  .scaleBand()
+  .range([height, 0])
+  .domain(myconsts)
+  .padding(0.01);
+svg.append("g").style("font-size", "16px").call(d3.axisLeft(y));
+
+// Build color scale
+const myColor = {
+  "Nature Connection" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#82AC45"])
+    .domain([0, 10]),
+  "Fulfillment through Culture" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#998FE4"])
+    .domain([0, 10]),
+  "Education" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#D59B2D"])
+    .domain([0, 10]),
+  "Health" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#5598C3"])
+    .domain([0, 10]),
+  "Leisure Time" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#DC4B60"])
+    .domain([0, 10]),
+  "Living Standards" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#269683"])
+    .domain([0, 10]),
+  "Safety and Security" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#434c86"])
+    .domain([0, 10]),
+  "Social Cohesion" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#e5632e"])
+    .domain([0, 10]),
+    "Resilience" : d3
+    .scaleLinear()
+    .range(["#e8e8e8", "#fdfd65"])
+    .domain([0, 10])
+} 
+
+function drawAsterPlot(data) {
+  svg
+    .selectAll()
+    .data(data, function(d) {
+      return d.description;
+    })
+    .enter()
+    .append("rect")
+    .attr("x", function(d) {
+      return 3;
+    })
+    .attr("y", function(d) {
+      return y(d.description);
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", y.bandwidth())
+    .style("fill", function(d) {
+      return myColor[d.description]((d.score > 10 ? 10 : d.score));
+    });
+
+
+  const h = 50;
+
+  const key = d3
+    .select("#legend1")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", h);
+
+  const legend = key
+    .append("defs")
+    .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "100%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+  legend
+    .append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#e8e8e8")
+    .attr("stop-opacity", 1);
+
+  legend
+    .append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#000000")
+    .attr("stop-opacity", 1);
+
+  key
+    .append("rect")
+    .attr("width", width)
+    .attr("height", h - 30)
+    .style("fill", "url(#gradient)")
+    .attr("transform", "translate(" + margin.left + ",10)");
+
+  const y2 = d3
+    .scaleLinear()
+    .range([195, 0])
+    .domain([10, 0]);
+
+    const ticks = [5];
+    const tickLabels = ['Positive Influence →']
+
+  const yAxis = d3
+    .axisBottom()
+    .scale(y2)
+    .tickValues(ticks)
+    .tickFormat(function(d, i) {
+      return tickLabels[i]
+  });
+
+  key
+    .append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + margin.left + ",30)")
+    .style("font-size", "12px")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("axis title");
+
+  drawn = true;
+  $('#legend1 .tick > line').attr('y2', 0);
+}
+
+function updateAsterPlot(data) { 
+  svg
+    .selectAll('rect')
+    .data(data, function(d) {
+      return d.description;
+    })
+    .attr("width", x.bandwidth())
+    .attr("height", y.bandwidth())
+    .style("fill", function(d) {
+      return myColor[d.description]((d.score > 10 ? 10 : d.score));
+    });
+}
+const url = require("url");
+/**
+ * Opens a new PDF window when clicking on "more..." on the snapshot page
+ * @function
+ */
+function openMorePDF(block) {
+  const win = new BrowserWindow({
+    width: 800,
+    height: 600
+  })
+
+  PDFWindow.addSupport(win)
+
+  let appPath = app.getAppPath()
+
+  win.loadURL(
+    url.format({
+      pathname: block + '.pdf',
+      protocol: 'file:',
+      slashes: true
+    })
+  );
+}
+/*   win.loadURL('file:///' + path.join(__dirname, '/' + block + '.pdf')) */
+
+
+/* save state of 'dont show this message again' checkbox */
+function saveOption() {
+  var cb = $('#checkbox-modal-hide');
+  var cbcheck = false
+  if (cb.is(':checked')) {
+    cbcheck = true
+    store.set('checkbox1', cbcheck);
+  }
+}
+
+/* check state of 'dont show this message again' checkbox on page load */
+$(function() {
+  var checked = store.get('checkbox1');
+  if(checked == true) {
+    $('#popup1').hide();
+  }
+})
+
+ipcRenderer.on('toggleAbout', function() {
+  $('#checkbox-modal-hide').removeAttr('checked')
+  store.delete('checkbox1')
+});

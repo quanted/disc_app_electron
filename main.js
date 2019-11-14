@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const url = require("url");
 const Papa = require("papaparse");
+const sqlite3 = require("sqlite3");
 
 
 // SET ENV
@@ -14,6 +15,7 @@ const Papa = require("papaparse");
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let savedFileName = "";
+const appTitle = `Decision Integration for Strong Communities ${app.getVersion()} | BETA | US EPA`;
 
 function createWindow() {
   const WEB_FOLDER = "";
@@ -35,10 +37,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true
     },
-    title:
-      "Decision Integration for Strong Communities " +
-      app.getVersion() +
-      " | BETA | US EPA"
+    title: appTitle
   });
 
   // show the window once it's ready
@@ -110,8 +109,46 @@ function createWindow() {
             let focusedWin = BrowserWindow.getFocusedWindow();
             focusedWin.webContents.send("toggleSearch");
           }
+        },
+        {
+          label: "Show DISC Description (requires restart)",
+          id: "toggle-about",
+          accelerator: process.platform === "darwin" ? "Command+D" : "CTRL+D",
+          click: () => {
+            mainWindow.webContents.send("toggleAbout");
+          }
         }
       ]
+    },
+    {
+      label: "Good to Know",
+      click: () => {
+        const id = snapshots.length;
+        let win = new BrowserWindow({
+          width: 800,
+          height: 600,
+          frame: true,
+          title: `Good to Know - ${appTitle}`
+        });
+        win.setMenu(null);
+        snapshots[id] = win;
+        win.show();
+        // and load the index.html of the app.
+        win.loadURL(
+          url.format({
+            pathname: "goodtoknow.html",
+            protocol: PROTOCOL + ":",
+            slashes: true,
+            autoHideMenuBar: false
+          })
+        );
+
+        // garbage collection handle
+        win.on("closed", () => {
+          win = null;
+          snapshots[id] = null;
+        });
+      }
     }
   ];
 
@@ -152,6 +189,41 @@ function createWindow() {
   
   
 
+  let dbPath;
+
+  if (fs.existsSync(path.join(__dirname, "/hwbi_app/DISC.db"))) {
+    dbPath = path.join(__dirname, "/hwbi_app/DISC.db");
+  } else if (
+    fs.existsSync(path.join(process.resourcesPath, "/hwbi_app/DISC.db"))
+  ) {
+    dbPath = path.join(process.resourcesPath, "/hwbi_app/DISC.db");
+  }
+
+  const db = new sqlite3.Database(dbPath);
+
+  function getNationalDomainScores() {
+    var sql = `SELECT DOMAIN, avg(SCORE) as SCORE from(
+    SELECT Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR, avg(MetricVarScores.SCORE) as SCORE
+      FROM MetricVarScores
+      INNER JOIN Counties ON MetricVarScores.FIPS == Counties.FIPS
+      INNER JOIN MetricVars ON MetricVarScores.METRIC_VAR == MetricVars.METRIC_VAR
+      INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR
+      INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR
+      INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN
+      WHERE MetricGroups_Domains.METRIC_GRP='HWBI' OR MetricGroups_Domains.METRIC_GRP='CRSI'
+      Group By Domains_Indicators.DOMAIN, Indicators_MetricVars.INDICATOR) Group By DOMAIN`;
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      mainWindow.webContents.send("national-disc", rows);
+    });
+
+    db.close();
+  }
+
+  getNationalDomainScores();
+
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
 
@@ -162,7 +234,7 @@ function createWindow() {
       choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Yes", "No"],
-        title: "Decision Integration for Strong Communities",
+        title: appTitle,
         message: "Are you sure you want to quit?"
       });
       if (choice == 1) {
@@ -173,7 +245,7 @@ function createWindow() {
       choice = dialog.showMessageBoxSync(this, {
         type: "question",
         buttons: ["Save", "Don't Save", "Cancel"],
-        title: "Decision Integration for Strong Communities",
+        title: appTitle,
         message: "Do you want to save your changes to " + savedFileName + "?"
       });
       console.log(choice);
@@ -242,7 +314,7 @@ ipcMain.on("print-to-pdf", function(event) {
   const pdfPath = path.join(__dirname, "/print.pdf");
   const win = BrowserWindow.fromWebContents(event.sender);
   win.webContents.printToPDF(
-    { printBackground: true, landscape: true },
+    { printBackground: true, landscape: false },
     function(error, data) {
       if (error) {
         event.sender.send("wrote-pdf", fileNames);
@@ -272,7 +344,7 @@ ipcMain.on("print-to-pdf", function(event) {
                 dialog.showMessageBoxSync({
                   type: "error",
                   buttons: ["OK"],
-                  title: "Decision Integration for Strong Communities",
+                  title: appTitle,
                   message: `${fileNames} is open in another program. Please close it and try again.`
                 });
               } else if (error) {
@@ -350,7 +422,7 @@ function openFile() {
   const choice = dialog.showMessageBoxSync({
     type: "question",
     buttons: ["Customized Metrics", "Scenario Builder Metrics", "Cancel"],
-    title: "Decision Integration for Strong Communities",
+    title: appTitle,
     message: "Which Metric data do you want to load?"
   });
 
@@ -377,7 +449,7 @@ function openFile() {
             {
               type: "question",
               buttons: ["Save", "Don't Save", "Cancel"],
-              title: "Decision Integration for Strong Communities",
+              title: appTitle,
               message:
                 "Do you want to save your changes to " + savedFileName + "?"
             },
@@ -586,3 +658,28 @@ function loadState() {
     }
   );
 }
+
+ipcMain.on("open-pdf", function(event, arg) {
+  console.log(path.join(process.resourcesPath, "/pdf/" + arg + ".pdf"));
+
+  if (fs.existsSync(path.join(__dirname, "/pdf/" + arg + ".pdf"))) {
+    pdfPath = path.join(__dirname, "/pdf/" + arg + ".pdf");
+  } else if (
+    fs.existsSync(path.join(process.resourcesPath, "/pdf/" + arg + ".pdf"))
+  ) {
+    pdfPath = path.join(process.resourcesPath, "/pdf/" + arg + ".pdf");
+  }
+
+  if (!fs.existsSync(path.join(app.getPath("temp"), "/DISC"))) {
+    fs.mkdirSync(path.join(app.getPath("temp"), "/DISC"));
+  }
+
+  fs.copyFileSync(
+    pdfPath,
+    path.join(app.getPath("temp"), "/DISC/" + arg + ".pdf")
+  );
+
+  shell.openExternal(
+    "file://" + path.join(app.getPath("temp"), "/DISC/" + arg + ".pdf")
+  );
+});
