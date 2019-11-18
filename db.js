@@ -847,7 +847,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 
   let val;
 
-  val = dataStructure.HWBI_DOMAIN["Nature Connection"][valueType] +
+  val = dataStructure.HWBI_DOMAIN["Connection to Nature"][valueType] +
     (2.125496 + 
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 4.983393 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -4.639731 +
@@ -876,9 +876,9 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Nature Connection"].scenario_val = val;
+  dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = val;
 
-  val = dataStructure.HWBI_DOMAIN["Fulfillment through Culture"][valueType] +
+  val = dataStructure.HWBI_DOMAIN["Cultural Fulfillment"][valueType] +
     (1.241511 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 1.606393 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.437157 +
@@ -913,7 +913,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Fulfillment through Culture"].scenario_val = val; 
+  dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Education"][valueType] +
     (0.317409 +
@@ -1298,7 +1298,7 @@ ipcRenderer.on('save', (event, arg) => {
   csv += 'county,"' + location.county + '"\n';
   csv += 'state_abbr,' + location.state_abbr + '\n';
   csv += 'state,' + location.state + '\n';
-  csv += '"Nature Connection",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
+  csv += '"Connection to Nature",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
   csv += '"Cultural Fullfillment",' + dataStructure.HWBI_DOMAIN[2].weight + '\n';
   csv += '"Education",' + dataStructure.HWBI_DOMAIN[15].weight + '\n';
   csv += '"Health",' + dataStructure.HWBI_DOMAIN[4].weight + '\n';
@@ -1617,11 +1617,11 @@ const myconsts = [
   "Social Cohesion",
   "Safety and Security",
   "Resilience",
-  "Nature Connection",
+  "Connection to Nature",
   "Living Standards",
   "Leisure Time",
   "Health",
-  "Fulfillment through Culture",
+  "Cultural Fulfillment",
   "Education"
 ];
 
@@ -1642,11 +1642,11 @@ svg.append("g").style("font-size", "16px").call(d3.axisLeft(y));
 
 // Build color scale
 const myColor = {
-  "Nature Connection" : d3
+  "Connection to Nature" : d3
     .scaleLinear()
     .range(["#e8e8e8", "#82AC45"])
     .domain([0, 10]),
-  "Fulfillment through Culture" : d3
+  "Cultural Fulfillment" : d3
     .scaleLinear()
     .range(["#e8e8e8", "#998FE4"])
     .domain([0, 10]),
