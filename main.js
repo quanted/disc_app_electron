@@ -126,33 +126,39 @@ function createWindow() {
     },
     {
       label: "Good to Know",
-      click: () => {
-        const id = snapshots.length;
-        let win = new BrowserWindow({
-          width: 800,
-          height: 600,
-          frame: true,
-          title: `Good to Know - ${appTitle}`
-        });
-        win.setMenu(null);
-        snapshots[id] = win;
-        win.show();
-        // and load the index.html of the app.
-        win.loadURL(
-          url.format({
-            pathname: "goodtoknow.html",
-            protocol: PROTOCOL + ":",
-            slashes: true,
-            autoHideMenuBar: false
-          })
-        );
+      submenu: [
+        {
+          label: "Tips and Tricks",
+          click: () => {
+            const id = snapshots.length;
+            let win = new BrowserWindow({
+              width: 800,
+              height: 600,
+              frame: true,
+              title: `Good to Know - ${appTitle}`
+            });
+            win.setMenu(null);
+            snapshots[id] = win;
+            win.show();
+            // and load the index.html of the app.
+            win.loadURL(
+              url.format({
+                pathname: "goodtoknow.html",
+                protocol: PROTOCOL + ":",
+                slashes: true,
+                autoHideMenuBar: false
+              })
+            );
 
-        // garbage collection handle
-        win.on("closed", () => {
-          win = null;
-          snapshots[id] = null;
-        });
-      }
+            // garbage collection handle
+            win.on("closed", () => {
+              win = null;
+              snapshots[id] = null;
+            });
+          }
+        }
+      ]
+      
     }
   ];
 

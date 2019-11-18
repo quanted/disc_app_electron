@@ -1831,3 +1831,7 @@ ipcRenderer.on('toggleAbout', function() {
   $('#checkbox-modal-hide').removeAttr('checked')
   store.delete('checkbox1')
 });
+
+if (process.platform === 'darwin') {
+  $('.customize-close').html('&larr;');
+}
