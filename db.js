@@ -7,7 +7,11 @@ const fs = require('fs');
 let Store;
 
 try {
-  Store = require('electron-store');
+  if (process.platform === 'darwin') {
+    Store = require(path.resolve('node_modules/electron-store'));
+  } else {
+    Store = require('electron-store')
+  }
 } catch (e) { 
   console.log(e);
   try {

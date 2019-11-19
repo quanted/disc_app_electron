@@ -30,7 +30,7 @@ builder
   .build({
     win: ["default"],
     mac: ["default"],
-    targets: Platform.WINDOWS.createTarget(),
+    /* targets: Platform.WINDOWS.createTarget(), */
     config: config
   })
   .then(m => {
