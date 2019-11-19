@@ -590,7 +590,8 @@ function createDataStructure(obj) {
   "INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR " +
   "INNER JOIN Domains_Indicators ON Indicators_MetricVars.INDICATOR == Domains_Indicators.INDICATOR " + 
   "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN " + 
-  "ORDER BY DOMAIN ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
+  "LEFT OUTER JOIN DomainOrder ON MetricGroups_Domains.DOMAIN == DomainOrder.DOMAIN " + 
+  "ORDER BY DomainOrder.LIST_ORDER ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -882,7 +883,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
 
   let val;
 
-  val = dataStructure.HWBI_DOMAIN["Nature Connection"][valueType] +
+  val = dataStructure.HWBI_DOMAIN["Connection to Nature"][valueType] +
     (2.125496 + 
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 4.983393 +
       dataStructure.SERVICE_DOMAIN[key.S08].scenario_val * -4.639731 +
@@ -911,9 +912,9 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Nature Connection"].scenario_val = val;
+  dataStructure.HWBI_DOMAIN["Connection to Nature"].scenario_val = val;
 
-  val = dataStructure.HWBI_DOMAIN["Fulfillment through Culture"][valueType] +
+  val = dataStructure.HWBI_DOMAIN["Cultural Fulfillment"][valueType] +
     (1.241511 +
       dataStructure.SERVICE_DOMAIN[key.S03].scenario_val * 1.606393 +
       dataStructure.SERVICE_DOMAIN[key.S12].scenario_val * -0.437157 +
@@ -948,7 +949,7 @@ function calculateServiceHWBI(valueType = 'custom_val') {
   if (val > 1) {
     val = 1;
   }
-  dataStructure.HWBI_DOMAIN["Fulfillment through Culture"].scenario_val = val; 
+  dataStructure.HWBI_DOMAIN["Cultural Fulfillment"].scenario_val = val; 
 
   val = dataStructure.HWBI_DOMAIN["Education"][valueType] +
     (0.317409 +
@@ -1333,7 +1334,7 @@ ipcRenderer.on('save', (event, arg) => {
   csv += 'county,"' + location.county + '"\n';
   csv += 'state_abbr,' + location.state_abbr + '\n';
   csv += 'state,' + location.state + '\n';
-  csv += '"Nature Connection",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
+  csv += '"Connection to Nature",' + dataStructure.HWBI_DOMAIN[1].weight + '\n';
   csv += '"Cultural Fullfillment",' + dataStructure.HWBI_DOMAIN[2].weight + '\n';
   csv += '"Education",' + dataStructure.HWBI_DOMAIN[15].weight + '\n';
   csv += '"Health",' + dataStructure.HWBI_DOMAIN[4].weight + '\n';
@@ -1649,14 +1650,14 @@ const svg = d3
 // Labels of row and columns
 const myGroups = ["Domain"];
 const myconsts = [
-  "Social Cohesion",
-  "Safety and Security",
-  "Resilience",
-  "Nature Connection",
-  "Living Standards",
+  "Connection to Nature",
   "Leisure Time",
+  "Cultural Fulfillment",
+  "Social Cohesion",
+  "Resilience",
+  "Safety and Security",
+  "Living Standards",
   "Health",
-  "Fulfillment through Culture",
   "Education"
 ];
 
@@ -1677,11 +1678,11 @@ svg.append("g").style("font-size", "16px").call(d3.axisLeft(y));
 
 // Build color scale
 const myColor = {
-  "Nature Connection" : d3
+  "Connection to Nature" : d3
     .scaleLinear()
     .range(["#e8e8e8", "#82AC45"])
     .domain([0, 10]),
-  "Fulfillment through Culture" : d3
+  "Cultural Fulfillment" : d3
     .scaleLinear()
     .range(["#e8e8e8", "#998FE4"])
     .domain([0, 10]),
@@ -1866,3 +1867,7 @@ ipcRenderer.on('toggleAbout', function() {
   $('#checkbox-modal-hide').removeAttr('checked')
   store.delete('checkbox1')
 });
+
+if (process.platform === 'darwin') {
+  $('.customize-close').html('&larr;');
+}
