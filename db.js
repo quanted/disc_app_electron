@@ -1744,8 +1744,8 @@ function drawAsterPlot(data) {
     .range([195, 0])
     .domain([10, 0]);
 
-    const ticks = [5];
-    const tickLabels = ['Positive Influence →']
+    const ticks = [0, 5, 10];
+    const tickLabels = ['Less','Positive Influence →','More']
 
   const yAxis = d3
     .axisBottom()
