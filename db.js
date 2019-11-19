@@ -555,7 +555,8 @@ function createDataStructure(obj) {
   "INNER JOIN Indicators_MetricVars ON Indicators_MetricVars.METRIC_VAR == MetricVars.METRIC_VAR " +
   "INNER JOIN Domains_Indicators ON Indicators_MetricVars.INDICATOR == Domains_Indicators.INDICATOR " + 
   "INNER JOIN MetricGroups_Domains ON MetricGroups_Domains.DOMAIN == Domains_Indicators.DOMAIN " + 
-  "ORDER BY DOMAIN ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
+  "LEFT OUTER JOIN DomainOrder ON MetricGroups_Domains.DOMAIN == DomainOrder.DOMAIN " + 
+  "ORDER BY DomainOrder.LIST_ORDER ASC, INDICATOR ASC, MetricVars.METRIC_VAR ASC;";
 
   db.all(sql, [], (err, rows) => {
     if (err) {
@@ -1614,14 +1615,14 @@ const svg = d3
 // Labels of row and columns
 const myGroups = ["Domain"];
 const myconsts = [
-  "Social Cohesion",
-  "Safety and Security",
-  "Resilience",
   "Connection to Nature",
-  "Living Standards",
   "Leisure Time",
-  "Health",
   "Cultural Fulfillment",
+  "Social Cohesion",
+  "Resilience",
+  "Safety and Security",
+  "Living Standards",
+  "Health",
   "Education"
 ];
 

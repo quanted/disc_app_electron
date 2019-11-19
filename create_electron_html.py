@@ -37,16 +37,17 @@ service_metrics = cur.fetchall()
 #print(service_metrics)
 
 cur.execute("SELECT MetricVars.METRIC_VAR, MetricVars.METRIC_VAR_DESC, Domains.DOMAIN, Indicators.INDICATOR, MetricGroups_Domains.METRIC_GRP, MetricVars.MINVAL, " +
-        "MetricVars.MAXVAL, MetricVars.POS_NEG_METRIC, MetricVars.METRIC_VAR_DESC, MetricVars.UNITS, Indicators.INDICATOR_DESC, Domains.DOMAIN_DESC, MetricVars.METRIC, MetricVars.SOURCE " +
+        "MetricVars.MAXVAL, MetricVars.POS_NEG_METRIC, MetricVars.METRIC_VAR_DESC, MetricVars.UNITS, Indicators.INDICATOR_DESC, Domains.DOMAIN_DESC, MetricVars.METRIC, MetricVars.SOURCE, DomainOrder.LIST_ORDER " +
     "FROM MetricVars " +
     "INNER JOIN Indicators_MetricVars ON MetricVars.METRIC_VAR == Indicators_MetricVars.METRIC_VAR " +
     "INNER JOIN Domains_Indicators ON Domains_Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
     "INNER JOIN MetricGroups_Domains ON Domains_Indicators.DOMAIN == MetricGroups_Domains.DOMAIN " +
     "INNER JOIN Indicators ON Indicators.INDICATOR == Indicators_MetricVars.INDICATOR " +
     "INNER JOIN Domains ON Domains_Indicators.DOMAIN == Domains.DOMAIN " +
+    "INNER JOIN DomainOrder ON Domains_Indicators.DOMAIN == DomainOrder.DOMAIN " +
     "INNER JOIN MetricGroups ON MetricGroups_Domains.METRIC_GRP == MetricGroups.METRIC_GRP " +
     "WHERE MetricGroups.METRIC_GRP == 'HWBI' OR MetricGroups.METRIC_GRP == 'CRSI' " +
-    "ORDER BY Domains.DOMAIN ASC;")
+    "ORDER BY DomainOrder.LIST_ORDER ASC;")
 hwbi_metrics = cur.fetchall()
 
 try:
