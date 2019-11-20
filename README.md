@@ -4,20 +4,29 @@ Electron app for Decision Integration for Strong Communities (DISC) tool
 **Note**: Running this requires [Git](https://git-scm.com/), [Python 3](https://www.python.org/downloads/), and [Django](https://www.djangoproject.com/download/) on your system.
 ### Clone the qed_hwbi host project
 `git clone -b dev --recursive https://github.com/quanted/qed_hwbi.git`
-### Switch to the dev branch of hwbi_app and the facelift brances static_qed, and templates_qed
+### Switch to the dev branch of hwbi_app and the facelift brances static_qed and templates_qed
 `cd hwbi_app`  
 `git checkout dev`
 ### You will need to obtain DISC.db and citites.db from *somewhere* and put them in qed_hwbi\hwbi_app
 ## Electron App Compilation from Source
-**Note**: Running this requires [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/) (which includes npm) on your system.
+**Note**: Running this requires [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/) (which includes [npm](https://www.npmjs.com/)) on your system.
 ### Clone the repository to the qed_hwbi folder
 `$ git clone -b facelift https://github.com/quanted/disc_app_electron.git`
-### Run the python script to create index.html for the electron app from the qed_hwbi folder
+### Run the python script from the qed_hwbi folder to create index.html for the electron app
+This script copies the necessary files from static_hwbi and hwbi_app and generates the index.html using Django templates and files from the templates_hwbi repo.
+
 `python.exe .\manage.py shell`  
 `exec(open('disc_app_electron/create_electron_html.py').read())`
-### Go into the disc_app_electron repository
+### Go into the disc_app_electron directory
 `$ cd disc_app_electron`
 ### Install dependencies
+Dependencies are defined in disc_app_electron\package.json.
+
 `$ npm install`
 ### Run the app
 `$ npm start`
+
+## Building the application
+To build the application with Electron Builder enter the following while in qed_hwbi\disc_app_electron. The built program will appear in qed_hwbi\disc_app_electron\dist.
+
+`$ npm run dist`
